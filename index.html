@@ -19,22 +19,13 @@
   --sh2:0 20px 40px -10px rgba(0,0,0,0.12);
   --glass:rgba(255,255,255,0.75);
 }
-html,body{height:100%;overflow:hidden}
-body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;flex-direction:row;align-items:center;justify-content:center;padding:18px 14px;gap:14px;font-family:Inter,system-ui,sans-serif;color:var(--tx)}
+html,body{height:100%;height:100dvh;overflow:hidden;font-family:Inter,system-ui,sans-serif;color:var(--tx)}
 
-/* ── Side dashboard panel ── */
-.side-dash{display:flex;flex-direction:column;align-items:center;justify-content:space-between;width:52px;height:calc(100vh - 36px);max-height:900px;background:rgba(15,35,75,.55);border:1px solid rgba(126,179,247,.12);border-radius:18px;padding:16px 0;flex-shrink:0;backdrop-filter:blur(8px)}
-.side-dash a{display:flex;flex-direction:column;align-items:center;gap:10px;text-decoration:none;color:rgba(255,255,255,.5);transition:.2s;width:100%;padding:10px 0}
-.side-dash a:hover{color:#7eb3f7;background:rgba(26,78,140,.35)}
-.side-dash-ico{font-size:18px}
-.side-dash-txt{writing-mode:vertical-rl;text-orientation:mixed;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);transform:rotate(180deg)}
-.side-dash-arr{font-size:16px;transform:rotate(-90deg);display:inline-block}
-.side-dash-divider{width:24px;height:1px;background:rgba(255,255,255,.08)}
-.side-dash-dot{width:8px;height:8px;border-radius:50%;background:#2BB673;box-shadow:0 0 6px #2BB673;animation:blink2 2s infinite}
-@keyframes blink2{0%,100%{opacity:1}50%{opacity:.3}}
+/* ── Desktop: shell centrado con fondo ── */
+body{background:linear-gradient(135deg,#e0e7ff 0%,#f3f4f6 100%);display:flex;align-items:center;justify-content:center}
 
-/* ── Phone shell ── */
-.shell{width:390px;height:calc(100vh - 36px);max-height:900px;background:#0f0f0f;border-radius:52px;padding:13px;box-shadow:0 0 0 1px #252525,0 0 0 2.5px #0f0f0f,0 40px 90px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.07);flex-shrink:0;position:relative;display:flex;flex-direction:column}
+/* ── Phone shell (solo desktop) ── */
+.shell{width:390px;height:calc(100dvh - 36px);max-height:900px;background:#0f0f0f;border-radius:52px;padding:13px;box-shadow:0 0 0 1px #252525,0 0 0 2.5px #0f0f0f,0 40px 90px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.07);flex-shrink:0;position:relative;display:flex;flex-direction:column}
 .shell::before{content:'';position:absolute;left:-3.5px;top:108px;width:3.5px;height:30px;background:#1c1c1c;border-radius:2px 0 0 2px;box-shadow:0 44px 0 #1c1c1c,0 86px 0 #1c1c1c}
 .shell::after{content:'';position:absolute;right:-3.5px;top:158px;width:3.5px;height:62px;background:#1c1c1c;border-radius:0 2px 2px 0}
 .screen{width:364px;flex:1;min-height:0;border-radius:40px;overflow:hidden;position:relative;background:var(--bg)}
@@ -61,8 +52,44 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
 #splash,#onboard,#rolesel,.modal-bg{position:absolute!important;inset:0!important;display:none!important}
 /* App starts below the status bar (50px) so the Dynamic Island + time bar are never covered */
 #app{position:absolute!important;top:50px!important;left:0!important;right:0!important;bottom:0!important;display:flex!important}
-/* Panels stop above the bottom nav so the nav is always visible */
-.panel{position:absolute!important;top:50px!important;left:0!important;right:0!important;bottom:54px!important;z-index:500}
+/* ── Panel base: oculto fuera de pantalla ── */
+.panel{
+  position:absolute!important;
+  top:50px!important; left:0!important; right:0!important; bottom:56px!important;
+  display:flex!important; flex-direction:column; overflow:hidden;
+  background:var(--bg);
+  transform:translateY(105%);
+  transition:transform .32s cubic-bezier(.4,0,.2,1);
+  z-index:900;
+  visibility:hidden;
+  pointer-events:none;
+}
+/* ── Panel abierto: visible encima del nav ── */
+.panel.open{
+  transform:translateY(0)!important;
+  visibility:visible!important;
+  pointer-events:all!important;
+  z-index:950!important;
+}
+/* ── Panel de reporte: igual que .panel pero cubre también el tbar ── */
+#reportP{
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  background:var(--bg);
+  position:absolute;
+  top:0; left:0; right:0; bottom:56px;
+  z-index:9500;
+  transform:translateY(105%);
+  transition:transform .32s cubic-bezier(.4,0,.2,1);
+  visibility:hidden;
+  pointer-events:none;
+}
+#reportP.open{
+  transform:translateY(0);
+  visibility:visible;
+  pointer-events:all;
+}
 .modal-bg{z-index:700}
 .toast-stack{position:absolute!important;top:58px!important;left:12px!important;right:12px!important;z-index:9000!important;pointer-events:none;display:flex;flex-direction:column;gap:6px}
 
@@ -167,7 +194,7 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
 .rleg-line{width:18px;height:3px;border-radius:2px;flex-shrink:0}
 
 /* Bottom sheet */
-.bs{position:absolute;background:var(--glass);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);left:0;right:0;bottom:54px;z-index:300;background:var(--sf);border-radius:20px 20px 0 0;box-shadow:0 -8px 32px rgba(0,82,163,.14);transition:transform .3s cubic-bezier(.4,0,.2,1);border-top:2px solid rgba(0,82,163,.08)}
+.bs{position:absolute;background:var(--glass);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);left:0;right:0;bottom:56px;z-index:300;background:var(--sf);border-radius:20px 20px 0 0;box-shadow:0 -8px 32px rgba(0,82,163,.14);transition:transform .3s cubic-bezier(.4,0,.2,1);border-top:2px solid rgba(0,82,163,.08)}
 .bs-handle{width:36px;height:4px;background:var(--bd);border-radius:4px;margin:10px auto 0}
 .bs-mini{padding:10px 14px 14px}
 .bs-full{display:none;padding:0 14px 14px}
@@ -213,7 +240,7 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
 .da:active{transform:scale(.97)}
 
 /* Bottom nav — always on top */
-.bnav{height:56px;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:2px solid rgba(0,82,163,.08);display:flex;align-items:stretch;flex-shrink:0;position:relative;z-index:600;box-shadow:0 -4px 16px rgba(0,82,163,.08)}
+.bnav{height:56px;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:2px solid rgba(0,82,163,.08);display:flex;align-items:stretch;flex-shrink:0;position:relative;z-index:10000;box-shadow:0 -4px 16px rgba(0,82,163,.08)}
 .nt{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--t3);border:none;background:none;font-family:Inter,sans-serif;cursor:pointer;transition:.2s;position:relative}
 .nt.on{color:var(--p)}
 .nt svg{width:19px;height:19px;transition:.2s}
@@ -222,9 +249,8 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
 .nt-badge{position:absolute;top:6px;right:calc(50% - 12px);background:var(--r);color:#fff;font-size:8px;font-weight:800;padding:1px 4px;border-radius:6px;min-width:14px;text-align:center}
 .ni{position:absolute;top:0;height:3px;background:linear-gradient(90deg,#0052A3,#0066CC);border-radius:0 0 3px 3px;transition:all .3s cubic-bezier(.4,0,.2,1);width:20%;box-shadow:0 2px 8px rgba(0,82,163,.3)}
 
-/* ────── PANELS ────── */
-.panel{background:var(--glass);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);transform:translateY(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;visibility:hidden;pointer-events:none}
-.panel.open{transform:translateY(0);visibility:visible;pointer-events:all}
+/* Panel glass effect — no redefinir posición ni z-index aquí */
+.panel{ background:var(--glass); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); }
 .ph{position:sticky;top:0;background:transparent;padding:13px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;flex-shrink:0;z-index:10}
 .ph-t{font-size:15px;font-weight:800;flex:1;color:var(--tx)}
 .bk{width:30px;height:30px;border-radius:8px;background:var(--bg);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s;flex-shrink:0}
@@ -362,14 +388,93 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
 ::-webkit-scrollbar{width:2px}
 ::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
 
-/* Mobile full-screen */
-@media(max-width:480px){
-  html,body{background:var(--bg);padding:0;height:100%;height:100dvh;overflow:hidden;display:flex}
-  .side-dash{display:none}
-  .shell{width:100%;height:100%;max-height:none;border-radius:0;padding:0;background:transparent;box-shadow:none;flex:1}
+/* ── Reporte de incidente ── */
+.step-pill{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.step-d{width:20px;height:4px;border-radius:3px;background:var(--bd);transition:.3s}
+.step-d.act{background:var(--p)}
+.rep-hero{background:linear-gradient(135deg,#E63946,#ff4d5a);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:13px;margin-bottom:14px;cursor:pointer;border:none;width:100%;font-family:Inter,sans-serif;transition:all .2s cubic-bezier(.4,0,.2,1);box-shadow:0 6px 18px rgba(230,57,70,.3)}
+.rep-hero:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(230,57,70,.4)}
+.rep-hero:active{transform:scale(.98)}
+.rep-hero-ico{width:44px;height:44px;background:rgba(255,255,255,.18);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.rep-hero-t{color:#fff;font-size:14px;font-weight:800;text-align:left;line-height:1.2}
+.rep-hero-s{color:rgba(255,255,255,.75);font-size:11px;text-align:left;margin-top:2px}
+.rep-map-wrap{height:210px;border-radius:14px;overflow:hidden;position:relative;margin-bottom:10px;border:2px solid var(--bd)}
+.rep-map-hint{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);color:#fff;font-size:10px;font-weight:700;padding:4px 9px;border-radius:7px;z-index:500;pointer-events:none}
+.rep-loc-row{display:flex;align-items:center;gap:8px;background:var(--bg);border:1.5px solid var(--bd);border-radius:11px;padding:10px 12px;margin-bottom:9px;font-size:12px;color:var(--t2);transition:.2s}
+.rep-loc-row.set{border-color:var(--g);background:rgba(43,182,115,.06);color:var(--tx)}
+.rep-photo-area{border:2px dashed var(--bd);border-radius:13px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;background:none;width:100%;font-family:Inter,sans-serif;transition:.2s;margin-bottom:10px}
+.rep-photo-area:hover{border-color:var(--p);background:rgba(0,82,163,.04)}
+.rep-photo-preview{position:relative;margin-bottom:10px;border-radius:13px;overflow:hidden}
+.rep-photo-preview img{width:100%;max-height:190px;object-fit:cover;display:block}
+.rep-photo-del{position:absolute;top:7px;right:7px;background:rgba(0,0,0,.6);border:none;border-radius:50%;width:28px;height:28px;font-size:15px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.rep-desc{width:100%;border:1.5px solid var(--bd);border-radius:12px;padding:12px;min-height:78px;font-family:Inter,sans-serif;font-size:13px;color:var(--tx);background:var(--bg);resize:none;outline:none;margin-bottom:12px;transition:border .2s}
+.rep-desc:focus{border-color:var(--p)}
+
+/* ══ RESPONSIVE ══════════════════════════════════════════════════════
+   Móvil  (≤768px) : app ocupa toda la pantalla, sin shell
+   Tablet (769-1024px): shell centrado, sin bordes del teléfono
+   Desktop(≥1025px) : shell centrado con efecto de teléfono físico
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── Móvil: pantalla completa, sin chrome del teléfono ── */
+@media(max-width:768px){
+  html,body{
+    background:var(--bg);
+    padding:0;
+    width:100%;
+    height:100dvh;
+    overflow:hidden;
+  }
+  .shell{
+    width:100%;
+    height:100dvh;
+    max-height:none;
+    border-radius:0;
+    padding:0;
+    background:transparent;
+    box-shadow:none;
+    flex:1;
+  }
   .shell::before,.shell::after{display:none}
-  .screen{width:100%;height:100%;border-radius:0}
+  .screen{
+    width:100%;
+    height:100%;
+    border-radius:0;
+    overflow:hidden;
+  }
+  /* Ocultar elementos decorativos del shell físico */
   .island,.sbar{display:none}
+  /* En móvil el app empieza desde arriba (sin isla) */
+  #app{top:0!important}
+  .panel{top:0!important}
+}
+
+/* ── Tablet: shell flotante sin bordes físicos ── */
+@media(min-width:769px) and (max-width:1024px){
+  body{padding:16px}
+  .shell{
+    width:390px;
+    height:calc(100dvh - 32px);
+    max-height:860px;
+    border-radius:32px;
+    padding:0;
+    box-shadow:0 20px 60px rgba(0,0,0,.35);
+  }
+  .shell::before,.shell::after{display:none}
+  .screen{width:100%;border-radius:32px}
+  .island,.sbar{display:none}
+  #app{top:0!important}
+  .panel{top:0!important}
+}
+
+/* ── Desktop: shell completo con efecto de teléfono físico ── */
+@media(min-width:1025px){
+  body{padding:20px}
+  .shell{
+    width:390px;
+    height:calc(100dvh - 40px);
+    max-height:900px;
+  }
 }
 
 /* Dark Mode */
@@ -404,21 +509,6 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
 .leaflet-popup-tip { background: var(--glass) !important; backdrop-filter: blur(16px); }
 .leaflet-container a.leaflet-popup-close-button { color: var(--tx) !important; }
 
-/* Smooth Panel Transitions */
-.panel {
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-  transform: translateY(100%) scale(0.95);
-  opacity: 0;
-  pointer-events: none;
-  display: flex !important;
-  z-index: -1;
-}
-.panel.open {
-  transform: translateY(0) scale(1);
-  opacity: 1;
-  pointer-events: all;
-  z-index: 1000;
-}
 
 /* Route-sync notification banner */
 .sync-banner {
@@ -430,6 +520,7 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
   animation: syncSlide .4s cubic-bezier(0.16,1,0.3,1);
 }
 @keyframes syncSlide { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes blink2{0%,100%{opacity:1}50%{opacity:.25}}
 .sync-banner .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #FFD700; box-shadow: 0 0 6px #FFD700; animation: blink2 1s infinite; flex-shrink: 0; }
 
 </style>
@@ -503,6 +594,28 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
       <div class="bs-handle"></div>
 
       <!-- Passenger sheet -->
+      <div class="bs-mini" id="bsPas">
+        <div class="nbc" onclick="toast('Cargando info del Bus B12…','g')">
+          <div class="nb-ico">🚌</div>
+          <div style="flex:1">
+            <div class="nb-rt">Bus B12 · Miraflores → Centro</div>
+            <div class="nb-eta">4 <sub>min</sub></div>
+            <div class="nb-prog"><div class="nb-prog-fill" style="width:72%"></div></div>
+            <div class="occ-row"><div class="od" style="background:var(--g)"></div><span style="font-size:9px;color:var(--t3)">Poco lleno</span></div>
+          </div>
+        </div>
+        <div class="ub-row">
+          <div class="ub"><div class="ub-l">Siguiente</div><div class="ub-t">12 min</div><div class="ub-o"><div class="od" style="background:var(--y)"></div><div class="od" style="background:var(--y)"></div></div></div>
+          <div class="ub"><div class="ub-l">Posterior</div><div class="ub-t">19 min</div><div class="ub-o"><div class="od" style="background:var(--g)"></div></div></div>
+          <div class="ub"><div class="ub-l">C45 directo</div><div class="ub-t">8 min</div><div class="ub-o"><div class="od" style="background:var(--g)"></div></div></div>
+          <div class="ub"><div class="ub-l">Metropolitano</div><div class="ub-t">22 min</div><div class="ub-o"><div class="od" style="background:var(--r)"></div><div class="od" style="background:var(--r)"></div></div></div>
+        </div>
+        <button class="rep-btn" onclick="ntab(2);openReport()">
+          <svg width="14" height="14" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Reportar Incidente
+        </button>
+      </div>
+
       <!-- Driver sheet -->
       <div class="drv-sheet" id="bsDrv">
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px">
@@ -529,7 +642,7 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
           </div>
         </div>
         <div class="drv-acts">
-          <button class="da" style="background:#fff7d6;color:#92400e" onclick="toast('Reporte enviado a la base ✓','y')">⚠️ Reportar</button>
+          <button class="da" style="background:#fff7d6;color:#92400e" onclick="openReport()">⚠️ Reportar</button>
           <button class="da" style="background:#dbeafe;color:#1e40af" onclick="op('chatP')">💬 Base</button>
           <button class="da" style="background:var(--r);color:#fff" onclick="toast('¡Solicitud de apoyo enviada urgente!','r')">🆘 Apoyo</button>
         </div>
@@ -541,10 +654,86 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
       <div class="ni" id="ni"></div>
       <button class="nt on" onclick="ntab(0);ca()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg><span>Inicio</span></button>
       <button class="nt" onclick="ntab(1);op('searchP')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span>Rutas</span></button>
-
+      <button class="nt" id="repNavBtn" onclick="ntab(2);openReport()" style="color:var(--r)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Reportar</span></button>
       <button class="nt" onclick="ntab(3);op('chatP')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span>Chat IA</span></button>
       <button class="nt" onclick="ntab(4);op('profileP')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Perfil</span></button>
     </nav>
+
+    <!-- ── REPORTAR INCIDENTE — pantalla única ── -->
+    <div id="reportP">
+
+      <!-- Header -->
+      <div class="ph" style="background:var(--sf);border-bottom:2px solid rgba(230,57,70,.25);flex-shrink:0">
+        <button class="bk" onclick="closeReport()"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+        <div class="ph-t">Reportar Incidente</div>
+        <div style="display:flex;align-items:center;gap:5px;background:rgba(230,57,70,.1);border-radius:8px;padding:4px 9px">
+          <div style="width:7px;height:7px;border-radius:50%;background:var(--r);animation:blink2 1.2s infinite"></div>
+          <span style="font-size:10px;font-weight:700;color:var(--r)">ATU EN VIVO</span>
+        </div>
+      </div>
+
+      <!-- Formulario único y scrollable -->
+      <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:14px">
+
+        <!-- 1. Tipo de incidente -->
+        <div>
+          <div style="font-size:10px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">1 · Tipo de incidente</div>
+          <div class="rt-grid">
+            <button class="rtb" onclick="selRepType(this,'Accidente')"><div class="rtb-i">🚨</div>Accidente</button>
+            <button class="rtb" onclick="selRepType(this,'Congestión')"><div class="rtb-i">🚦</div>Congestión</button>
+            <button class="rtb" onclick="selRepType(this,'Semáforo averiado')"><div class="rtb-i">🔴</div>Semáforo</button>
+            <button class="rtb" onclick="selRepType(this,'Bus averiado')"><div class="rtb-i">🚌</div>Bus averiado</button>
+            <button class="rtb" onclick="selRepType(this,'Paradero bloqueado')"><div class="rtb-i">🚏</div>Paradero</button>
+            <button class="rtb" onclick="selRepType(this,'Otro')"><div class="rtb-i">📋</div>Otro</button>
+          </div>
+        </div>
+
+        <!-- 2. Ubicación -->
+        <div>
+          <div style="font-size:10px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">2 · Ubicación</div>
+          <div class="rep-map-wrap" style="height:160px;margin-bottom:8px">
+            <div id="repMap" style="height:100%;width:100%"></div>
+            <div class="rep-map-hint">📍 Toca el mapa para marcar</div>
+          </div>
+          <div class="rep-loc-row" id="repLocRow">
+            <svg width="13" height="13" fill="none" stroke="var(--t3)" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span id="repLocTxt" style="flex:1;font-size:11px">Sin marcar — toca el mapa o usa tu ubicación</span>
+          </div>
+          <button onclick="useRepMyLoc()" style="width:100%;background:rgba(0,82,163,.07);border:1.5px solid rgba(0,82,163,.18);border-radius:11px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;color:var(--p);margin-top:6px">
+            📍 Usar mi ubicación actual
+          </button>
+        </div>
+
+        <!-- 3. Evidencia -->
+        <div>
+          <div style="font-size:10px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">3 · Evidencia (opcional)</div>
+          <div id="repPhotoArea" class="rep-photo-area" style="padding:14px" onclick="document.getElementById('repPhotoInput').click()">
+            <div style="font-size:24px">📷</div>
+            <div style="font-size:12px;font-weight:700;color:var(--tx)">Tomar foto / Subir imagen</div>
+            <div style="font-size:10px;color:var(--t3)">Cámara, galería o archivo — opcional</div>
+          </div>
+          <input type="file" id="repPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="previewRepPhoto(this)">
+          <div id="repPhotoPreview" class="rep-photo-preview" style="display:none">
+            <img id="repPhotoImg" alt="Foto del incidente">
+            <button class="rep-photo-del" onclick="clearRepPhoto()">×</button>
+          </div>
+        </div>
+
+        <!-- 4. Comentario -->
+        <div>
+          <div style="font-size:10px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">4 · Comentario (opcional)</div>
+          <textarea id="repDescTxt" class="rep-desc" style="margin-bottom:0" placeholder="Describe lo que ocurrió — ej: 'bus volcado bloquea carril derecho'…"></textarea>
+        </div>
+
+        <!-- Botón enviar -->
+        <button class="rep-submit" id="repSubmitBtn" onclick="submitRepIncident()">
+          🚨 Enviar Reporte a la ATU
+        </button>
+        <div style="height:6px"></div>
+
+      </div>
+    </div>
+
   </div><!-- /app -->
 
   <!-- ── PANELS ── -->
@@ -663,6 +852,15 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
         <div class="pf-chip">✨ Viajero Frecuente · 142 viajes este mes</div>
       </div>
       <div class="pb" style="background:var(--bg)">
+        <!-- CTA Reportar Incidente -->
+        <button class="rep-hero" onclick="openReport()">
+          <div class="rep-hero-ico">🚨</div>
+          <div>
+            <div class="rep-hero-t">Reportar Incidente</div>
+            <div class="rep-hero-s">Marca ubicación · Adjunta foto · Envía a la ATU</div>
+          </div>
+          <svg style="margin-left:auto;flex-shrink:0" width="16" height="16" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
         <div class="sec-l" style="margin-bottom:9px">Mis estadísticas del mes</div>
         <div class="stat-row">
           <div class="stat-c"><div class="stat-lbl">Viajes</div><div class="stat-v">142</div><div class="stat-sub">+18 vs anterior</div></div>
@@ -766,22 +964,6 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
 </div><!-- /shell -->
 
 <!-- Side panel — Dashboard ATU -->
-<div class="side-dash">
-  <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
-    <div style="width:32px;height:32px;background:linear-gradient(135deg,#1A4E8C,#2563eb);border-radius:9px;display:flex;align-items:center;justify-content:center">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-    </div>
-    <div class="side-dash-dot"></div>
-  </div>
-  <a href="dashboard.html" target="_blank" title="Abrir Dashboard ATU">
-    <div class="side-dash-txt">Dashboard ATU</div>
-    <div class="side-dash-arr">→</div>
-  </a>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
-    <div class="side-dash-divider"></div>
-    <div style="font-size:9px;color:rgba(255,255,255,.25);font-weight:700;letter-spacing:.04em;writing-mode:vertical-rl;transform:rotate(180deg)">CONTROL</div>
-  </div>
-</div>
 
 <script>
 // ── ROUTE SYNC (dashboard → index) ──
@@ -1194,6 +1376,7 @@ function setMode(m){
   if(document.getElementById('mD')) document.getElementById('mD').classList.toggle('on',m==='driver');
   if(document.getElementById('dvBar')) document.getElementById('dvBar').style.display=m==='driver'?'flex':'none';
   if(document.getElementById('bs')) document.getElementById('bs').style.display=m==='passenger'||m==='driver'?'block':'none';
+  if(document.getElementById('bsPas')) document.getElementById('bsPas').style.display=m==='passenger'?'block':'none';
   if(document.getElementById('bsDrv')) document.getElementById('bsDrv').style.display=m==='driver'?'flex':'none';
   if(m==='driver'){
     if(document.getElementById('grn')) document.getElementById('grn').textContent='Conductor · MT-2347';
@@ -1212,13 +1395,41 @@ function setMode(m){
 }
 
 // ── NAVIGATION ──
+function _srch(show){ const e=document.querySelector('.sbar-srch'); if(e) e.style.display=show?'':'none'; }
+
 function ntab(i){
   document.querySelectorAll('.nt').forEach((t,j)=>t.classList.toggle('on',j===i));
+  // 5 botones × 20% c/u — indicador queda centrado en el botón activo
   document.getElementById('ni').style.left=(i*20)+'%';
+  _srch(i===0); // barra de búsqueda solo en Inicio
+  // El botón Reportar (índice 2) tiene su propio color; restaurar los demás
+  document.querySelectorAll('.nt').forEach((t,j)=>{
+    if(j!==2) t.style.color='';
+  });
 }
-function ca(){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('open'));}
-function op(id){document.getElementById(id).classList.add('open');}
-function cl(id){document.getElementById(id).classList.remove('open');}
+function ca(){
+  _closeAllPanels();
+  _srch(true);
+}
+function op(id){
+  _closeAllPanels();
+  document.getElementById(id).classList.add('open');
+  _srch(false);
+}
+function cl(id){
+  document.getElementById(id).classList.remove('open');
+  if(!document.querySelector('.panel.open') && !document.getElementById('reportP').classList.contains('open')) _srch(true);
+}
+function _closeAllPanels(){
+  // Cerrar paneles normales
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('open'));
+  // Cerrar reporte si estaba abierto
+  var rp=document.getElementById('reportP');
+  if(rp && rp.classList.contains('open')){
+    rp.classList.remove('open');
+    if(_repMap){ try{_repMap.remove();}catch(e){} _repMap=null; _repMkr=null; }
+  }
+}
 function closeMod(id){document.getElementById(id).classList.remove('open');}
 
 // ── ROUTE SELECT ──
@@ -1397,6 +1608,134 @@ function toast(msg,type='g'){
   w.appendChild(t);
   setTimeout(()=>t.style.cssText+=';opacity:0;transform:translateY(-8px);transition:.3s',3000);
   setTimeout(()=>t.remove(),3350);
+}
+
+// ── REPORT INCIDENT ──
+let repType='', repLat=null, repLng=null, _repMap=null, _repMkr=null;
+
+function openReport(){
+  // Cerrar todo lo demás
+  document.querySelectorAll('.panel.open').forEach(function(p){ p.classList.remove('open'); });
+
+  // Abrir con la misma animación que los panels
+  var rp = document.getElementById('reportP');
+  rp.classList.add('open');
+  _srch(false);
+
+  // Reset estado del formulario
+  repType=''; repLat=null; repLng=null;
+  document.querySelectorAll('#reportP .rtb').forEach(function(b){ b.classList.remove('sel'); });
+  document.getElementById('repLocRow').classList.remove('set');
+  document.getElementById('repLocTxt').textContent='Sin marcar — toca el mapa o usa tu ubicación';
+  document.getElementById('repPhotoInput').value='';
+  document.getElementById('repPhotoArea').style.display='flex';
+  document.getElementById('repPhotoPreview').style.display='none';
+  document.getElementById('repDescTxt').value='';
+
+  // Destruir mapa anterior e inicializar nuevo
+  if(_repMap){ try{_repMap.remove();}catch(e){} _repMap=null; _repMkr=null; }
+  _initRepMap();
+
+  // En modo conductor precargar posición del bus
+  if(mode==='driver'){ repLat=-12.0876; repLng=-77.0283; _setRepLoc(repLat,repLng,'Tu posición en ruta'); }
+}
+
+function closeReport(){
+  document.getElementById('reportP').classList.remove('open');
+  if(_repMap){ try{_repMap.remove();}catch(e){} _repMap=null; _repMkr=null; }
+  ntab(0);
+  _srch(true);
+}
+
+function selRepType(btn, type){
+  document.querySelectorAll('#reportP .rtb').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  repType=type;
+}
+
+function goRepStep(step){
+  ['rStep1','rStep2','rStep3'].forEach((id,i)=>{
+    const e=document.getElementById(id); if(e) e.style.display=i===(step-1)?'block':'none';
+  });
+  ['sd1','sd2','sd3'].forEach((id,i)=>{
+    const e=document.getElementById(id); if(e) e.classList.toggle('act',i<step);
+  });
+  const titles=['Reportar Incidente','Marcar Ubicación','Foto y Descripción'];
+  const t=document.getElementById('repPanelTitle'); if(t) t.textContent=titles[step-1];
+  if(step===2) _initRepMap();
+  if(step===3){
+    const st=document.getElementById('repSumType'); if(st) st.textContent=repType||'—';
+    const sl=document.getElementById('repSumLoc'); if(sl) sl.textContent=repLat?`${repLat.toFixed(4)}, ${repLng.toFixed(4)}`:'—';
+  }
+}
+
+function _initRepMap(){
+  if(_repMap) return;
+  setTimeout(()=>{
+    const el=document.getElementById('repMap');
+    if(!el||!window.L) return;
+    const cx=repLat||-12.0983, cy=repLng||-77.0366;
+    _repMap=L.map('repMap',{zoomControl:false,attributionControl:false}).setView([cx,cy],15);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(_repMap);
+    // Marcador de posición actual (azul)
+    const uIc=L.divIcon({className:'',html:'<div style="width:12px;height:12px;background:#0052A3;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,82,163,.5)"></div>',iconSize:[12,12],iconAnchor:[6,6]});
+    L.marker([-12.0983,-77.0366],{icon:uIc,interactive:false}).addTo(_repMap);
+    // Si ya hay coords de conductor, colocar marcador
+    if(repLat) _placeRepMkr(repLat,repLng);
+    // Click en mapa para marcar incidente
+    _repMap.on('click',e=>{ _setRepLoc(e.latlng.lat,e.latlng.lng); });
+  },200);
+}
+
+function _placeRepMkr(lat,lng){
+  const incIc=L.divIcon({className:'',html:'<div style="width:30px;height:30px;background:rgba(230,57,70,.15);border:2.5px solid #E63946;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 2px 10px rgba(230,57,70,.45)">📍</div>',iconSize:[30,30],iconAnchor:[15,15]});
+  if(_repMkr && _repMap) _repMap.removeLayer(_repMkr);
+  _repMkr=L.marker([lat,lng],{icon:incIc}).addTo(_repMap);
+  _repMap.setView([lat,lng],16,{animate:true});
+}
+
+function _setRepLoc(lat,lng,label){
+  repLat=lat; repLng=lng;
+  const txt=label||`${lat.toFixed(5)}, ${lng.toFixed(5)} — Ubicación marcada`;
+  document.getElementById('repLocTxt').textContent=txt;
+  document.getElementById('repLocRow').classList.add('set');
+  if(_repMap) _placeRepMkr(lat,lng);
+}
+
+function useRepMyLoc(){
+  _setRepLoc(-12.0983,-77.0366,'San Isidro, Lima — Tu ubicación actual');
+  if(!_repMap) _initRepMap();
+}
+
+function previewRepPhoto(input){
+  if(!input.files||!input.files[0]) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    document.getElementById('repPhotoImg').src=e.target.result;
+    document.getElementById('repPhotoArea').style.display='none';
+    document.getElementById('repPhotoPreview').style.display='block';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function clearRepPhoto(){
+  document.getElementById('repPhotoInput').value='';
+  document.getElementById('repPhotoArea').style.display='flex';
+  document.getElementById('repPhotoPreview').style.display='none';
+}
+
+function submitRepIncident(){
+  if(!repType){ toast('Selecciona un tipo de incidente','r'); return; }
+  closeReport();
+  document.getElementById('successOv').classList.add('show');
+  // Agregar a notificaciones
+  const locStr=repLat?`${repLat.toFixed(4)}, ${repLng.toFixed(4)}`:'Tu zona';
+  NOTIFS_DATA.unshift({ic:'🚨',t:`Reporte enviado: ${repType}`,b:`Ubicación: ${locStr}`,ago:'Ahora mismo',c:'var(--r)'});
+  setTimeout(()=>{
+    document.getElementById('successOv').classList.remove('show');
+    renderNotifs();
+    toast('✅ Reporte enviado — la ATU lo revisa en menos de 2 minutos','g');
+  },2800);
 }
 
 // ── LIVE ALERTS ──
