@@ -972,7 +972,9 @@ function mergeRoutesFromDashboard(saved){
   saved.forEach(sr => {
     const rd = ROUTES_DATA.find(r => r.id === sr.id);
     if(rd && sr.coords && sr.coords.length >= 2){
-      rd.coords = sr.coords;
+      // Guardar como waypoints originales para que OSRM siempre use coords limpias
+      rd._waypts = sr.coords.slice();
+      rd.coords  = sr.coords.slice();
       rd.col = sr.color || rd.col;
       rd.nm  = sr.name  || rd.nm;
     }
@@ -1019,21 +1021,21 @@ function rebuildMapRoutes(){
   busMs.forEach(b => { try { b.m.remove(); } catch(e){} });
   busMs = [];
 
-  // Redraw all routes using updated ROUTES_DATA coords
+  // Redibujar todas las rutas usando siempre los waypoints originales (_waypts)
   Promise.all(ROUTES_DATA.map(async r => {
-    const shadow = L.polyline(r.coords, {color:r.out, weight:8, opacity:.35, lineJoin:'round', lineCap:'round'}).addTo(map);
-    const line   = L.polyline(r.coords, {color:r.col, weight:4.5, opacity:.92, lineJoin:'round', lineCap:'round'})
+    const waypts = r._waypts || r.coords;
+    const shadow = L.polyline(waypts, {color:r.out, weight:8, opacity:.35, lineJoin:'round', lineCap:'round'}).addTo(map);
+    const line   = L.polyline(waypts, {color:r.col, weight:4.5, opacity:.92, lineJoin:'round', lineCap:'round'})
       .bindPopup(`<b style="color:${r.col}">${r.id}</b><br>${r.nm}`).addTo(map);
 
-    // Road-snap; si OSRM falla se densifica por interpolación
-    const res = await osrmRoute(r.coords, false);
-    if(res && res[0] && res[0].coords.length > 10){
-      r.coords = res[0].coords;
-    } else {
-      r.coords = densifyRoute(r.coords);
-    }
-    line.setLatLngs(r.coords);
-    shadow.setLatLngs(r.coords);
+    const res = await osrmRoute(waypts, false);
+    const finalCoords = (res && res[0] && res[0].coords.length > 10)
+      ? res[0].coords
+      : densifyRoute(waypts);
+
+    r.coords = finalCoords;
+    line.setLatLngs(finalCoords);
+    shadow.setLatLngs(finalCoords);
 
     const stopsGroup = L.layerGroup().addTo(map);
     r.stops.forEach(s => {
@@ -1044,14 +1046,14 @@ function rebuildMapRoutes(){
     });
     routeLayers.push({shadow, line, r, stopsGroup});
   })).then(() => {
-    // Respawn animated buses on the updated routes
-    const bInits = [{ri:0,pct:.2},{ri:0,pct:.7},{ri:1,pct:.4},{ri:2,pct:.3},{ri:3,pct:.1},{ri:3,pct:.8}];
+    const bInits = [{ri:0,pct:.12},{ri:0,pct:.68},{ri:1,pct:.35},{ri:2,pct:.3},{ri:3,pct:.08},{ri:3,pct:.78}];
     bInits.forEach(b => {
       const r  = ROUTES_DATA[b.ri];
-      const pi = Math.floor(r.coords.length * b.pct);
-      const pos = r.coords[pi] || r.coords[0];
+      const coords = r.coords;
+      const pi = Math.floor(coords.length * b.pct);
+      const pos = coords[pi] || coords[0];
       const ic = L.divIcon({className:'smooth-marker', html:`<div style="background:${r.col};color:#fff;border-radius:6px;padding:3px 7px;font-size:9px;font-weight:800;border:2px solid rgba(255,255,255,.5);box-shadow:0 3px 10px rgba(0,0,0,.28);white-space:nowrap;line-height:1.2">${r.id}</div>`, iconSize:[36,18], iconAnchor:[18,9]});
-      busMs.push({m: L.marker(pos, {icon:ic, zIndexOffset:500}).addTo(map), ri:b.ri, pi, dir:1});
+      busMs.push({m: L.marker(pos, {icon:ic, zIndexOffset:500}).addTo(map), ri:b.ri, pi, dir:1, coords});
     });
   });
 }
@@ -1255,53 +1257,64 @@ function initMap(){
   map=L.map('map',{zoomControl:false,attributionControl:false}).setView([-12.0720,-77.0400],13);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
 
-  Promise.all(ROUTES_DATA.map(async r=>{
-    const shadow=L.polyline(r.coords,{color:r.out,weight:8,opacity:.35,lineJoin:'round',lineCap:'round'}).addTo(map);
-    const line=L.polyline(r.coords,{color:r.col,weight:4.5,opacity:.92,lineJoin:'round',lineCap:'round'}).bindPopup(`<b style="color:${r.col}">${r.id}</b><br>${r.nm}`).addTo(map);
+  // Guardar waypoints originales ANTES de cualquier mutación
+  ROUTES_DATA.forEach(r => { if(!r._waypts) r._waypts = r.coords.slice(); });
 
-    // OSRM ajusta la ruta a calles reales; si falla → interpolación densa como fallback
-    const res = await osrmRoute(r.coords, false);
-    if(res && res[0] && res[0].coords.length > 10){
-      r.coords = res[0].coords;          // denso, sigue calles reales
-    } else {
-      r.coords = densifyRoute(r.coords); // fallback: 200+ pts interpolados
-    }
-    line.setLatLngs(r.coords);
-    shadow.setLatLngs(r.coords);
+  Promise.all(ROUTES_DATA.map(async r=>{
+    // Siempre usar los waypoints originales para dibujar la línea inicial
+    const shadow=L.polyline(r._waypts,{color:r.out,weight:8,opacity:.35,lineJoin:'round',lineCap:'round'}).addTo(map);
+    const line=L.polyline(r._waypts,{color:r.col,weight:4.5,opacity:.92,lineJoin:'round',lineCap:'round'}).bindPopup(`<b style="color:${r.col}">${r.id}</b><br>${r.nm}`).addTo(map);
+
+    // OSRM con waypoints originales (no con coords ya densificadas)
+    const res = await osrmRoute(r._waypts, false);
+    const finalCoords = (res && res[0] && res[0].coords.length > 10)
+      ? res[0].coords
+      : densifyRoute(r._waypts);
+
+    // Actualizar polyline Y coords con el MISMO array
+    r.coords = finalCoords;
+    line.setLatLngs(finalCoords);
+    shadow.setLatLngs(finalCoords);
 
     const stopsGroup = L.layerGroup().addTo(map);
     r.stops.forEach(s=>{
       const ic=L.divIcon({className:'smooth-marker',html:`<div style="width:10px;height:10px;border-radius:50%;background:#fff;border:2.5px solid ${r.col};box-shadow:0 1px 4px rgba(0,0,0,.2)"></div>`,iconSize:[10,10],iconAnchor:[5,5]});
       L.marker([s.lat,s.lng],{icon:ic}).bindPopup(`<b>${s.nm}</b><br><span style="color:${r.col};font-size:11px;font-weight:700">${r.id}</span>`).addTo(stopsGroup);
     });
+    // Guardar referencia al polyline para que la animación use siempre el mismo array
     routeLayers.push({shadow,line,r,stopsGroup});
   })).then(() => {
-    // Buses inicializados DESPUÉS de que las coords ya son densas
+    // Buses creados DESPUÉS de que todos los coords estén finalizados
     const bInits=[
-      {ri:0,pct:0.15},{ri:0,pct:0.65},
-      {ri:1,pct:0.25},{ri:1,pct:0.75},
-      {ri:2,pct:0.40},
-      {ri:3,pct:0.10},{ri:3,pct:0.55},{ri:3,pct:0.85}
+      {ri:0,pct:0.12},{ri:0,pct:0.62},
+      {ri:1,pct:0.20},{ri:1,pct:0.72},
+      {ri:2,pct:0.38},
+      {ri:3,pct:0.08},{ri:3,pct:0.50},{ri:3,pct:0.82}
     ];
     bInits.forEach(b=>{
       const r=ROUTES_DATA[b.ri];
-      const pi=Math.floor(r.coords.length * b.pct);
-      const pos=r.coords[pi] || r.coords[0];
+      const coords=r.coords;
+      const pi=Math.floor(coords.length * b.pct);
+      const pos=coords[pi] || coords[0];
       const ic=L.divIcon({className:'smooth-marker',html:`<div style="background:${r.col};color:#fff;border-radius:6px;padding:3px 7px;font-size:9px;font-weight:800;border:2px solid rgba(255,255,255,.5);box-shadow:0 3px 10px rgba(0,0,0,.28);white-space:nowrap;line-height:1.2">${r.id}</div>`,iconSize:[36,18],iconAnchor:[18,9]});
-      busMs.push({m:L.marker(pos,{icon:ic,zIndexOffset:500}).addTo(map),ri:b.ri,pi,dir:b.pct>0.5?-1:1});
+      // Guardar referencia DIRECTA al array de coords (mismo que el polyline)
+      busMs.push({m:L.marker(pos,{icon:ic,zIndexOffset:500}).addTo(map),ri:b.ri,pi,dir:b.pct>0.5?-1:1,coords});
     });
 
-    // Animación: paso proporcional → recorre la ruta en ~16 segundos (200pts × 80ms)
-    setInterval(()=>{
-      busMs.forEach(b=>{
-        const coords=ROUTES_DATA[b.ri].coords;
-        const step=Math.max(1, Math.ceil(coords.length/200));
-        b.pi+=b.dir*step;
-        if(b.pi>=coords.length-1){b.pi=coords.length-1;b.dir=-1;}
-        if(b.pi<=0){b.pi=0;b.dir=1;}
-        b.m.setLatLng(coords[b.pi]);
-      });
-    }, 80);
+    // Un único setInterval — cada bus usa su referencia propia al array de coords
+    if(!window._busAnimInterval){
+      window._busAnimInterval = setInterval(()=>{
+        busMs.forEach(b=>{
+          const coords = b.coords;
+          if(!coords || coords.length<2) return;
+          const step=Math.max(1, Math.ceil(coords.length/160));
+          b.pi+=b.dir*step;
+          if(b.pi>=coords.length-1){b.pi=coords.length-1;b.dir=-1;}
+          if(b.pi<=0){b.pi=0;b.dir=1;}
+          b.m.setLatLng(coords[b.pi]);
+        });
+      }, 80);
+    }
   });
 
   // User marker
