@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SmartFlow Lima — Centro de Control ATU</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#1A4E8C;--primary-light:#2563eb;--primary-dark:#0f2d5a;
+  --green:#2BB673;--yellow:#F5A623;--red:#E63946;
+  --bg:#0f1724;--surface:#161f2e;--surface2:#1e2a3d;--surface3:#243044;
+  --border:#2a3a52;--text:#e8edf5;--muted:#6b7fa0;--mono:JetBrains Mono,monospace;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;font-size:14px}
+/* LAYOUT */
+.layout{display:flex;height:100vh}
+/* SIDEBAR */
+.sidebar{width:220px;min-width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:10}
+.sidebar-logo{padding:18px 16px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sidebar-logo svg{flex-shrink:0}
+.sidebar-logo .brand-text{font-size:13px;font-weight:700;color:#fff;line-height:1.2}
+.sidebar-logo .brand-sub{font-size:11px;color:var(--muted);font-weight:400}
+.sidebar-nav{flex:1;padding:10px 0;overflow-y:auto}
+.nav-section{padding:8px 16px 4px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;color:var(--muted);font-weight:500;font-size:13px;transition:all .15s;border-left:3px solid transparent;user-select:none}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:rgba(26,78,140,.18);color:#6ba3f5;border-left-color:#1A4E8C}
+.nav-item .nav-icon{width:16px;height:16px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:700}
+.sidebar-footer{padding:12px 16px;border-top:1px solid var(--border)}
+.user-info{display:flex;align-items:center;gap:8px}
+.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#2563eb);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;font-weight:600;color:var(--text)}
+.user-role{font-size:10px;color:var(--muted)}
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.topbar-title{font-weight:700;font-size:15px;color:#fff}
+.topbar-badge{background:rgba(43,182,115,.15);color:var(--green);border:1px solid rgba(43,182,115,.3);font-size:11px;padding:2px 8px;border-radius:12px;font-weight:600}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.clock{font-family:var(--mono);font-size:13px;color:var(--muted);background:var(--surface2);padding:4px 10px;border-radius:6px;border:1px solid var(--border)}
+.icon-btn{width:32px;height:32px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;position:relative}
+.icon-btn:hover{background:var(--surface3)}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--red);border-radius:50%;border:1px solid var(--surface)}
+.content{flex:1;overflow:hidden;position:relative}
+/* SECTIONS */
+.section{display:none;height:100%;overflow-y:auto}
+.section.active{display:flex;flex-direction:column}
+/* KPI CARDS */
+.kpi-row{display:flex;gap:12px;padding:16px 20px 0;flex-shrink:0}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;flex:1;min-width:0}
+.kpi-label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.kpi-value{font-size:26px;font-weight:700;color:#fff;margin:4px 0 2px;font-family:var(--mono);line-height:1}
+.kpi-delta{font-size:11px;font-weight:600}
+.kpi-delta.up{color:var(--green)}
+.kpi-delta.down{color:var(--red)}
+.kpi-delta.warn{color:var(--yellow)}
+.kpi-bar{height:3px;background:var(--border);border-radius:3px;margin-top:10px;overflow:hidden}
+.kpi-bar-fill{height:100%;border-radius:3px;transition:width 1s ease}
+/* GRID LAYOUTS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 20px;flex:1;min-height:0}
+.grid-3{display:grid;grid-template-columns:2fr 1.2fr 1fr;gap:12px;padding:12px 20px;flex:1;min-height:0}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;padding:12px 20px;flex:1;min-height:0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.card-header{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.card-title{font-size:13px;font-weight:600;color:#fff}
+.card-body{flex:1;overflow:hidden;position:relative}
+.card-scroll{height:100%;overflow-y:auto;padding:10px 14px}
+/* MAP */
+#map-main,#map-flota,#map-routes{height:100%;width:100%}
+.leaflet-container{background:#1a2740!important}
+/* CAMERA GRID */
+.cam-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;height:100%}
+.cam-cell{position:relative;background:#000;overflow:hidden;cursor:pointer}
+.cam-cell canvas{width:100%;height:100%;display:block}
+.cam-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.85));padding:8px;font-size:11px;font-family:var(--mono);color:#0ff}
+.cam-status{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+.cam-time{position:absolute;top:6px;left:6px;font-family:var(--mono);font-size:10px;color:#fff;opacity:.8}
+.cam-ai{position:absolute;top:24px;left:6px;font-family:var(--mono);font-size:9px;color:#0ff;opacity:.9}
+.cam-cell.expanded{grid-column:span 2;grid-row:span 2}
+/* ALERTS */
+.alert-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.alert-item:last-child{border-bottom:none}
+.alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.alert-dot.red{background:var(--red);box-shadow:0 0 6px var(--red)}
+.alert-dot.yellow{background:var(--yellow);box-shadow:0 0 6px var(--yellow)}
+.alert-dot.green{background:var(--green);box-shadow:0 0 6px var(--green)}
+.alert-text{font-size:12px;color:var(--text);line-height:1.5}
+.alert-meta{font-size:10px;color:var(--muted);margin-top:2px;font-family:var(--mono)}
+.alert-action{margin-left:auto;flex-shrink:0}
+/* REPORTS TABLE */
+.table-wrap{overflow-x:auto;height:100%}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{padding:10px 12px;text-align:left;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1}
+tbody td{padding:10px 12px;border-bottom:1px solid rgba(42,58,82,.5);color:var(--text)}
+tbody tr:hover{background:var(--surface2)}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.badge.red{background:rgba(230,57,70,.15);color:#ff6b75;border:1px solid rgba(230,57,70,.3)}
+.badge.yellow{background:rgba(245,166,35,.15);color:#f5c842;border:1px solid rgba(245,166,35,.3)}
+.badge.green{background:rgba(43,182,115,.15);color:#2BB673;border:1px solid rgba(43,182,115,.3)}
+.badge.blue{background:rgba(37,99,235,.15);color:#6ba3f5;border:1px solid rgba(37,99,235,.3)}
+/* SEMAFOROS */
+.semaf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;padding:14px}
+.semaf-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s}
+.semaf-card:hover{border-color:var(--primary-light);background:var(--surface3)}
+.semaf-id{font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:4px}
+.semaf-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px}
+.semaf-lights{display:flex;gap:6px;align-items:center}
+.s-light{width:14px;height:14px;border-radius:50%;background:var(--surface);border:1px solid var(--border);transition:all .3s}
+.s-light.on-red{background:var(--red);box-shadow:0 0 8px var(--red)}
+.s-light.on-yellow{background:var(--yellow);box-shadow:0 0 8px var(--yellow)}
+.s-light.on-green{background:var(--green);box-shadow:0 0 8px var(--green)}
+.semaf-cycle{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:6px}
+.semaf-status{font-size:10px;margin-top:4px;font-weight:600}
+/* CHARTS */
+.chart-wrap{position:relative;flex:1;min-height:0;padding:10px}
+/* FLOTA LIST */
+.flota-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(42,58,82,.4);cursor:pointer}
+.flota-item:hover{background:rgba(26,78,140,.1);margin:0 -14px;padding-left:14px;padding-right:14px}
+.flota-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.flota-icon.green{background:rgba(43,182,115,.15);border:1px solid rgba(43,182,115,.3)}
+.flota-icon.yellow{background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.3)}
+.flota-icon.red{background:rgba(230,57,70,.15);border:1px solid rgba(230,57,70,.3)}
+.flota-name{font-size:12px;font-weight:600;color:var(--text)}
+.flota-meta{font-size:10px;color:var(--muted);font-family:var(--mono)}
+.flota-speed{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted)}
+/* ROUTE EDITOR */
+.route-editor{display:flex;flex-direction:column;gap:12px;padding:14px;height:100%;overflow-y:auto}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.form-input,.form-select,.form-textarea{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;font-family:inherit;outline:none;transition:border .15s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--primary-light)}
+.form-textarea{resize:vertical;min-height:80px}
+.form-row{display:flex;gap:10px}
+.form-row .form-group{flex:1}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-light)}
+.btn-success{background:var(--green);color:#fff}
+.btn-danger{background:var(--red);color:#fff}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--surface2);color:var(--text)}
+/* TOAST */
+.toast-container{position:fixed;top:60px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:12px 16px;min-width:280px;box-shadow:0 8px 24px rgba(0,0,0,.4);animation:slideIn .3s ease;display:flex;align-items:flex-start;gap:10px}
+.toast.red{border-left:3px solid var(--red)}
+.toast.yellow{border-left:3px solid var(--yellow)}
+.toast.green{border-left:3px solid var(--green)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;width:500px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:16px}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+/* Leaflet custom icons */
+.bus-marker{background:var(--green);color:#fff;border-radius:6px;width:28px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:2px solid rgba(255,255,255,.4);font-family:var(--mono)}
+.cam-marker{background:rgba(0,170,255,.2);border:2px solid #0af;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px}
+.incident-marker{background:rgba(230,57,70,.2);border:2px solid var(--red);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px}
+/* PULSE */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.pulse{animation:pulse 2s infinite}
+/* LIVE INDICATOR */
+.live{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--red);font-weight:700}
+.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--red);animation:pulse 1.5s infinite}
+/* OVERVIEW CHARTS ROW */
+.charts-row{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;padding:0 20px 12px;flex-shrink:0;height:200px}
+</style>
+</head>
+<body>
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#1A4E8C"/><path d="M8 16h16M8 11h10M8 21h7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+      <div>
+        <div class="brand-text">SmartFlow Lima</div>
+        <div class="brand-sub">Centro de Control ATU</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Principal</div>
+      <div class="nav-item active" data-section="overview">
+        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        Resumen General
+      </div>
+      <div class="nav-item" data-section="monitoreo">
+        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Monitoreo Tráfico
+        <span class="nav-badge pulse">3</span>
+      </div>
+      <div class="nav-item" data-section="camaras">
+        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        Cámaras en Vivo
+      </div>
+      <div class="nav-item" data-section="flota">
+        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8zM5.5 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM18.5 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>
+        Flota GPS
+      </div>
+      <div class="nav-section">Gestión</div>
+      <div class="nav-item" data-section="rutas">
+        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        Crear / Editar Rutas
+      </div>
+      <div class="nav-item" data-section="semaforos">
+        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="17" r="2"/></svg>
+        Semáforos
+      </div>
+      <div class="nav-item" data-section="alertas">
+        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Alertas
+        <span class="nav-badge pulse" id="alertsBadge">5</span>
+      </div>
+      <div class="nav-item" data-section="reclamos">
+        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Reclamos
+        <span class="nav-badge">12</span>
+      </div>
+      <div class="nav-item" data-section="reporteria">
+        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Reportería
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="avatar">JR</div>
+        <div>
+          <div class="user-name">Ing. J. Ríos</div>
+          <div class="user-role">Supervisor ATU</div>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <a href="index.html" style="font-size:11px;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:4px">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          Ver App Pasajero
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title" id="topbarTitle">Resumen General</div>
+      <span class="live">EN VIVO</span>
+      <span class="topbar-badge">Sistema Operativo</span>
+      <div class="topbar-right">
+        <div class="clock" id="clockDisplay">00:00:00</div>
+        <div class="icon-btn" onclick="toggleNotifPanel()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <span class="notif-dot"></span>
+        </div>
+        <div class="icon-btn">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- ==================== OVERVIEW ==================== -->
+      <section class="section active" id="section-overview">
+        <div class="kpi-row">
+          <div class="kpi">
+            <div class="kpi-label">Vehículos Activos</div>
+            <div class="kpi-value" id="kpi-vehicles">1,247</div>
+            <div class="kpi-delta up">▲ +34 vs ayer</div>
+            <div class="kpi-bar"><div class="kpi-bar-fill" style="width:78%;background:var(--green)"></div></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Alertas Activas</div>
+            <div class="kpi-value" id="kpi-alerts" style="color:var(--red)">5</div>
+            <div class="kpi-delta down">▲ +2 última hora</div>
+            <div class="kpi-bar"><div class="kpi-bar-fill" style="width:22%;background:var(--red)"></div></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Nivel de Congestión</div>
+            <div class="kpi-value" id="kpi-cong" style="color:var(--yellow)">43%</div>
+            <div class="kpi-delta warn">▲ Moderado</div>
+            <div class="kpi-bar"><div class="kpi-bar-fill" style="width:43%;background:var(--yellow)"></div></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Velocidad Media</div>
+            <div class="kpi-value">22 <small style="font-size:14px;color:var(--muted)">km/h</small></div>
+            <div class="kpi-delta down">▼ -4 vs promedio</div>
+            <div class="kpi-bar"><div class="kpi-bar-fill" style="width:55%;background:var(--primary-light)"></div></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Reportes Ciudadanos</div>
+            <div class="kpi-value" id="kpi-reports">84</div>
+            <div class="kpi-delta up">▲ +7 hoy</div>
+            <div class="kpi-bar"><div class="kpi-bar-fill" style="width:60%;background:var(--primary)"></div></div>
+          </div>
+        </div>
+
+        <div class="charts-row" style="margin-top:12px">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Volumen de Tráfico (últimas 24h)</div></div>
+            <div class="chart-wrap"><canvas id="chartTraffic"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Incidentes por Tipo</div></div>
+            <div class="chart-wrap"><canvas id="chartIncidents"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Nivel de Servicio</div></div>
+            <div class="chart-wrap"><canvas id="chartService"></canvas></div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.8fr 1fr;gap:12px;padding:0 20px 16px;flex:1;min-height:0;height:220px">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Mapa de Calor — Congestión Lima</div>
+              <span style="margin-left:auto;font-size:11px;color:var(--muted)">Actualizado hace 30s</span>
+            </div>
+            <div class="card-body"><div id="map-main" style="height:100%;border-radius:0 0 10px 10px"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Alertas Recientes</div></div>
+            <div class="card-scroll" id="alertsList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== MONITOREO ==================== -->
+      <section class="section" id="section-monitoreo">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;height:100%">
+          <div style="position:relative;border-right:1px solid var(--border)">
+            <div style="position:absolute;top:10px;left:10px;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;color:#fff">
+              🚦 Estado Semafórico — Lima
+            </div>
+            <div id="map-semaf" style="height:100%"></div>
+          </div>
+          <div style="display:flex;flex-direction:column">
+            <div style="padding:10px 14px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center">
+              <span style="font-size:13px;font-weight:600;color:#fff">Incidentes Activos</span>
+              <span class="badge red" id="incidentCount">3 Críticos</span>
+              <button class="btn btn-ghost" style="margin-left:auto;font-size:11px" onclick="addRandomIncident()">+ Simular</button>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:12px 14px" id="incidentsList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== CÁMARAS ==================== -->
+      <section class="section" id="section-camaras">
+        <div style="padding:10px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);flex-shrink:0">
+          <span style="font-size:13px;font-weight:600;color:#fff">Cámaras Urbanas — Lima Metropolitana</span>
+          <span class="live">EN VIVO</span>
+          <span style="margin-left:auto;font-size:11px;color:var(--muted)">8/8 cámaras activas</span>
+          <select class="form-select" style="width:auto;font-size:11px;padding:5px 10px" id="camLayout" onchange="setCamLayout(this.value)">
+            <option value="4">4 cámaras</option>
+            <option value="9">9 cámaras (grid)</option>
+          </select>
+        </div>
+        <div style="flex:1;padding:12px 20px;display:grid;gap:8px;min-height:0" id="camGridContainer">
+          <!-- generated by JS -->
+        </div>
+      </section>
+
+      <!-- ==================== FLOTA GPS ==================== -->
+      <section class="section" id="section-flota">
+        <div style="display:grid;grid-template-columns:1fr 320px;height:100%;gap:0">
+          <div style="position:relative">
+            <div style="position:absolute;top:10px;left:10px;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;color:#fff;font-weight:600">
+              🚌 Flota Activa — 1,247 unidades
+            </div>
+            <div id="map-flota" style="height:100%"></div>
+          </div>
+          <div style="background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column">
+            <div style="padding:12px 14px;border-bottom:1px solid var(--border)">
+              <input class="form-input" placeholder="Buscar unidad..." style="width:100%;font-size:12px">
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:4px 14px" id="flotaList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== RUTAS ==================== -->
+      <section class="section" id="section-rutas">
+        <div style="display:grid;grid-template-columns:340px 1fr;height:100%;gap:0">
+          <div style="background:var(--surface);border-right:1px solid var(--border);overflow-y:auto">
+            <div class="route-editor">
+              <div style="font-size:14px;font-weight:700;color:#fff">Editor de Rutas</div>
+              <div class="form-group">
+                <label class="form-label">Nombre de Ruta</label>
+                <input class="form-input" placeholder="Ej: Ruta 36 — Miraflores Express">
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Tipo</label>
+                  <select class="form-select">
+                    <option>Regular</option>
+                    <option>Expreso</option>
+                    <option>Temporal / Desvío</option>
+                    <option>Emergencia</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Estado</label>
+                  <select class="form-select">
+                    <option>Activa</option>
+                    <option>Borrador</option>
+                    <option>Suspendida</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Punto de Origen</label>
+                <input class="form-input" placeholder="Buscar paradero de origen..." id="routeOrigin">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Punto de Destino</label>
+                <input class="form-input" placeholder="Buscar paradero de destino..." id="routeDest">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Horario de Operación</label>
+                <div class="form-row">
+                  <input class="form-input" type="time" value="05:00">
+                  <input class="form-input" type="time" value="23:00">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Frecuencia (minutos)</label>
+                <input class="form-input" type="number" value="8" min="1" max="60">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Flota Asignada (unidades)</label>
+                <input class="form-input" type="number" value="12" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Notas</label>
+                <textarea class="form-textarea" placeholder="Información adicional sobre la ruta..."></textarea>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="showToast('Ruta guardada como borrador','green')">💾 Guardar Borrador</button>
+                <button class="btn btn-success" onclick="showToast('¡Ruta publicada! Los conductores ya la reciben.','green')">🚀 Publicar Ruta</button>
+                <button class="btn btn-ghost" onclick="showToast('Simulación iniciada...','yellow')">🔬 Simular Impacto</button>
+              </div>
+            </div>
+          </div>
+          <div style="position:relative">
+            <div style="position:absolute;top:10px;left:10px;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;color:#fff;font-weight:600">
+              Haz click en el mapa para trazar la ruta
+            </div>
+            <div id="map-routes" style="height:100%"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== SEMÁFOROS ==================== -->
+      <section class="section" id="section-semaforos">
+        <div style="padding:10px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0">
+          <span style="font-size:13px;font-weight:600;color:#fff">Control Semafórico — Lima Metropolitana</span>
+          <span class="badge yellow">8 con ciclos subóptimos</span>
+          <button class="btn btn-ghost" style="margin-left:auto;font-size:11px" onclick="showToast('Optimización IA iniciada para todos los semáforos...','yellow')">⚡ Optimizar Todo con IA</button>
+        </div>
+        <div style="flex:1;overflow-y:auto" id="semafGrid"></div>
+      </section>
+
+      <!-- ==================== ALERTAS ==================== -->
+      <section class="section" id="section-alertas">
+        <div style="padding:10px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0">
+          <span style="font-size:13px;font-weight:600;color:#fff">Alertas del Sistema</span>
+          <span class="badge red pulse">5 Críticas</span>
+          <button class="btn btn-ghost" style="margin-left:auto;font-size:11px" onclick="clearAlerts()">Marcar todas como leídas</button>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:12px 20px" id="alertasFull"></div>
+      </section>
+
+      <!-- ==================== RECLAMOS ==================== -->
+      <section class="section" id="section-reclamos">
+        <div style="padding:10px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0">
+          <span style="font-size:13px;font-weight:600;color:#fff">Gestión de Reclamos Ciudadanos</span>
+          <span class="badge red">12 Pendientes</span>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <select class="form-select" style="width:auto;font-size:11px;padding:5px 10px">
+              <option>Todos los tipos</option>
+              <option>Congestión</option>
+              <option>Accidente</option>
+              <option>Semáforo</option>
+              <option>Bus averiado</option>
+            </select>
+            <select class="form-select" style="width:auto;font-size:11px;padding:5px 10px">
+              <option>Todos los estados</option>
+              <option>Pendiente</option>
+              <option>En revisión</option>
+              <option>Resuelto</option>
+            </select>
+          </div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:0 20px 16px">
+          <div class="table-wrap"><table id="reclamosTable"></table></div>
+        </div>
+      </section>
+
+      <!-- ==================== REPORTERÍA ==================== -->
+      <section class="section" id="section-reporteria">
+        <div style="display:grid;grid-template-columns:300px 1fr;height:100%;gap:0">
+          <div style="background:var(--surface);border-right:1px solid var(--border);padding:16px;overflow-y:auto">
+            <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:14px">Generador de Reportes</div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label class="form-label">Tipo de Reporte</label>
+              <select class="form-select" id="reportType">
+                <option>Validaciones por estación</option>
+                <option>Incidencias por corredor</option>
+                <option>Cumplimiento de rutas</option>
+                <option>Flota operativa</option>
+                <option>Reclamos por servicio</option>
+                <option>Pasaje promedio</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label class="form-label">Período</label>
+              <select class="form-select">
+                <option>Hoy</option>
+                <option>Última semana</option>
+                <option>Último mes</option>
+                <option selected>Últimos 3 meses</option>
+                <option>Año actual</option>
+                <option>Rango personalizado</option>
+              </select>
+            </div>
+            <div class="form-row" style="margin-bottom:12px">
+              <div class="form-group">
+                <label class="form-label">Desde</label>
+                <input class="form-input" type="date" value="2026-03-01">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Hasta</label>
+                <input class="form-input" type="date" value="2026-05-30">
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label class="form-label">Corredor</label>
+              <select class="form-select">
+                <option>Todos los corredores</option>
+                <option>Corredor Javier Prado</option>
+                <option>Corredor Arequipa</option>
+                <option>Metropolitano</option>
+                <option>Metro Línea 1</option>
+              </select>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">
+              <button class="btn btn-primary" onclick="showToast('Generando reporte...','yellow');setTimeout(()=>showToast('Reporte listo','green'),2000)">📊 Generar Reporte</button>
+              <button class="btn btn-success" onclick="showToast('Exportando a Excel...','green')">📥 Exportar Excel</button>
+              <button class="btn btn-ghost" onclick="showToast('Exportando a PDF...','green')">📄 Exportar PDF</button>
+              <button class="btn btn-ghost" onclick="showToast('Programando envío automático...','yellow')">🔄 Programar Envío</button>
+            </div>
+          </div>
+          <div style="overflow-y:auto;padding:16px 20px">
+            <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:14px">Vista Previa — Validaciones por Estación (Últimos 3 meses)</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div class="card" style="height:220px">
+                <div class="card-header"><div class="card-title">Pasajeros por Estación</div></div>
+                <div class="chart-wrap"><canvas id="chartRepBar"></canvas></div>
+              </div>
+              <div class="card" style="height:220px">
+                <div class="card-header"><div class="card-title">Tendencia Mensual</div></div>
+                <div class="chart-wrap"><canvas id="chartRepLine"></canvas></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">Resumen por Corredor</div></div>
+              <div class="card-scroll">
+                <table id="reportTable" style="width:100%"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- TOASTS -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- INCIDENT MODAL -->
+<div class="modal-overlay" id="incidentModal">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Detalle del Incidente</div>
+    <div id="modalBody"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-primary" onclick="showToast('Equipo asignado al incidente','green');closeModal()">Asignar Equipo</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const LIMA = [-12.0464, -77.0428];
+
+const CAMERAS = [
+  {id:'CAM-001',name:'Javier Prado / Arequipa',lat:-12.0876,lng:-77.0365,status:'active',vehicles:47,pedestrians:12},
+  {id:'CAM-002',name:'Aviación / Javier Prado',lat:-12.0876,lng:-77.0283,status:'active',vehicles:63,pedestrians:8},
+  {id:'CAM-003',name:'28 de Julio / Arequipa',lat:-12.0736,lng:-77.0365,status:'warning',vehicles:29,pedestrians:34},
+  {id:'CAM-004',name:'Plaza Mayor — Jr. de la Unión',lat:-12.0464,lng:-77.0297,status:'active',vehicles:18,pedestrians:87},
+  {id:'CAM-005',name:'Angamos / Arequipa',lat:-12.1176,lng:-77.0365,status:'active',vehicles:55,pedestrians:21},
+  {id:'CAM-006',name:'La Marina / Brasil',lat:-12.0634,lng:-77.0856,status:'active',vehicles:71,pedestrians:15},
+  {id:'CAM-007',name:'Benavides / Arequipa',lat:-12.1067,lng:-77.0365,status:'active',vehicles:38,pedestrians:19},
+  {id:'CAM-008',name:'Tomás Valle / Universitaria',lat:-12.0087,lng:-77.0634,status:'inactive',vehicles:0,pedestrians:0},
+];
+
+const SEMAFOROS = [
+  {id:'SEM-001',name:'Javier Prado & Av. Arequipa',phase:'green',cycle:90,optimal:75,status:'suboptimo',lat:-12.0876,lng:-77.0365},
+  {id:'SEM-002',name:'Aviación & Javier Prado',phase:'red',cycle:120,optimal:90,status:'critico',lat:-12.0876,lng:-77.0283},
+  {id:'SEM-003',name:'28 de Julio & Arequipa',phase:'yellow',cycle:60,optimal:55,status:'ok',lat:-12.0736,lng:-77.0365},
+  {id:'SEM-004',name:'Plaza Grau & Wilson',phase:'green',cycle:85,optimal:80,status:'ok',lat:-12.0521,lng:-77.0298},
+  {id:'SEM-005',name:'Angamos & Arequipa',phase:'red',cycle:110,optimal:70,status:'critico',lat:-12.1176,lng:-77.0365},
+  {id:'SEM-006',name:'Naranjal & Universitaria',phase:'green',cycle:75,optimal:70,status:'ok',lat:-11.9798,lng:-77.0423},
+  {id:'SEM-007',name:'Paseo de la República & Benavides',phase:'yellow',cycle:95,optimal:80,status:'suboptimo',lat:-12.1067,lng:-77.0298},
+  {id:'SEM-008',name:'La Marina & Brasil',phase:'red',cycle:140,optimal:90,status:'critico',lat:-12.0634,lng:-77.0856},
+  {id:'SEM-009',name:'Tomás Valle & Faucett',phase:'green',cycle:70,optimal:70,status:'ok',lat:-12.0087,lng:-77.0634},
+  {id:'SEM-010',name:'Nicolás Arriola & Javier Prado',phase:'red',cycle:100,optimal:85,status:'suboptimo',lat:-12.0823,lng:-77.0023},
+  {id:'SEM-011',name:'Canaval y Moreyra & Rivera N.',phase:'green',cycle:80,optimal:75,status:'ok',lat:-12.0983,lng:-77.0366},
+  {id:'SEM-012',name:'Larco & Reducto',phase:'yellow',cycle:65,optimal:60,status:'ok',lat:-12.1185,lng:-77.0283},
+];
+
+const INCIDENTS = [
+  {id:'INC-087',type:'Accidente',desc:'Colisión múltiple, 2 vehículos involucrados, carril derecho bloqueado',loc:'Javier Prado Km 8.2',time:'14:23',severity:'red',lat:-12.0876,lng:-77.0283},
+  {id:'INC-086',type:'Congestión Severa',desc:'Cola de más de 2 km, velocidad promedio 8 km/h',loc:'Av. Arequipa cdra. 42-50',time:'14:18',severity:'red',lat:-12.0876,lng:-77.0365},
+  {id:'INC-085',type:'Bus Averiado',desc:'Bus MT-2234 fuera de servicio, pasajeros derivados a MT-2356',loc:'Paradero San Isidro 7',time:'14:10',severity:'yellow',lat:-12.0983,lng:-77.0366},
+  {id:'INC-084',type:'Paradero Saturado',desc:'Más de 80 pasajeros esperando, frecuencia reducida',loc:'Paradero Naranjal - Metropolitano',time:'13:55',severity:'yellow',lat:-11.9798,lng:-77.0423},
+  {id:'INC-083',type:'Semáforo Averiado',desc:'Semáforo sin señal, genera retraso en flujo',loc:'La Marina & Brasil',time:'13:40',severity:'red',lat:-12.0634,lng:-77.0856},
+];
+
+const FLOTA = [
+  {id:'MT-1023',route:'Ruta B12',driver:'C. Mendoza',speed:34,status:'green',loc:'Av. Arequipa cdra 28',next:'Paradero Larcomar 3 min',lat:-12.0983,lng:-77.0365},
+  {id:'MT-2347',route:'Ruta C45',driver:'A. Torres',speed:12,status:'yellow',loc:'Javier Prado Este Km 6',next:'Paradero La Cultura 6 min',lat:-12.0876,lng:-77.0283},
+  {id:'MT-0891',route:'Ruta A07',driver:'M. Quispe',speed:41,status:'green',loc:'Av. La Marina 520',next:'Paradero Brasil 2 min',lat:-12.0634,lng:-77.0856},
+  {id:'MT-3412',route:'Ruta D23',driver:'R. Flores',speed:0,status:'red',loc:'Paradero Grau',next:'Averiado — sin ETA',lat:-12.0521,lng:-77.0298},
+  {id:'MT-0456',route:'Ruta E09',driver:'J. Huanca',speed:28,status:'green',loc:'Av. Universitaria cdra 14',next:'Paradero UNI 4 min',lat:-12.0087,lng:-77.0634},
+  {id:'MT-1789',route:'Ruta F15',driver:'S. Ramos',speed:22,status:'green',loc:'Av. Angamos 840',next:'Paradero Miraflores 5 min',lat:-12.1176,lng:-77.0365},
+  {id:'MT-2100',route:'Ruta B12',driver:'P. Vargas',speed:0,status:'green',loc:'Terminal Sur',next:'Sale en 8 min',lat:-12.1234,lng:-77.0312},
+  {id:'MT-0034',route:'Ruta G02',driver:'L. Castro',speed:19,status:'yellow',loc:'Jr. Lampa cdra 3',next:'Paradero Lima Centro 7 min',lat:-12.0464,lng:-77.0297},
+];
+
+// ===== CLOCK =====
+function updateClock(){
+  const now = new Date();
+  document.getElementById('clockDisplay').textContent = now.toLocaleTimeString('es-PE',{hour12:false});
+}
+setInterval(updateClock,1000); updateClock();
+
+// ===== NAVIGATION =====
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    item.classList.add('active');
+    const sec = item.dataset.section;
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.getElementById('section-'+sec).classList.add('active');
+    document.getElementById('topbarTitle').textContent = item.textContent.trim().replace(/\d+/g,'').trim();
+    onSectionOpen(sec);
+  });
+});
+
+function onSectionOpen(sec){
+  if(sec==='monitoreo' && !window._mapSemafInit) initMapSemaf();
+  if(sec==='flota' && !window._mapFlotaInit) initMapFlota();
+  if(sec==='rutas' && !window._mapRoutesInit) initMapRoutes();
+  if(sec==='camaras') initCameras();
+  if(sec==='semaforos') renderSemaforos();
+  if(sec==='alertas') renderAlertasFull();
+  if(sec==='reclamos') renderReclamos();
+  if(sec==='reporteria') initReportCharts();
+}
+
+// ===== MAIN MAP (OVERVIEW) =====
+let mainMap;
+function initMainMap(){
+  mainMap = L.map('map-main',{zoomControl:true,attributionControl:false}).setView(LIMA,12);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(mainMap);
+
+  // Heatmap circles (simulated)
+  const hotspots = [
+    {lat:-12.0876,lng:-77.0365,r:400,color:'#E63946',opacity:.35},
+    {lat:-12.0876,lng:-77.0283,r:350,color:'#E63946',opacity:.3},
+    {lat:-12.1176,lng:-77.0365,r:300,color:'#F5A623',opacity:.25},
+    {lat:-12.0636,lng:-77.0856,r:250,color:'#F5A623',opacity:.22},
+    {lat:-12.0087,lng:-77.0634,r:200,color:'#2BB673',opacity:.18},
+    {lat:-12.0983,lng:-77.0366,r:280,color:'#2BB673',opacity:.15},
+    {lat:-12.0464,lng:-77.0297,r:180,color:'#F5A623',opacity:.2},
+  ];
+  hotspots.forEach(h=>{
+    L.circle([h.lat,h.lng],{radius:h.r,color:'transparent',fillColor:h.color,fillOpacity:h.opacity}).addTo(mainMap);
+  });
+
+  // Camera markers
+  CAMERAS.forEach(cam=>{
+    const icon = L.divIcon({className:'',html:`<div style="background:rgba(0,170,255,.25);border:1.5px solid #0af;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:#0af">📷</div>`,iconSize:[18,18],iconAnchor:[9,9]});
+    L.marker([cam.lat,cam.lng],{icon}).bindPopup(`<b>${cam.id}</b><br>${cam.name}<br>🚗 ${cam.vehicles} veh/min`).addTo(mainMap);
+  });
+
+  // Incident markers
+  INCIDENTS.forEach(inc=>{
+    const color = inc.severity==='red'?'#E63946':'#F5A623';
+    const icon = L.divIcon({className:'',html:`<div style="background:${color}22;border:2px solid ${color};width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px">⚠️</div>`,iconSize:[22,22],iconAnchor:[11,11]});
+    L.marker([inc.lat,inc.lng],{icon}).bindPopup(`<b>${inc.type}</b><br>${inc.loc}<br>${inc.desc}`).addTo(mainMap);
+  });
+
+  // Bus route lines
+  const routeCoords = [
+    [[-12.1185,-77.0283],[-12.1067,-77.0323],[-12.0983,-77.0356],[-12.0876,-77.0388],[-12.0731,-77.0406],[-12.0521,-77.0352],[-12.0464,-77.0297]],
+    [[-12.0564,-77.1197],[-12.0521,-77.0985],[-12.0487,-77.0756],[-12.0464,-77.0428],[-12.0634,-77.0380],[-12.0983,-77.0366]],
+    [[-11.9298,-77.0456],[-11.9756,-77.0423],[-12.0156,-77.0389],[-12.0464,-77.0428],[-12.0678,-77.0134],[-12.0834,-76.9892]],
+  ];
+  const colors = ['#2BB673','#1A4E8C','#F5A623'];
+  routeCoords.forEach((coords,i)=>{
+    L.polyline(coords,{color:colors[i],weight:3,opacity:.7,dashArray:i===2?'6,4':null}).addTo(mainMap);
+  });
+}
+
+// ===== SEMAF MAP =====
+let semafMap;
+function initMapSemaf(){
+  window._mapSemafInit=true;
+  semafMap = L.map('map-semaf',{zoomControl:true,attributionControl:false}).setView(LIMA,12);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(semafMap);
+
+  SEMAFOROS.forEach(sem=>{
+    const color = sem.status==='critico'?'#E63946':sem.status==='suboptimo'?'#F5A623':'#2BB673';
+    const icon = L.divIcon({className:'',html:`<div style="background:${color}33;border:2px solid ${color};width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px">🚦</div>`,iconSize:[20,20],iconAnchor:[10,10]});
+    L.marker([sem.lat,sem.lng],{icon}).bindPopup(`
+      <b>${sem.id}</b><br>${sem.name}<br>
+      Ciclo actual: ${sem.cycle}s | Óptimo: ${sem.optimal}s<br>
+      Estado: <b style="color:${color}">${sem.status.toUpperCase()}</b>
+    `).addTo(semafMap);
+  });
+
+  INCIDENTS.forEach(inc=>{
+    const color = inc.severity==='red'?'#E63946':'#F5A623';
+    const icon = L.divIcon({className:'',html:`<div style="background:${color}22;border:2px solid ${color};width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px">⚠️</div>`,iconSize:[22,22],iconAnchor:[11,11]});
+    L.marker([inc.lat,inc.lng],{icon}).on('click',()=>openIncident(inc)).addTo(semafMap);
+  });
+
+  renderIncidentsList();
+}
+
+// ===== FLOTA MAP =====
+let flotaMap, busMarkers=[];
+function initMapFlota(){
+  window._mapFlotaInit=true;
+  flotaMap = L.map('map-flota',{zoomControl:true,attributionControl:false}).setView(LIMA,12);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(flotaMap);
+
+  busMarkers = FLOTA.map(bus=>{
+    const color = bus.status==='green'?'#2BB673':bus.status==='yellow'?'#F5A623':'#E63946';
+    const icon = L.divIcon({className:'',html:`<div style="background:${color};color:#fff;border-radius:5px;padding:2px 5px;font-size:10px;font-weight:700;white-space:nowrap;border:1px solid rgba(255,255,255,.3)">${bus.id}</div>`,iconSize:[60,18],iconAnchor:[30,9]});
+    return {marker:L.marker([bus.lat,bus.lng],{icon}).bindPopup(`<b>${bus.id}</b> — ${bus.route}<br>Chofer: ${bus.driver}<br>Velocidad: ${bus.speed} km/h<br>Próximo: ${bus.next}`).addTo(flotaMap), data:bus, lat:bus.lat, lng:bus.lng};
+  });
+
+  renderFlotaList();
+  // Animate buses
+  setInterval(animateBuses, 3000);
+}
+
+function animateBuses(){
+  busMarkers.forEach(b=>{
+    if(b.data.speed>0){
+      b.lat += (Math.random()-.5)*0.0015;
+      b.lng += (Math.random()-.5)*0.0015;
+      b.marker.setLatLng([b.lat,b.lng]);
+    }
+  });
+}
+
+// ===== ROUTES MAP =====
+let routesMap, routePoints=[], routeLine;
+function initMapRoutes(){
+  window._mapRoutesInit=true;
+  routesMap = L.map('map-routes',{zoomControl:true,attributionControl:false}).setView(LIMA,12);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(routesMap);
+
+  // Existing routes
+  const routeCoords = [
+    [[-12.1185,-77.0283],[-12.0983,-77.0356],[-12.0876,-77.0388],[-12.0521,-77.0352],[-12.0464,-77.0297]],
+    [[-12.0564,-77.1197],[-12.0487,-77.0756],[-12.0464,-77.0428],[-12.0983,-77.0366]],
+  ];
+  routeCoords.forEach(c=>L.polyline(c,{color:'#2563eb',weight:3,opacity:.5}).addTo(routesMap));
+
+  routesMap.on('click',e=>{
+    routePoints.push([e.latlng.lat,e.latlng.lng]);
+    L.circleMarker([e.latlng.lat,e.latlng.lng],{radius:6,color:'#F5A623',fillColor:'#F5A623',fillOpacity:1}).addTo(routesMap);
+    if(routeLine) routesMap.removeLayer(routeLine);
+    if(routePoints.length>1){
+      routeLine = L.polyline(routePoints,{color:'#F5A623',weight:4,dashArray:'8,4'}).addTo(routesMap);
+    }
+    showToast(`Punto agregado: ${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`,'yellow');
+  });
+}
+
+// ===== CAMERAS =====
+const camContexts = {};
+function initCameras(){
+  const container = document.getElementById('camGridContainer');
+  const layout = document.getElementById('camLayout').value;
+  const cols = layout==='9'?3:2;
+  const rows = layout==='9'?3:2;
+  const cams = CAMERAS.slice(0,cols*rows);
+
+  container.style.gridTemplateColumns = `repeat(${cols},1fr)`;
+  container.style.gridTemplateRows = `repeat(${rows},1fr)`;
+  container.innerHTML='';
+
+  cams.forEach((cam,i)=>{
+    const cell = document.createElement('div');
+    cell.style.cssText='position:relative;background:#000;overflow:hidden;border-radius:6px;cursor:pointer';
+    cell.innerHTML=`
+      <canvas id="cam-canvas-${i}" style="width:100%;height:100%;display:block"></canvas>
+      <div style="position:absolute;top:6px;left:8px;font-family:JetBrains Mono,monospace;font-size:10px;color:#0af;opacity:.9" id="cam-time-${i}">00:00:00</div>
+      <div style="position:absolute;top:22px;left:8px;font-family:JetBrains Mono,monospace;font-size:9px;color:#0f8;opacity:.85" id="cam-ai-${i}">🚗 ${cam.vehicles} veh/min  🚶 ${cam.pedestrians}</div>
+      <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.85));padding:8px;font-size:11px;font-family:JetBrains Mono,monospace;color:#0af">${cam.id} — ${cam.name}</div>
+      <div style="position:absolute;top:6px;right:8px;width:7px;height:7px;border-radius:50%;background:${cam.status==='active'?'#2BB673':cam.status==='warning'?'#F5A623':'#E63946'};box-shadow:0 0 6px ${cam.status==='active'?'#2BB673':cam.status==='warning'?'#F5A623':'#E63946'}"></div>
+    `;
+    container.appendChild(cell);
+
+    setTimeout(()=>{
+      const canvas = document.getElementById(`cam-canvas-${i}`);
+      if(!canvas) return;
+      canvas.width = canvas.offsetWidth||320;
+      canvas.height = canvas.offsetHeight||200;
+      const ctx = canvas.getContext('2d');
+      camContexts[i] = {ctx, canvas, cam, vehicles:[], frame:0};
+      // init vehicles
+      for(let v=0;v<6;v++){
+        camContexts[i].vehicles.push({x:Math.random()*canvas.width,y:canvas.height*(0.35+Math.random()*.3),speed:(Math.random()+.5)*(cam.status==='active'?1:.2),w:22+Math.random()*14,h:10+Math.random()*6,color:['#e74c3c','#3498db','#f39c12','#2ecc71','#9b59b6','#e67e22','#1abc9c'][Math.floor(Math.random()*7)]});
+      }
+      if(cam.status!=='inactive') animateCam(i);
+    },100);
+  });
+}
+
+function animateCam(i){
+  const c = camContexts[i];
+  if(!c) return;
+  const {ctx,canvas,cam,vehicles} = c;
+  ctx.fillStyle = cam.status==='warning'?'#1a1a0a':'#0a0a0a';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // Roads
+  const midY = canvas.height*.5;
+  ctx.fillStyle='#1c1c1c';
+  ctx.fillRect(0,midY-40,canvas.width,80);
+  // Road lines
+  ctx.strokeStyle='#333';
+  ctx.lineWidth=1;
+  ctx.setLineDash([15,10]);
+  ctx.beginPath();ctx.moveTo(0,midY);ctx.lineTo(canvas.width,midY);ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Lane markings
+  ctx.strokeStyle='#fff3';
+  ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,midY-40);ctx.lineTo(canvas.width,midY-40);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,midY+40);ctx.lineTo(canvas.width,midY+40);ctx.stroke();
+
+  // Buildings (background)
+  for(let b=0;b<8;b++){
+    const bx = b*(canvas.width/7);
+    const bh = 30+Math.sin(b*1.3)*20;
+    ctx.fillStyle=`rgba(30,30,50,${.5+b%3*.1})`;
+    ctx.fillRect(bx,midY-40-bh,canvas.width/8-2,bh);
+  }
+
+  // Vehicles
+  vehicles.forEach(v=>{
+    v.x += v.speed;
+    if(v.x>canvas.width+30) v.x=-30;
+    ctx.save();
+    ctx.shadowColor=v.color;ctx.shadowBlur=4;
+    ctx.fillStyle=v.color;
+    ctx.fillRect(v.x,v.y-v.h/2,v.w,v.h);
+    // Headlights
+    ctx.fillStyle='rgba(255,255,200,.8)';
+    ctx.fillRect(v.x+v.w-2,v.y-2,2,4);
+    ctx.restore();
+  });
+
+  // AI overlay boxes
+  if(c.frame%30<20){
+    ctx.strokeStyle='#0f8';
+    ctx.lineWidth=1;
+    vehicles.slice(0,3).forEach(v=>{
+      ctx.strokeRect(v.x-2,v.y-v.h/2-2,v.w+4,v.h+4);
+      ctx.fillStyle='#0f8';
+      ctx.font='7px monospace';
+      ctx.fillText(Math.floor(v.speed*20)+'km/h',v.x,v.y-v.h/2-4);
+    });
+  }
+
+  // Timestamp
+  const now = new Date();
+  const el = document.getElementById(`cam-time-${i}`);
+  if(el) el.textContent = now.toLocaleTimeString('es-PE',{hour12:false});
+
+  // Update AI counts randomly
+  if(c.frame%90===0){
+    const ai = document.getElementById(`cam-ai-${i}`);
+    if(ai) ai.textContent = `🚗 ${Math.floor(cam.vehicles+Math.random()*10-5)} veh/min  🚶 ${Math.floor(cam.pedestrians+Math.random()*6-3)}`;
+  }
+
+  c.frame++;
+  requestAnimationFrame(()=>animateCam(i));
+}
+
+function setCamLayout(v){ initCameras(); }
+
+// ===== ALERTS LIST =====
+const ALERTS_DATA = [
+  {color:'red',text:'Accidente en Javier Prado Km 8.2 — 2 vehículos. Carril derecho bloqueado.',meta:'Hace 2 min · Fuente: CAM-002 · IA',action:'Ver'},
+  {color:'red',text:'Congestión crítica Av. Arequipa cdra 42–50. Velocidad media: 8 km/h.',meta:'Hace 5 min · Fuente: GPS Flota',action:'Ver'},
+  {color:'red',text:'Semáforo SEM-008 averiado — La Marina & Brasil. Sin señal.',meta:'Hace 18 min · Fuente: Reporte ciudadano',action:'Ver'},
+  {color:'yellow',text:'Bus MT-2347 con retraso de 12 min. Ruta C45 afectada.',meta:'Hace 24 min · Fuente: GPS MT-2347',action:'Ver'},
+  {color:'yellow',text:'Paradero Naranjal saturado (+80 pasajeros). Solicitar frecuencia adicional.',meta:'Hace 31 min · Fuente: Validaciones',action:'Ver'},
+  {color:'green',text:'Ruta A07 normalizada. Incidente resuelto en Av. Universitaria.',meta:'Hace 45 min · Fuente: Equipo campo',action:''},
+];
+
+function renderAlerts(){
+  const el = document.getElementById('alertsList');
+  if(!el) return;
+  el.innerHTML = ALERTS_DATA.slice(0,4).map(a=>`
+    <div class="alert-item">
+      <div class="alert-dot ${a.color}"></div>
+      <div style="flex:1">
+        <div class="alert-text">${a.text}</div>
+        <div class="alert-meta">${a.meta}</div>
+      </div>
+      ${a.action?`<div class="alert-action"><button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="showToast('Abriendo detalle...','yellow')">${a.action}</button></div>`:''}
+    </div>
+  `).join('');
+}
+
+function renderAlertasFull(){
+  document.getElementById('alertasFull').innerHTML = ALERTS_DATA.map(a=>`
+    <div class="alert-item" style="padding:14px 0">
+      <div class="alert-dot ${a.color}" style="width:10px;height:10px;margin-top:5px"></div>
+      <div style="flex:1">
+        <div class="alert-text" style="font-size:13px">${a.text}</div>
+        <div class="alert-meta">${a.meta}</div>
+      </div>
+      ${a.action?`<button class="btn btn-ghost" style="font-size:11px" onclick="showToast('Procesando alerta...','yellow')">Gestionar</button>`:'<span class="badge green">Resuelto</span>'}
+    </div>
+  `).join('');
+}
+
+function clearAlerts(){ showToast('Todas las alertas marcadas como leídas','green'); document.getElementById('alertsBadge').textContent='0'; }
+
+// ===== INCIDENTS LIST =====
+function renderIncidentsList(){
+  document.getElementById('incidentsList').innerHTML = INCIDENTS.map(inc=>`
+    <div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;cursor:pointer;transition:all .15s;border-left:3px solid ${inc.severity==='red'?'var(--red)':'var(--yellow)'}" onclick="openIncident(${JSON.stringify(inc).replace(/"/g,'&quot;')})">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span class="badge ${inc.severity==='red'?'red':'yellow'}">${inc.type}</span>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--muted)">${inc.id} · ${inc.time}</span>
+      </div>
+      <div style="font-size:12px;color:var(--text)">${inc.desc}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">📍 ${inc.loc}</div>
+    </div>
+  `).join('');
+}
+
+function addRandomIncident(){
+  const types = ['Congestión','Accidente','Bus Averiado','Semáforo Roto'];
+  const locs = ['Av. Javier Prado','Av. Arequipa','La Marina','Universitaria'];
+  const t = types[Math.floor(Math.random()*types.length)];
+  const l = locs[Math.floor(Math.random()*locs.length)];
+  showToast(`Nueva alerta: ${t} en ${l}`, 'red');
+  const badge = document.getElementById('incidentCount');
+  const n = parseInt(badge.textContent)||0;
+  badge.textContent = (n+1)+' Críticos';
+}
+
+function openIncident(inc){
+  document.getElementById('modalTitle').textContent = inc.type+' — '+inc.id;
+  document.getElementById('modalBody').innerHTML = `
+    <div style="display:grid;gap:10px">
+      <div style="display:flex;gap:10px">
+        <div style="flex:1;background:var(--surface2);border-radius:8px;padding:12px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">UBICACIÓN</div>
+          <div style="font-size:13px;color:var(--text)">📍 ${inc.loc}</div>
+        </div>
+        <div style="flex:1;background:var(--surface2);border-radius:8px;padding:12px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">HORA REPORTE</div>
+          <div style="font-size:13px;color:var(--text);font-family:var(--mono)">${inc.time} hrs</div>
+        </div>
+      </div>
+      <div style="background:var(--surface2);border-radius:8px;padding:12px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">DESCRIPCIÓN</div>
+        <div style="font-size:13px;color:var(--text)">${inc.desc}</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:8px;padding:12px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">SEVERIDAD</div>
+        <span class="badge ${inc.severity}">${inc.severity==='red'?'CRÍTICO':'MEDIO'}</span>
+      </div>
+    </div>
+  `;
+  document.getElementById('incidentModal').classList.add('open');
+}
+function closeModal(){ document.getElementById('incidentModal').classList.remove('open'); }
+
+// ===== SEMAFOROS =====
+let semafPhases = {};
+function renderSemaforos(){
+  const grid = document.getElementById('semafGrid');
+  grid.innerHTML = `<div class="semaf-grid">` + SEMAFOROS.map(s=>{
+    const color = s.status==='critico'?'var(--red)':s.status==='suboptimo'?'var(--yellow)':'var(--green)';
+    return `
+    <div class="semaf-card" id="semaf-${s.id}" onclick="openSemaforo('${s.id}')">
+      <div class="semaf-id">${s.id}</div>
+      <div class="semaf-name">${s.name}</div>
+      <div class="semaf-lights">
+        <div class="s-light ${s.phase==='red'?'on-red':''}" id="sR-${s.id}"></div>
+        <div class="s-light ${s.phase==='yellow'?'on-yellow':''}" id="sY-${s.id}"></div>
+        <div class="s-light ${s.phase==='green'?'on-green':''}" id="sG-${s.id}"></div>
+        <span style="font-size:10px;color:var(--muted);margin-left:8px" id="sCount-${s.id}">${s.cycle}s</span>
+      </div>
+      <div class="semaf-cycle">Ciclo: ${s.cycle}s | Óptimo: ${s.optimal}s</div>
+      <div class="semaf-status" style="color:${color}">${s.status==='critico'?'⚠️ Ciclo Ineficiente':s.status==='suboptimo'?'⚡ Subóptimo':'✅ Normal'}</div>
+    </div>`;
+  }).join('') + `</div>`;
+
+  // Animate traffic lights
+  SEMAFOROS.forEach(s=>{
+    semafPhases[s.id] = {phase:s.phase, countdown:s.cycle};
+    animateSemaforo(s);
+  });
+}
+
+function animateSemaforo(s){
+  const phases = ['red','yellow','green'];
+  const durations = {red:s.cycle*.5,yellow:5,green:s.cycle*.45};
+  let phaseIdx = phases.indexOf(s.phase);
+  let countdown = durations[s.phase]||s.cycle/3;
+
+  setInterval(()=>{
+    const rEl = document.getElementById(`sR-${s.id}`);
+    const yEl = document.getElementById(`sY-${s.id}`);
+    const gEl = document.getElementById(`sG-${s.id}`);
+    const cEl = document.getElementById(`sCount-${s.id}`);
+    if(!rEl) return;
+    countdown--;
+    if(cEl) cEl.textContent = Math.max(0,Math.round(countdown))+'s';
+    if(countdown<=0){
+      phaseIdx=(phaseIdx+1)%3;
+      const p = phases[phaseIdx];
+      countdown = durations[p];
+      rEl.className='s-light '+(p==='red'?'on-red':'');
+      yEl.className='s-light '+(p==='yellow'?'on-yellow':'');
+      gEl.className='s-light '+(p==='green'?'on-green':'');
+    }
+  },1000);
+}
+
+function openSemaforo(id){
+  const s = SEMAFOROS.find(x=>x.id===id);
+  document.getElementById('modalTitle').textContent = `${s.id} — ${s.name}`;
+  document.getElementById('modalBody').innerHTML = `
+    <div style="display:grid;gap:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div style="background:var(--surface2);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:10px;color:var(--muted)">CICLO ACTUAL</div>
+          <div style="font-size:22px;font-weight:700;color:#fff;font-family:var(--mono)">${s.cycle}s</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:10px;color:var(--muted)">CICLO ÓPTIMO IA</div>
+          <div style="font-size:22px;font-weight:700;color:var(--green);font-family:var(--mono)">${s.optimal}s</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:10px;color:var(--muted)">AHORRO</div>
+          <div style="font-size:22px;font-weight:700;color:var(--yellow);font-family:var(--mono)">${s.cycle-s.optimal}s</div>
+        </div>
+      </div>
+      <div style="background:rgba(43,182,115,.1);border:1px solid rgba(43,182,115,.3);border-radius:8px;padding:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:6px">💡 Recomendación IA</div>
+        <div style="font-size:12px;color:var(--text)">Reducir ciclo verde de ${s.cycle}s a ${s.optimal}s en hora punta. Incrementar fase verde en dirección Este-Oeste para reducir cola en ${Math.round((s.cycle-s.optimal)/s.cycle*100)}%.</div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btn-success" onclick="showToast('Ciclo actualizado a ${s.optimal}s ✓','green');closeModal()">Aplicar ${s.optimal}s</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('incidentModal').classList.add('open');
+}
+
+// ===== FLOTA LIST =====
+function renderFlotaList(){
+  document.getElementById('flotaList').innerHTML = FLOTA.map(b=>`
+    <div class="flota-item" onclick="showToast('Unidad ${b.id} — ${b.loc}','yellow')">
+      <div class="flota-icon ${b.status}">🚌</div>
+      <div>
+        <div class="flota-name">${b.id} · ${b.route}</div>
+        <div class="flota-meta">${b.driver} · ${b.loc}</div>
+        <div class="flota-meta" style="color:${b.status==='red'?'var(--red)':b.status==='yellow'?'var(--yellow)':'var(--muted)'}">→ ${b.next}</div>
+      </div>
+      <div class="flota-speed">${b.speed} km/h</div>
+    </div>
+  `).join('');
+}
+
+// ===== RECLAMOS TABLE =====
+const RECLAMOS = [
+  {id:'REC-312',fecha:'30/05 14:21',usuario:'J. García',tipo:'Congestión',loc:'Av. Arequipa',estado:'Pendiente',prioridad:'red'},
+  {id:'REC-311',fecha:'30/05 14:05',usuario:'M. López',tipo:'Semáforo',loc:'Javier Prado',estado:'En revisión',prioridad:'yellow'},
+  {id:'REC-310',fecha:'30/05 13:48',usuario:'A. Pérez',tipo:'Bus averiado',loc:'San Isidro',estado:'Pendiente',prioridad:'red'},
+  {id:'REC-309',fecha:'30/05 13:20',usuario:'C. Torres',tipo:'Congestión',loc:'La Marina',estado:'En revisión',prioridad:'yellow'},
+  {id:'REC-308',fecha:'30/05 12:55',usuario:'R. Quispe',tipo:'Paradero bloqueado',loc:'Angamos',estado:'Resuelto',prioridad:'green'},
+  {id:'REC-307',fecha:'30/05 12:30',usuario:'L. Huanca',tipo:'Bus averiado',loc:'Callao',estado:'Resuelto',prioridad:'green'},
+  {id:'REC-306',fecha:'30/05 11:45',usuario:'P. Vargas',tipo:'Accidente',loc:'Universitaria',estado:'En revisión',prioridad:'yellow'},
+  {id:'REC-305',fecha:'30/05 11:10',usuario:'F. Castro',tipo:'Congestión',loc:'28 de Julio',estado:'Pendiente',prioridad:'red'},
+];
+function renderReclamos(){
+  document.getElementById('reclamosTable').innerHTML = `
+    <thead><tr>
+      <th>ID</th><th>Fecha/Hora</th><th>Usuario</th><th>Tipo</th><th>Ubicación</th><th>Estado</th><th>Acción</th>
+    </tr></thead>
+    <tbody>
+    ${RECLAMOS.map(r=>`<tr>
+      <td style="font-family:var(--mono);font-size:11px">${r.id}</td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--muted)">${r.fecha}</td>
+      <td>${r.usuario}</td>
+      <td>${r.tipo}</td>
+      <td style="color:var(--muted)">📍 ${r.loc}</td>
+      <td><span class="badge ${r.prioridad}">${r.estado}</span></td>
+      <td><button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="showToast('Asignando equipo al ${r.id}...','yellow')">Asignar</button></td>
+    </tr>`).join('')}
+    </tbody>
+  `;
+}
+
+// ===== CHARTS (OVERVIEW) =====
+let chartsInit=false;
+function initOverviewCharts(){
+  if(chartsInit) return; chartsInit=true;
+  const hours = Array.from({length:24},(_,i)=>i+':00');
+  const trafficData = [120,80,60,45,55,90,180,320,420,380,310,280,350,390,410,380,450,510,480,380,290,210,170,140];
+
+  Chart.defaults.color='#6b7fa0';
+  Chart.defaults.borderColor='rgba(42,58,82,.5)';
+
+  new Chart(document.getElementById('chartTraffic'),{
+    type:'line',
+    data:{labels:hours,datasets:[{label:'Vehículos/h',data:trafficData,borderColor:'#1A4E8C',backgroundColor:'rgba(26,78,140,.15)',fill:true,tension:.4,pointRadius:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:8,font:{size:9}}},y:{ticks:{font:{size:9}}}}}
+  });
+
+  new Chart(document.getElementById('chartIncidents'),{
+    type:'doughnut',
+    data:{labels:['Congestión','Accidente','Bus Averiado','Semáforo','Otro'],datasets:[{data:[42,18,14,16,10],backgroundColor:['#E63946','#F5A623','#1A4E8C','#2BB673','#6b7fa0'],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}}}
+  });
+
+  new Chart(document.getElementById('chartService'),{
+    type:'bar',
+    data:{labels:['Lu','Ma','Mi','Ju','Vi','Sá','Do'],datasets:[{label:'Nivel',data:[78,82,75,80,71,88,92],backgroundColor:(ctx)=>{const v=ctx.raw; return v>=80?'#2BB673':v>=70?'#F5A623':'#E63946'}}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{font:{size:9},callback:v=>v+'%'}}}}
+  });
+}
+
+function initReportCharts(){
+  if(document.getElementById('chartRepBar')._chartInit) return;
+  document.getElementById('chartRepBar')._chartInit=true;
+  new Chart(document.getElementById('chartRepBar'),{
+    type:'bar',
+    data:{labels:['Naranjal','Javier Prado','Angamos','Miraflores','La Cultura','Canadá'],datasets:[{label:'Pasajeros',data:[8420,7130,6890,5940,5210,4780],backgroundColor:'#1A4E8C'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9}}},y:{ticks:{font:{size:9}}}}}
+  });
+  new Chart(document.getElementById('chartRepLine'),{
+    type:'line',
+    data:{labels:['Mar','Abr','May'],datasets:[{label:'Pasajeros',data:[245000,268000,281000],borderColor:'#2BB673',backgroundColor:'rgba(43,182,115,.1)',fill:true,tension:.4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9}}},y:{ticks:{font:{size:9}}}}}
+  });
+  document.getElementById('reportTable').innerHTML=`
+    <thead><tr><th>Corredor</th><th>Pasajeros/día</th><th>Cumplimiento</th><th>Incidentes</th></tr></thead>
+    <tbody>
+      <tr><td>Javier Prado</td><td style="font-family:var(--mono)">24,180</td><td><span class="badge yellow">87%</span></td><td>12</td></tr>
+      <tr><td>Av. Arequipa</td><td style="font-family:var(--mono)">31,540</td><td><span class="badge green">94%</span></td><td>7</td></tr>
+      <tr><td>Metropolitano</td><td style="font-family:var(--mono)">89,200</td><td><span class="badge green">97%</span></td><td>3</td></tr>
+      <tr><td>Metro Línea 1</td><td style="font-family:var(--mono)">112,400</td><td><span class="badge green">99%</span></td><td>1</td></tr>
+      <tr><td>La Marina</td><td style="font-family:var(--mono)">18,760</td><td><span class="badge red">72%</span></td><td>21</td></tr>
+    </tbody>
+  `;
+}
+
+// ===== TOAST =====
+function showToast(msg, type='green'){
+  const t = document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<span style="font-size:14px">${type==='red'?'🚨':type==='yellow'?'⚠️':'✅'}</span><div><div style="font-size:12px;color:#fff;font-weight:600">${msg}</div></div>`;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(()=>t.remove(),4000);
+}
+
+// ===== KPI LIVE UPDATE =====
+let reportCount=84;
+function liveUpdate(){
+  if(Math.random()>.6){
+    reportCount++;
+    const el=document.getElementById('kpi-reports');
+    if(el) el.textContent=reportCount.toLocaleString();
+  }
+  const v=document.getElementById('kpi-vehicles');
+  if(v) v.textContent=(1200+Math.floor(Math.random()*100)).toLocaleString();
+  const c=document.getElementById('kpi-cong');
+  if(c) c.textContent=Math.floor(38+Math.random()*12)+'%';
+
+  // Random alerts
+  if(Math.random()>.92){
+    const msgs=[
+      'Congestión detectada en Av. Brasil',
+      'Bus MT-1234 reporta incidencia',
+      'Semáforo SEM-003 con ciclo irregular',
+      'Ciudadano reporta paradero bloqueado'
+    ];
+    showToast(msgs[Math.floor(Math.random()*msgs.length)],'yellow');
+  }
+}
+setInterval(liveUpdate,5000);
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded',()=>{
+  initMainMap();
+  initOverviewCharts();
+  renderAlerts();
+  renderIncidentsList();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>SmartFlow Lima — App Móvil</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --primary:#1A4E8C;--green:#2BB673;--yellow:#F5A623;--red:#E63946;
+  --bg:#f0f4fa;--surface:#fff;--border:#e8eef6;--text:#1B2230;--muted:#8A94A6;
+}
+
+/* ============================
+   DESKTOP — phone frame wrapper
+   ============================ */
+html{height:100%;background:#0d1b2e}
+body{
+  min-height:100%;
+  background:radial-gradient(ellipse at 60% 40%,#1a3a6e 0%,#0d1b2e 70%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  padding:30px 20px 40px;
+  overflow-y:auto;
+  font-family:Inter,system-ui,sans-serif;
+}
+
+/* desktop label above phone */
+.desktop-label{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:20px;color:rgba(255,255,255,.6);font-size:13px;font-weight:500;
+}
+.desktop-label a{
+  color:#6ba3f5;text-decoration:none;font-weight:600;
+  background:rgba(26,78,140,.3);padding:4px 12px;border-radius:8px;border:1px solid rgba(107,163,245,.3);
+}
+
+/* The physical phone shell */
+.phone-shell{
+  width:393px;
+  background:#111;
+  border-radius:54px;
+  padding:14px;
+  box-shadow:
+    0 0 0 1px #2a2a2a,
+    0 0 0 2px #111,
+    0 40px 80px rgba(0,0,0,.7),
+    inset 0 1px 0 rgba(255,255,255,.06);
+  position:relative;
+  flex-shrink:0;
+}
+/* Side buttons left */
+.phone-shell::before{
+  content:'';position:absolute;
+  left:-4px;top:110px;
+  width:4px;height:28px;
+  background:#1e1e1e;border-radius:2px 0 0 2px;
+  box-shadow:0 42px 0 #1e1e1e, 0 82px 0 #1e1e1e;
+}
+/* Power button right */
+.phone-shell::after{
+  content:'';position:absolute;
+  right:-4px;top:160px;
+  width:4px;height:60px;
+  background:#1e1e1e;border-radius:0 2px 2px 0;
+}
+
+/* The actual screen area */
+.phone-screen{
+  width:365px;
+  height:790px;
+  border-radius:42px;
+  overflow:hidden;
+  position:relative;
+  background:var(--bg);
+}
+
+/* Dynamic Island */
+.dynamic-island{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  width:126px;height:37px;
+  background:#111;border-radius:20px;
+  z-index:10000;
+  display:flex;align-items:center;justify-content:flex-end;
+  padding-right:12px;gap:5px;
+}
+.island-camera{width:11px;height:11px;border-radius:50%;background:#1a1a1a;border:1px solid #2a2a2a}
+.island-dot{width:4px;height:4px;border-radius:50%;background:#1e3a2e;box-shadow:0 0 4px #2BB673}
+
+/* Status bar */
+.status-bar{
+  height:50px;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:0 28px 8px;
+  font-size:12px;font-weight:700;color:var(--text);
+  flex-shrink:0;position:relative;z-index:100;
+  background:var(--surface);
+}
+.status-icons{display:flex;align-items:center;gap:5px}
+.signal-bars{display:flex;align-items:flex-end;gap:1.5px;height:12px}
+.signal-bars span{width:3px;background:var(--text);border-radius:1px}
+.signal-bars span:nth-child(1){height:4px}
+.signal-bars span:nth-child(2){height:7px}
+.signal-bars span:nth-child(3){height:10px}
+.signal-bars span:nth-child(4){height:12px;opacity:.3}
+.battery{width:20px;height:11px;border:1.5px solid var(--text);border-radius:2.5px;position:relative;display:flex;align-items:center;padding:1.5px}
+.battery::after{content:'';position:absolute;right:-4px;top:50%;transform:translateY(-50%);width:2px;height:5px;background:var(--text);border-radius:0 1px 1px 0}
+.battery-fill{height:100%;width:70%;background:var(--green);border-radius:1px}
+
+/* ============================
+   ALL APP ELEMENTS — absolute inside .phone-screen
+   ============================ */
+#splash,#onboarding,#roleSelect,#app,
+.panel,.modal-overlay{
+  position:absolute!important;
+  inset:0!important;
+  overflow:hidden;
+}
+.toast-wrap{
+  position:absolute!important;
+  top:60px!important;left:12px!important;right:12px!important;
+  z-index:9500!important;
+}
+.chat-input-bar{
+  position:absolute!important;
+  bottom:58px!important;left:0!important;right:0!important;
+  z-index:700!important;
+}
+
+/* ============================
+   SPLASH
+   ============================ */
+#splash{
+  background:linear-gradient(160deg,#0f2d5a,#1A4E8C,#1a6bb5);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:9999;transition:opacity .5s;
+}
+#splash.hidden{opacity:0;pointer-events:none}
+.splash-logo{width:76px;height:76px;background:rgba(255,255,255,.15);border-radius:22px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.splash-title{font-size:24px;font-weight:700;color:#fff;letter-spacing:-.5px}
+.splash-sub{font-size:13px;color:rgba(255,255,255,.7);margin-top:5px;margin-bottom:36px}
+.splash-loader{width:160px;height:3px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden}
+.splash-loader-bar{height:100%;background:#fff;border-radius:3px;animation:load 2.2s ease-in-out forwards}
+@keyframes load{0%{width:0}100%{width:100%}}
+
+/* ============================
+   ONBOARDING
+   ============================ */
+#onboarding{background:#fff;z-index:9998;display:none;flex-direction:column}
+.ob-slides{flex:1;position:relative;overflow:hidden}
+.ob-slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 28px;text-align:center;opacity:0;transform:translateX(100%);transition:all .35s ease}
+.ob-slide.active{opacity:1;transform:translateX(0)}
+.ob-slide.prev{opacity:0;transform:translateX(-100%)}
+.ob-emoji{font-size:72px;margin-bottom:18px}
+.ob-title{font-size:21px;font-weight:700;color:var(--text);margin-bottom:10px}
+.ob-desc{font-size:14px;color:var(--muted);line-height:1.65;max-width:280px}
+.ob-dots{display:flex;justify-content:center;gap:6px;padding:14px}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s}
+.ob-dot.active{background:var(--primary);width:22px;border-radius:4px}
+.ob-bottom{padding:16px 22px 28px;display:flex;flex-direction:column;gap:10px}
+.btn-full{width:100%;background:var(--primary);color:#fff;border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all .15s}
+.btn-full:active{transform:scale(.98);background:#1555a0}
+
+/* ============================
+   ROLE SELECT
+   ============================ */
+#roleSelect{background:#fff;z-index:9997;display:none;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px}
+.role-title{font-size:20px;font-weight:700;margin-bottom:6px;text-align:center}
+.role-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:28px}
+.role-cards{display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px}
+.role-card{background:#fff;border:2px solid var(--border);border-radius:16px;padding:16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px}
+.role-card:hover,.role-card:active{border-color:var(--primary);background:#f0f6ff}
+.role-card-icon{font-size:32px;flex-shrink:0}
+.role-card-name{font-size:15px;font-weight:700;margin-bottom:3px}
+.role-card-desc{font-size:11px;color:var(--muted);line-height:1.4}
+
+/* ============================
+   APP
+   ============================ */
+#app{display:none;flex-direction:column;background:var(--bg)}
+
+/* TOP BAR */
+.topbar{height:54px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;box-shadow:0 1px 6px rgba(0,0,0,.05);z-index:100}
+.topbar-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#2563eb);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}
+.topbar-greet{flex:1;min-width:0}
+.topbar-greet .name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-greet .sub{font-size:10px;color:var(--muted)}
+.mode-toggle{display:flex;background:var(--bg);border-radius:7px;padding:2px;border:1px solid var(--border);flex-shrink:0}
+.mode-btn{padding:3px 9px;border-radius:5px;font-size:10px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .2s;border:none;background:none;font-family:Inter,sans-serif}
+.mode-btn.active{background:var(--primary);color:#fff}
+.topbar-btn{width:34px;height:34px;border-radius:9px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;flex-shrink:0}
+.notif-badge{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--red);border:1.5px solid #fff}
+
+/* DRIVER STATUS */
+.driver-status{background:linear-gradient(135deg,#0f2d5a,var(--primary));padding:10px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.driver-unit{font-size:12px;font-weight:700;color:#fff}
+.driver-route{font-size:10px;color:rgba(255,255,255,.7)}
+.status-pill{padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700}
+.status-pill.green{background:#2BB67330;color:#2BB673;border:1px solid #2BB67350}
+
+/* MAP CONTAINER */
+#mapContainer{flex:1;position:relative;overflow:hidden}
+#map{height:100%;width:100%}
+.leaflet-container{background:#e8edf5!important}
+
+/* SEARCH */
+.search-bar{position:absolute;top:10px;left:10px;right:10px;z-index:400;background:#fff;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,.13);display:flex;align-items:center;padding:0 12px;height:44px;gap:8px;border:1px solid var(--border)}
+.search-bar input{flex:1;border:none;outline:none;font-size:13px;color:var(--text);font-family:Inter,sans-serif;background:transparent}
+.search-bar input::placeholder{color:var(--muted)}
+
+/* BOTTOM SHEET */
+.bottom-sheet{position:absolute;bottom:56px;left:0;right:0;z-index:300;background:#fff;border-radius:18px 18px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.1);max-height:56%}
+.sheet-handle{width:34px;height:4px;background:var(--border);border-radius:4px;margin:8px auto 12px}
+.sheet-collapsed{padding:0 14px 14px}
+
+.next-bus{display:flex;align-items:center;gap:10px;padding:10px;background:linear-gradient(135deg,#f0f8ff,#e8f4ff);border-radius:12px;margin-bottom:8px;cursor:pointer}
+.bus-icon-wrap{width:38px;height:38px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.bus-info{flex:1}
+.bus-route{font-size:12px;font-weight:700;color:var(--text)}
+.bus-time{font-size:22px;font-weight:700;color:var(--primary);line-height:1.1}
+.bus-time span{font-size:11px;font-weight:400;color:var(--muted)}
+.occupancy-row{display:flex;gap:5px;align-items:center;margin-top:3px}
+.occ-dot{width:7px;height:7px;border-radius:50%}
+
+.upcoming-buses{display:flex;gap:7px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px}
+.upcoming-buses::-webkit-scrollbar{display:none}
+.ubus{background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:7px 10px;white-space:nowrap;flex-shrink:0}
+.ubus-route{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase}
+.ubus-time{font-size:15px;font-weight:700;color:var(--text)}
+.ubus-occ{display:flex;gap:2px;margin-top:2px}
+
+.report-btn{width:100%;background:var(--red);color:#fff;border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;font-family:Inter,sans-serif}
+.report-btn:active{transform:scale(.98);background:#c0303a}
+
+/* DRIVER BOTTOM SHEET */
+.driver-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px}
+.driver-card-label{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.driver-card-value{font-size:14px;font-weight:700;color:var(--text)}
+.driver-action-row{display:flex;gap:7px;margin-top:0}
+.driver-action-btn{flex:1;padding:10px 6px;border-radius:9px;border:none;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;font-family:Inter,sans-serif;text-align:center}
+
+/* BOTTOM NAV */
+.bottom-nav{height:56px;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:stretch;flex-shrink:0;position:relative;z-index:200}
+.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--muted);transition:color .2s;border:none;background:none;font-family:Inter,sans-serif}
+.nav-tab.active{color:var(--primary)}
+.nav-tab svg{width:18px;height:18px}
+.nav-tab span{font-size:9px;font-weight:700}
+.nav-indicator{position:absolute;top:0;height:2px;background:var(--primary);border-radius:0 0 2px 2px;transition:all .3s ease;width:20%;left:0}
+
+/* PANELS (slide up) */
+.panel{background:#fff;z-index:500;transform:translateY(100%);transition:transform .3s ease;overflow-y:auto;display:flex;flex-direction:column}
+.panel.open{transform:translateY(0)}
+.panel-header{position:sticky;top:0;background:#fff;padding:13px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;z-index:10;flex-shrink:0}
+.panel-title{font-size:15px;font-weight:700;flex:1}
+.back-btn{width:30px;height:30px;border-radius:8px;background:var(--bg);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.panel-body{padding:14px;flex:1;overflow-y:auto}
+
+/* ROUTES */
+.route-card{background:linear-gradient(135deg,#f0f8ff,#e8f4ff);border:1px solid #d0e8ff;border-radius:12px;padding:13px;margin-bottom:9px;cursor:pointer;transition:all .2s}
+.route-card:active{transform:scale(.99)}
+.route-tag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px;font-size:9px;font-weight:700;margin-bottom:7px}
+.route-tag.fast{background:#d0f0e0;color:#0a6e40}
+.route-tag.cheap{background:#fff0d0;color:#7a5000}
+.route-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.route-meta{font-size:11px;color:var(--muted);display:flex;gap:10px}
+.route-time{font-size:19px;font-weight:700;color:var(--primary);margin-top:5px}
+.route-steps{display:flex;align-items:center;gap:5px;margin-top:7px;font-size:10px;color:var(--muted)}
+.step-dot{width:6px;height:6px;border-radius:50%;background:var(--primary);flex-shrink:0}
+.step-line{flex:1;height:1px;background:var(--border)}
+
+/* REPORT */
+.report-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+.report-type-btn{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:11px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:all .2s;font-size:10px;font-weight:700;text-align:center;font-family:Inter,sans-serif}
+.report-type-btn.selected{border-color:var(--primary);background:#f0f6ff;color:var(--primary)}
+.report-type-btn .icon{font-size:22px}
+.location-pill{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:7px;margin-bottom:10px;font-size:12px}
+.photo-btn{border:1.5px dashed var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;margin-bottom:10px;color:var(--muted);font-size:11px;background:none;width:100%;font-family:Inter,sans-serif}
+
+/* CHAT */
+.chat-body{padding:12px 14px 80px;display:flex;flex-direction:column;gap:9px;overflow-y:auto;flex:1}
+.msg-bubble{max-width:82%;padding:9px 12px;border-radius:13px;font-size:12px;line-height:1.5}
+.msg-user{background:var(--primary);color:#fff;align-self:flex-end;border-radius:13px 13px 4px 13px}
+.msg-bot{background:var(--bg);color:var(--text);align-self:flex-start;border-radius:13px 13px 13px 4px;border:1px solid var(--border)}
+.msg-time{font-size:9px;opacity:.6;margin-top:3px}
+.chat-input-bar{background:#fff;border-top:1px solid var(--border);padding:8px 10px;display:flex;gap:7px;align-items:center;z-index:700}
+.chat-input-bar input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:9px 14px;font-size:13px;outline:none;font-family:Inter,sans-serif}
+.chat-send-btn{width:36px;height:36px;background:var(--primary);border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.quick-replies{display:flex;gap:6px;overflow-x:auto;padding:0 14px 8px;flex-shrink:0}
+.quick-replies::-webkit-scrollbar{display:none}
+.quick-reply{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:5px 10px;font-size:11px;white-space:nowrap;cursor:pointer;transition:all .2s;flex-shrink:0;font-family:Inter,sans-serif}
+.quick-reply:active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+/* PROFILE */
+.profile-header{background:linear-gradient(135deg,#0f2d5a,var(--primary));padding:20px 14px 28px;color:#fff;text-align:center;flex-shrink:0}
+.profile-avatar-big{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;margin:0 auto 10px;border:3px solid rgba(255,255,255,.3)}
+.profile-name{font-size:17px;font-weight:700}
+.profile-email{font-size:11px;opacity:.8;margin-top:3px}
+.card-row{display:flex;gap:7px;margin-bottom:10px}
+.card-item{flex:1;background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px}
+.card-label{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.card-value{font-size:16px;font-weight:700;color:var(--text);margin-top:3px}
+.card-sub{font-size:9px;color:var(--muted)}
+.transport-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.transport-icon{font-size:22px;flex-shrink:0}
+.transport-name{font-size:12px;font-weight:700;color:var(--text)}
+.transport-balance{font-size:18px;font-weight:700;color:var(--primary);margin-top:1px}
+.setting-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer}
+.setting-icon{font-size:16px;width:22px;text-align:center}
+.setting-label{flex:1;font-size:13px;font-weight:500}
+.setting-value{font-size:11px;color:var(--muted)}
+
+/* RECHARGE */
+.balance-hero{background:linear-gradient(135deg,#1A4E8C,#2563eb);border-radius:14px;padding:20px;color:#fff;text-align:center;margin-bottom:14px}
+.balance-label{font-size:11px;opacity:.8;margin-bottom:6px}
+.balance-amount{font-size:38px;font-weight:700}
+.balance-sub{font-size:11px;opacity:.7;margin-top:3px}
+.amount-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px}
+.amount-btn{background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:12px;text-align:center;cursor:pointer;font-size:15px;font-weight:700;transition:all .2s;font-family:Inter,sans-serif}
+.amount-btn.selected{border-color:var(--primary);background:#f0f6ff;color:var(--primary)}
+.pay-method{display:flex;align-items:center;gap:10px;padding:12px;border:1.5px solid var(--border);border-radius:11px;cursor:pointer;margin-bottom:7px;background:#fff;transition:all .2s}
+.pay-method:active{border-color:var(--primary)}
+.pay-logo{font-size:22px;width:32px;text-align:center}
+.pay-name{font-size:13px;font-weight:700}
+
+/* NOTIF PANEL */
+.notif-item{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer}
+
+/* MODAL */
+.modal-overlay{background:rgba(0,0,0,.5);z-index:800;display:none;align-items:flex-end}
+.modal-overlay.open{display:flex}
+.modal-sheet{background:#fff;border-radius:18px 18px 0 0;width:100%;max-height:75%;overflow-y:auto}
+.modal-handle{width:34px;height:4px;background:var(--border);border-radius:4px;margin:10px auto 0}
+
+/* TOAST */
+.toast-wrap{display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{background:#1B2230;color:#fff;border-radius:11px;padding:10px 14px;font-size:12px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.25);animation:slideDown .3s ease;display:flex;align-items:center;gap:8px}
+@keyframes slideDown{from{transform:translateY(-16px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* SCROLLBARS */
+::-webkit-scrollbar{width:2px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* ============================
+   ACTUAL MOBILE DEVICE
+   ============================ */
+@media(max-width:500px){
+  html{background:var(--bg)}
+  body{padding:0;background:var(--bg);min-height:100vh;display:block}
+  .desktop-label{display:none}
+  .phone-shell{width:100%;border-radius:0;padding:0;box-shadow:none;background:transparent}
+  .phone-shell::before,.phone-shell::after{display:none}
+  .phone-screen{width:100%;height:100vh;border-radius:0}
+  .dynamic-island,.status-bar{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- DESKTOP LABEL -->
+<div class="desktop-label">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#1A4E8C"/><path d="M6 12h12M6 8h8M6 16h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+  SmartFlow Lima — Vista previa App Móvil
+  <a href="dashboard.html">→ Ir al Dashboard ATU</a>
+</div>
+
+<!-- PHONE SHELL -->
+<div class="phone-shell">
+  <div class="phone-screen">
+
+    <!-- Dynamic Island -->
+    <div class="dynamic-island">
+      <div class="island-dot"></div>
+      <div class="island-camera"></div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span id="statusTime" style="padding-top:4px">9:41</span>
+      <div class="status-icons" style="padding-top:4px">
+        <div class="signal-bars"><span></span><span></span><span></span><span></span></div>
+        <svg width="14" height="10" viewBox="0 0 16 12" fill="var(--text)" style="margin:0 2px"><path d="M8 2.4A9.4 9.4 0 0115.5 6L17 4.3A11.5 11.5 0 008 0 11.5 11.5 0 00-1 4.3L.5 6A9.4 9.4 0 018 2.4zm0 4.8A4.5 4.5 0 0111 8.9L12.5 7A6.6 6.6 0 008 5.2a6.6 6.6 0 00-4.5 1.8L5 8.9A4.5 4.5 0 018 7.2zm0 3.2a2 2 0 100 4 2 2 0 000-4z"/></svg>
+        <div class="battery"><div class="battery-fill"></div></div>
+      </div>
+    </div>
+
+    <!-- ===== SPLASH ===== -->
+    <div id="splash">
+      <div class="splash-logo">
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="rgba(255,255,255,0.2)"/><path d="M6 12h12M6 8h8M6 16h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="splash-title">SmartFlow Lima</div>
+      <div class="splash-sub">Tu ciudad, en tiempo real</div>
+      <div class="splash-loader"><div class="splash-loader-bar"></div></div>
+    </div>
+
+    <!-- ===== ONBOARDING ===== -->
+    <div id="onboarding">
+      <div class="ob-slides">
+        <div class="ob-slide active" id="ob0">
+          <div class="ob-emoji">🚌</div>
+          <div class="ob-title">Sabe cuándo llega tu bus</div>
+          <div class="ob-desc">Ve en tiempo real dónde están los buses, cuánto tardan y qué tan llenos van. Sin sorpresas.</div>
+        </div>
+        <div class="ob-slide" id="ob1">
+          <div class="ob-emoji">📸</div>
+          <div class="ob-title">Reporta lo que ves</div>
+          <div class="ob-desc">¿Accidente, semáforo roto o paradero bloqueado? Tu reporte llega directo a la ATU en segundos.</div>
+        </div>
+        <div class="ob-slide" id="ob2">
+          <div class="ob-emoji">🗺️</div>
+          <div class="ob-title">Viaja informado</div>
+          <div class="ob-desc">Rutas óptimas según el tráfico actual, alertas de congestión y asistente IA 24/7.</div>
+        </div>
+      </div>
+      <div class="ob-dots">
+        <div class="ob-dot active" id="dot0"></div>
+        <div class="ob-dot" id="dot1"></div>
+        <div class="ob-dot" id="dot2"></div>
+      </div>
+      <div class="ob-bottom">
+        <button class="btn-full" id="obNext">Siguiente</button>
+        <button id="obSkip" style="background:none;border:none;color:var(--muted);font-size:13px;padding:6px;cursor:pointer;font-family:Inter,sans-serif">Omitir</button>
+      </div>
+    </div>
+
+    <!-- ===== ROLE SELECT ===== -->
+    <div id="roleSelect">
+      <div class="role-title">¿Cómo usarás SmartFlow?</div>
+      <div class="role-sub">Puedes cambiar tu rol en cualquier momento</div>
+      <div class="role-cards">
+        <div class="role-card" onclick="startApp('passenger')">
+          <div class="role-card-icon">🧍</div>
+          <div>
+            <div class="role-card-name">Pasajero</div>
+            <div class="role-card-desc">Busca rutas, ve buses en tiempo real, recarga tu tarjeta y reporta incidentes</div>
+          </div>
+          <svg width="14" height="14" fill="none" stroke="var(--muted)" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="role-card" onclick="startApp('driver')">
+          <div class="role-card-icon">🚌</div>
+          <div>
+            <div class="role-card-name">Conductor</div>
+            <div class="role-card-desc">Alertas de tráfico, cambios de ruta y comunicación con la base en tiempo real</div>
+          </div>
+          <svg width="14" height="14" fill="none" stroke="var(--muted)" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="role-card" onclick="startApp('passenger')" style="border-style:dashed">
+          <div class="role-card-icon">👤</div>
+          <div>
+            <div class="role-card-name">Invitado</div>
+            <div class="role-card-desc">Sin cuenta, acceso básico al mapa</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MAIN APP ===== -->
+    <div id="app">
+
+      <!-- TOP BAR -->
+      <div class="topbar">
+        <div class="topbar-avatar" id="avatarEl">LR</div>
+        <div class="topbar-greet">
+          <div class="name" id="greetName">Buenos días, Luis</div>
+          <div class="sub" id="greetSub">¿A dónde vas hoy?</div>
+        </div>
+        <div class="mode-toggle">
+          <button class="mode-btn active" id="modePass" onclick="switchMode('passenger')">Pasajero</button>
+          <button class="mode-btn" id="modeDriv" onclick="switchMode('driver')">Conductor</button>
+        </div>
+        <div class="topbar-btn" onclick="openPanel('notifPanel')">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <div class="notif-badge"></div>
+        </div>
+      </div>
+
+      <!-- DRIVER STATUS -->
+      <div class="driver-status" id="driverStatus" style="display:none">
+        <span>🚌</span>
+        <div style="flex:1">
+          <div class="driver-unit">Unidad MT-2347</div>
+          <div class="driver-route">Ruta C45 — Callao → San Isidro</div>
+        </div>
+        <span class="status-pill green">En Ruta ●</span>
+      </div>
+
+      <!-- MAP AREA -->
+      <div id="mapContainer">
+        <div class="search-bar">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input id="searchInput" placeholder="¿A dónde vas?" autocomplete="off" readonly onclick="openPanel('routePanel')">
+        </div>
+        <div id="map"></div>
+
+        <!-- PASSENGER BOTTOM SHEET -->
+        <div class="bottom-sheet" id="bottomSheet">
+          <div class="sheet-handle"></div>
+
+          <div id="passengerSheet" class="sheet-collapsed">
+            <div class="next-bus">
+              <div class="bus-icon-wrap">🚌</div>
+              <div class="bus-info">
+                <div class="bus-route">Bus B12 — Miraflores ↔ Centro</div>
+                <div class="bus-time" id="nextBusTime">2 <span>min</span></div>
+                <div class="occupancy-row">
+                  <div class="occ-dot" style="background:var(--green)"></div>
+                  <div class="occ-dot" style="background:var(--green)"></div>
+                  <div class="occ-dot" style="background:var(--border)"></div>
+                  <span style="font-size:10px;color:var(--muted)">Baja ocupación</span>
+                </div>
+              </div>
+              <div style="font-size:18px;color:var(--muted)">›</div>
+            </div>
+            <div class="upcoming-buses">
+              <div class="ubus">
+                <div class="ubus-route">B12</div>
+                <div class="ubus-time" id="ubus1">8 min</div>
+                <div class="ubus-occ">
+                  <div class="occ-dot" style="width:5px;height:5px;background:var(--yellow)"></div>
+                  <div class="occ-dot" style="width:5px;height:5px;background:var(--yellow)"></div>
+                  <div class="occ-dot" style="width:5px;height:5px;background:var(--yellow)"></div>
+                </div>
+              </div>
+              <div class="ubus">
+                <div class="ubus-route">C45</div>
+                <div class="ubus-time">14 min</div>
+                <div class="ubus-occ">
+                  <div class="occ-dot" style="width:5px;height:5px;background:var(--green)"></div>
+                  <div class="occ-dot" style="width:5px;height:5px;background:var(--border)"></div>
+                  <div class="occ-dot" style="width:5px;height:5px;background:var(--border)"></div>
+                </div>
+              </div>
+              <div class="ubus">
+                <div class="ubus-route">A07</div>
+                <div class="ubus-time">19 min</div>
+                <div class="ubus-occ">
+                  <div class="occ-dot" style="width:5px;height:5px;background:var(--green)"></div>
+                  <div class="occ-dot" style="width:5px;height:5px;background:var(--green)"></div>
+                  <div class="occ-dot" style="width:5px;height:5px;background:var(--border)"></div>
+                </div>
+              </div>
+              <div class="ubus">
+                <div class="ubus-route">D23</div>
+                <div class="ubus-time">26 min</div>
+                <div class="ubus-occ">
+                  <div class="occ-dot" style="width:5px;height:5px;background:var(--red)"></div>
+                  <div class="occ-dot" style="width:5px;height:5px;background:var(--red)"></div>
+                  <div class="occ-dot" style="width:5px;height:5px;background:var(--red)"></div>
+                </div>
+              </div>
+            </div>
+            <button class="report-btn" onclick="openPanel('reportPanel')">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              REPORTAR INTERFERENCIA
+            </button>
+          </div>
+
+          <!-- DRIVER BOTTOM SHEET -->
+          <div id="driverSheet" class="sheet-collapsed" style="display:none">
+            <div class="driver-card">
+              <div class="driver-card-label">Siguiente Paradero</div>
+              <div class="driver-card-value">Paradero La Cultura · 1.2 km</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px">Pasajeros esperando: <strong style="color:var(--primary)">~24</strong></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px">
+              <div class="driver-card" style="margin:0">
+                <div class="driver-card-label">Velocidad</div>
+                <div class="driver-card-value" id="driverSpeed">28 km/h</div>
+              </div>
+              <div class="driver-card" style="margin:0">
+                <div class="driver-card-label">Cumplimiento</div>
+                <div class="driver-card-value" style="color:var(--green)">✓ A tiempo</div>
+              </div>
+            </div>
+            <div class="driver-action-row">
+              <button class="driver-action-btn" style="background:#fff3cd;color:#856404" onclick="showToast('Reporte enviado a la base','yellow')">⚠️ Reportar</button>
+              <button class="driver-action-btn" style="background:#d1ecf1;color:#0c5460" onclick="openPanel('chatPanel')">💬 Base</button>
+              <button class="driver-action-btn" style="background:var(--red);color:#fff" onclick="showToast('¡Solicitud de apoyo enviada!','red')">🆘 Apoyo</button>
+            </div>
+          </div>
+        </div>
+      </div><!-- /mapContainer -->
+
+      <!-- BOTTOM NAV -->
+      <nav class="bottom-nav">
+        <div class="nav-indicator" id="navIndicator"></div>
+        <button class="nav-tab active" onclick="setTab(0);closeAllPanels()">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+          <span>Inicio</span>
+        </button>
+        <button class="nav-tab" onclick="setTab(1);openPanel('routePanel')">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          <span>Rutas</span>
+        </button>
+        <button class="nav-tab" onclick="setTab(2);openPanel('reportPanel')">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>Reportar</span>
+        </button>
+        <button class="nav-tab" onclick="setTab(3);openPanel('chatPanel')">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          <span>Chat IA</span>
+        </button>
+        <button class="nav-tab" onclick="setTab(4);openPanel('profilePanel')">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Perfil</span>
+        </button>
+      </nav>
+    </div><!-- /app -->
+
+    <!-- ===== PANELS ===== -->
+
+    <!-- ROUTES -->
+    <div class="panel" id="routePanel">
+      <div class="panel-header">
+        <button class="back-btn" onclick="closePanel('routePanel');setTab(0)">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="panel-title">Rutas disponibles</div>
+      </div>
+      <div style="padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0">
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:11px">
+          <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border)">
+            <div style="width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0"></div>
+            <div style="font-size:12px;color:var(--muted)">Mi ubicación actual</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:10px 12px">
+            <div style="width:7px;height:7px;border-radius:50%;background:var(--red);flex-shrink:0"></div>
+            <input id="destInput" style="flex:1;border:none;background:none;font-size:12px;outline:none;font-family:Inter,sans-serif" placeholder="¿A dónde vas?">
+          </div>
+        </div>
+      </div>
+      <div style="padding:7px 14px;display:flex;gap:6px;border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0">
+        <button class="quick-reply" onclick="setDest('Universidad de Lima')">🎓 Universidad</button>
+        <button class="quick-reply" onclick="setDest('Centro de Lima')">🏛️ Centro</button>
+        <button class="quick-reply" onclick="setDest('Miraflores')">🌊 Miraflores</button>
+        <button class="quick-reply" onclick="setDest('San Isidro')">🏢 San Isidro</button>
+      </div>
+      <div class="panel-body">
+        <div class="route-card">
+          <div class="route-tag fast">⚡ Más rápido</div>
+          <div class="route-name">Metropolitano + Bus B12</div>
+          <div class="route-meta"><span>S/ 2.50</span><span>1 transbordo</span></div>
+          <div class="route-time">22 min</div>
+          <div class="route-steps">
+            <div class="step-dot"></div><div class="step-line"></div>
+            <span>Naranjal</span><div class="step-line"></div>
+            <div class="step-dot"></div><div class="step-line"></div>
+            <span>La Cultura</span><div class="step-line"></div>
+            <div class="step-dot"></div>
+          </div>
+        </div>
+        <div class="route-card">
+          <div class="route-tag cheap">💰 Más barato</div>
+          <div class="route-name">Bus C45 directo</div>
+          <div class="route-meta"><span>S/ 1.50</span><span>Sin transbordo</span></div>
+          <div class="route-time">35 min <span style="font-size:11px;color:var(--red)">⚠ Tráfico</span></div>
+          <div class="route-steps">
+            <div class="step-dot"></div><div class="step-line"></div>
+            <span>Paradero actual</span><div class="step-line"></div>
+            <div class="step-dot"></div>
+          </div>
+        </div>
+        <div class="route-card">
+          <div class="route-tag" style="background:#f0e8ff;color:#5b21b6">🚇 Menos transbordos</div>
+          <div class="route-name">Metro L1 + caminata</div>
+          <div class="route-meta"><span>S/ 3.00</span><span>Metro + 8 min a pie</span></div>
+          <div class="route-time">28 min</div>
+          <div class="route-steps">
+            <div class="step-dot" style="background:#7c3aed"></div><div class="step-line"></div>
+            <span>Est. Gamarra</span><div class="step-line"></div>
+            <div class="step-dot" style="background:#7c3aed"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORT -->
+    <div class="panel" id="reportPanel">
+      <div class="panel-header">
+        <button class="back-btn" onclick="closePanel('reportPanel');setTab(0)">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="panel-title">Reportar Incidencia</div>
+      </div>
+      <div class="panel-body">
+        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:9px">Tipo de incidente</div>
+        <div class="report-type-grid">
+          <div class="report-type-btn selected" onclick="selectReportType(this)"><div class="icon">🚗</div>Accidente</div>
+          <div class="report-type-btn" onclick="selectReportType(this)"><div class="icon">🚦</div>Congestión</div>
+          <div class="report-type-btn" onclick="selectReportType(this)"><div class="icon">🚌</div>Bus Averiado</div>
+          <div class="report-type-btn" onclick="selectReportType(this)"><div class="icon">🚧</div>Paradero Bloqueado</div>
+          <div class="report-type-btn" onclick="selectReportType(this)"><div class="icon">🔴</div>Semáforo Roto</div>
+          <div class="report-type-btn" onclick="selectReportType(this)"><div class="icon">📢</div>Otro</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:7px">Ubicación detectada</div>
+        <div class="location-pill">
+          <span>📍</span>
+          <span style="flex:1;font-size:12px">Av. Arequipa cdra. 42, Miraflores</span>
+          <span style="font-size:11px;color:var(--primary);font-weight:700;cursor:pointer">Cambiar</span>
+        </div>
+        <button class="photo-btn" onclick="showToast('Cámara activada','yellow')">
+          <span style="font-size:26px">📷</span>
+          <span>Agregar foto (opcional)</span>
+        </button>
+        <div style="margin-bottom:12px">
+          <div style="font-size:12px;font-weight:700;margin-bottom:7px">Descripción</div>
+          <textarea id="reportDesc" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:10px;font-size:12px;font-family:Inter,sans-serif;outline:none;resize:none;color:var(--text)" rows="3" placeholder="Describe brevemente lo que ocurre..."></textarea>
+        </div>
+        <button onclick="sendReport()" style="width:100%;background:var(--red);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">Enviar Reporte</button>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="panel" id="chatPanel" style="background:#f8faff">
+      <div class="panel-header" style="background:#fff">
+        <button class="back-btn" onclick="closePanel('chatPanel');setTab(0)">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
+        <div style="display:flex;align-items:center;gap:8px;flex:1">
+          <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#2563eb);display:flex;align-items:center;justify-content:center;font-size:14px">🤖</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text)">Asistente SmartFlow</div>
+            <div style="font-size:9px;color:var(--green);font-weight:700">● En línea</div>
+          </div>
+        </div>
+      </div>
+      <div class="quick-replies" style="padding-top:8px">
+        <button class="quick-reply" onclick="sendChat('¿Cuándo llega el próximo bus?')">🚌 Próximo bus</button>
+        <button class="quick-reply" onclick="sendChat('¿Cómo llego a Miraflores?')">🗺️ A Miraflores</button>
+        <button class="quick-reply" onclick="sendChat('¿Por qué hay tanto tráfico?')">🚦 Tráfico</button>
+        <button class="quick-reply" onclick="sendChat('¿Cómo recargo mi tarjeta?')">💳 Recargar</button>
+      </div>
+      <div class="chat-body" id="chatBody">
+        <div style="text-align:center;padding:6px;font-size:10px;color:var(--muted)">Hoy, 14:22</div>
+        <div class="msg-bubble msg-bot">¡Hola! Soy tu asistente de movilidad. 👋<br><br>¿En qué te puedo ayudar hoy?<div class="msg-time">14:22</div></div>
+      </div>
+      <div class="chat-input-bar">
+        <input id="chatInput" placeholder="Escribe tu mensaje..." onkeydown="if(event.key==='Enter')sendChatInput()">
+        <button class="chat-send-btn" onclick="sendChatInput()">
+          <svg width="14" height="14" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="panel" id="profilePanel">
+      <div class="panel-header">
+        <button class="back-btn" onclick="closePanel('profilePanel');setTab(0)">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="panel-title">Mi Perfil</div>
+      </div>
+      <div style="overflow-y:auto;flex:1">
+        <div class="profile-header">
+          <div class="profile-avatar-big">LR</div>
+          <div class="profile-name">Luis Rodríguez</div>
+          <div class="profile-email">luisrodriguez@gmail.com</div>
+          <div style="margin-top:10px;display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.15);padding:3px 10px;border-radius:10px;font-size:11px">✨ Viajero Frecuente — 142 viajes/mes</div>
+        </div>
+        <div class="panel-body" style="background:var(--bg)">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Mis estadísticas</div>
+          <div class="card-row">
+            <div class="card-item"><div class="card-label">Viajes/mes</div><div class="card-value">142</div><div class="card-sub">+18 vs anterior</div></div>
+            <div class="card-item"><div class="card-label">Ahorro vs taxi</div><div class="card-value" style="color:var(--green)">S/ 284</div><div class="card-sub">este mes</div></div>
+            <div class="card-item"><div class="card-label">CO₂ ahorrado</div><div class="card-value" style="color:var(--green)">38 kg</div><div class="card-sub">equiv.</div></div>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Mis tarjetas</div>
+          <div class="transport-card"><div class="transport-icon">🟢</div><div style="flex:1"><div class="transport-name">Tarjeta TIT</div><div class="transport-balance">S/ 12.50</div></div><button onclick="openPanel('rechargePanel')" style="background:var(--primary);color:#fff;border:none;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">Recargar</button></div>
+          <div class="transport-card"><div class="transport-icon">🔵</div><div style="flex:1"><div class="transport-name">Metropolitano</div><div class="transport-balance">S/ 8.00</div></div><button onclick="openPanel('rechargePanel')" style="background:var(--primary);color:#fff;border:none;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">Recargar</button></div>
+          <div class="transport-card"><div class="transport-icon">🔴</div><div style="flex:1"><div class="transport-name">Metro Línea 1</div><div class="transport-balance">S/ 5.50</div></div><button onclick="openPanel('rechargePanel')" style="background:var(--primary);color:#fff;border:none;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">Recargar</button></div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;margin-top:10px">
+            <div class="setting-item" onclick="showToast('Notificaciones configuradas','green')"><div class="setting-icon">🔔</div><div class="setting-label">Notificaciones</div><div class="setting-value">Activadas</div></div>
+            <div class="setting-item" onclick="showToast('Idioma','yellow')"><div class="setting-icon">🌐</div><div class="setting-label">Idioma</div><div class="setting-value">Español</div></div>
+            <div class="setting-item" onclick="showToast('Tema oscuro activado','yellow')"><div class="setting-icon">🌙</div><div class="setting-label">Tema</div><div class="setting-value">Claro</div></div>
+            <div class="setting-item" onclick="showToast('Abriendo historial...','yellow')"><div class="setting-icon">📊</div><div class="setting-label">Historial de viajes</div><div class="setting-value">30 días ›</div></div>
+          </div>
+          <button onclick="showToast('Sesión cerrada','red')" style="width:100%;background:#fff;border:1.5px solid var(--red);color:var(--red);border-radius:11px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECHARGE -->
+    <div class="panel" id="rechargePanel">
+      <div class="panel-header">
+        <button class="back-btn" onclick="closePanel('rechargePanel')">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="panel-title">Recargar Tarjeta</div>
+      </div>
+      <div class="panel-body">
+        <div class="balance-hero">
+          <div class="balance-label">Saldo actual — Tarjeta TIT</div>
+          <div class="balance-amount" id="balanceAmount">S/ 12.50</div>
+          <div class="balance-sub">Última recarga: hace 3 días</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px">Selecciona el monto</div>
+        <div class="amount-grid">
+          <div class="amount-btn" onclick="selectAmount(this,'5')">S/ 5</div>
+          <div class="amount-btn selected" onclick="selectAmount(this,'10')">S/ 10</div>
+          <div class="amount-btn" onclick="selectAmount(this,'20')">S/ 20</div>
+          <div class="amount-btn" onclick="selectAmount(this,'30')">S/ 30</div>
+          <div class="amount-btn" onclick="selectAmount(this,'50')">S/ 50</div>
+          <div class="amount-btn" onclick="selectAmount(this,'otro')">Otro</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px">Método de pago</div>
+        <div class="pay-method" onclick="doRecharge()"><div class="pay-logo">💚</div><div><div class="pay-name">Yape</div><div style="font-size:10px;color:var(--muted)">Pago instantáneo</div></div></div>
+        <div class="pay-method" onclick="doRecharge()"><div class="pay-logo">🔵</div><div><div class="pay-name">Plin</div><div style="font-size:10px;color:var(--muted)">Pago instantáneo</div></div></div>
+        <div class="pay-method" onclick="doRecharge()"><div class="pay-logo">💳</div><div><div class="pay-name">Tarjeta débito/crédito</div><div style="font-size:10px;color:var(--muted)">Visa, Mastercard</div></div></div>
+        <div class="pay-method" onclick="doRecharge()"><div class="pay-logo">🏧</div><div><div class="pay-name">Agente Físico</div><div style="font-size:10px;color:var(--muted)">Ver agentes cercanos</div></div></div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="panel" id="notifPanel">
+      <div class="panel-header">
+        <button class="back-btn" onclick="closePanel('notifPanel')">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="panel-title">Notificaciones</div>
+      </div>
+      <div class="panel-body" id="notifList"></div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast-wrap" id="toastWrap"></div>
+
+  </div><!-- /phone-screen -->
+</div><!-- /phone-shell -->
+
+<script>
+// ===== STATE =====
+let currentMode='passenger', selectedAmount='10', obIndex=0, currentBalance=12.50;
+
+// ===== STATUS BAR CLOCK =====
+function updateStatusClock(){
+  const d=new Date();
+  const h=d.getHours().toString().padStart(2,'0');
+  const m=d.getMinutes().toString().padStart(2,'0');
+  const el=document.getElementById('statusTime');
+  if(el) el.textContent=h+':'+m;
+}
+setInterval(updateStatusClock,10000); updateStatusClock();
+
+// ===== SPLASH → ONBOARDING =====
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('splash').classList.add('hidden');
+    document.getElementById('onboarding').style.display='flex';
+  },2400);
+});
+
+document.getElementById('obNext').addEventListener('click',()=>{
+  if(obIndex<2){
+    document.getElementById('ob'+obIndex).classList.remove('active');
+    document.getElementById('ob'+obIndex).classList.add('prev');
+    document.getElementById('dot'+obIndex).classList.remove('active');
+    obIndex++;
+    document.getElementById('ob'+obIndex).classList.add('active');
+    document.getElementById('dot'+obIndex).classList.add('active');
+    if(obIndex===2) document.getElementById('obNext').textContent='¡Comenzar!';
+  } else { showRoleSelect(); }
+});
+document.getElementById('obSkip').addEventListener('click', showRoleSelect);
+
+function showRoleSelect(){
+  document.getElementById('onboarding').style.display='none';
+  document.getElementById('roleSelect').style.display='flex';
+}
+
+function startApp(role){
+  currentMode=role;
+  document.getElementById('roleSelect').style.display='none';
+  const app=document.getElementById('app');
+  app.style.display='flex';
+  if(role==='driver') switchMode('driver');
+  initMap();
+  startBusCountdown();
+  renderNotifications();
+  setTimeout(()=>showToast('📍 Ubicación detectada ✓','green'),1500);
+  if(role==='driver') setTimeout(()=>showToast('⚠️ Desvío activo en Av. Arequipa','yellow'),4000);
+}
+
+// ===== MAP =====
+let map, busMarkers=[];
+
+// Rutas con coordenadas reales de calles de Lima
+const ROUTES = [
+  {
+    name:'B12 — Miraflores ↔ Centro Lima',
+    label:'B12', color:'#1A4E8C', outlineColor:'#0d3a72',
+    // Sigue Av. Arequipa / Paseo de la República
+    coords:[
+      [-12.1192,-77.0290], // Larco / Miraflores
+      [-12.1176,-77.0298], // Angamos
+      [-12.1067,-77.0332], // Aramburu
+      [-12.0983,-77.0356], // San Isidro
+      [-12.0923,-77.0361],
+      [-12.0876,-77.0365], // Javier Prado
+      [-12.0812,-77.0367],
+      [-12.0736,-77.0365], // 28 de Julio
+      [-12.0680,-77.0358],
+      [-12.0636,-77.0352],
+      [-12.0589,-77.0345],
+      [-12.0550,-77.0335],
+      [-12.0521,-77.0327], // Tacna/Wilson
+      [-12.0489,-77.0316],
+      [-12.0464,-77.0297], // Plaza Mayor
+    ],
+    stops:[
+      {lat:-12.1192,lng:-77.0290,name:'Paradero Larco'},
+      {lat:-12.1176,lng:-77.0298,name:'Paradero Angamos'},
+      {lat:-12.0983,lng:-77.0356,name:'Paradero San Isidro'},
+      {lat:-12.0876,lng:-77.0365,name:'Paradero Javier Prado'},
+      {lat:-12.0736,lng:-77.0365,name:'Paradero 28 de Julio'},
+      {lat:-12.0521,lng:-77.0327,name:'Paradero Wilson'},
+      {lat:-12.0464,lng:-77.0297,name:'Paradero Plaza Mayor'},
+    ]
+  },
+  {
+    name:'C45 — Callao ↔ San Isidro',
+    label:'C45', color:'#2BB673', outlineColor:'#1a8050',
+    // Sigue Av. La Marina → Brasil → Rep. de Panamá
+    coords:[
+      [-12.0564,-77.1197], // Callao
+      [-12.0578,-77.1089],
+      [-12.0601,-77.0998],
+      [-12.0623,-77.0912],
+      [-12.0634,-77.0856], // La Marina / Brasil
+      [-12.0672,-77.0756],
+      [-12.0712,-77.0634],
+      [-12.0745,-77.0534],
+      [-12.0789,-77.0456],
+      [-12.0834,-77.0412],
+      [-12.0898,-77.0389],
+      [-12.0947,-77.0374],
+      [-12.0983,-77.0366], // San Isidro
+    ],
+    stops:[
+      {lat:-12.0564,lng:-77.1197,name:'Terminal Callao'},
+      {lat:-12.0634,lng:-77.0856,name:'Paradero La Marina'},
+      {lat:-12.0712,lng:-77.0634,name:'Paradero Brasil'},
+      {lat:-12.0834,lng:-77.0412,name:'Paradero Rep. Panamá'},
+      {lat:-12.0983,lng:-77.0366,name:'Paradero San Isidro'},
+    ]
+  },
+  {
+    name:'A07 — SJL ↔ Ate Vitarte',
+    label:'A07', color:'#F5A623', outlineColor:'#b87a10',
+    // Sigue Javier Prado Este
+    coords:[
+      [-12.0089,-77.0023], // SJL
+      [-12.0156,-77.0145],
+      [-12.0245,-77.0212],
+      [-12.0356,-77.0256],
+      [-12.0420,-77.0278],
+      [-12.0464,-77.0297], // Lima Centro
+      [-12.0534,-77.0189],
+      [-12.0634,-77.0089],
+      [-12.0712,-76.9978],
+      [-12.0756,-76.9891],
+      [-12.0834,-76.9756], // Ate
+    ],
+    stops:[
+      {lat:-12.0089,lng:-77.0023,name:'Terminal SJL'},
+      {lat:-12.0356,lng:-77.0256,name:'Paradero Canto Grande'},
+      {lat:-12.0464,lng:-77.0297,name:'Paradero Lima Centro'},
+      {lat:-12.0634,lng:-77.0089,name:'Paradero Sta. Anita'},
+      {lat:-12.0834,lng:-76.9756,name:'Terminal Ate Vitarte'},
+    ]
+  },
+  {
+    name:'Metropolitano — Naranjal ↔ Chorrillos',
+    label:'MET', color:'#9333ea', outlineColor:'#6b21a8',
+    // Sigue Paseo de la República
+    coords:[
+      [-11.9798,-77.0423], // Naranjal
+      [-11.9967,-77.0420],
+      [-12.0134,-77.0412],
+      [-12.0289,-77.0378],
+      [-12.0364,-77.0356],
+      [-12.0434,-77.0334],
+      [-12.0489,-77.0312],
+      [-12.0612,-77.0298],
+      [-12.0712,-77.0298],
+      [-12.0823,-77.0298],
+      [-12.0923,-77.0298],
+      [-12.1034,-77.0298], // Aramburu
+      [-12.1123,-77.0298],
+      [-12.1267,-77.0298], // Benavides
+    ],
+    stops:[
+      {lat:-11.9798,lng:-77.0423,name:'Est. Naranjal'},
+      {lat:-12.0134,lng:-77.0412,name:'Est. Caquetá'},
+      {lat:-12.0364,lng:-77.0356,name:'Est. Quilca'},
+      {lat:-12.0489,lng:-77.0312,name:'Est. España'},
+      {lat:-12.0712,lng:-77.0298,name:'Est. Canadá'},
+      {lat:-12.0923,lng:-77.0298,name:'Est. Javier Prado'},
+      {lat:-12.1034,lng:-77.0298,name:'Est. Aramburu'},
+      {lat:-12.1267,lng:-77.0298,name:'Est. Benavides'},
+    ]
+  }
+];
+
+function initMap(){
+  map=L.map('map',{zoomControl:false,attributionControl:false}).setView([-12.0720,-77.0420],13);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
+
+  // Draw routes: primero el outline (borde oscuro), luego la línea de color encima
+  ROUTES.forEach(r=>{
+    // Sombra/outline
+    L.polyline(r.coords,{color:r.outlineColor,weight:7,opacity:.5,lineJoin:'round',lineCap:'round'}).addTo(map);
+    // Línea principal
+    L.polyline(r.coords,{color:r.color,weight:4,opacity:.9,lineJoin:'round',lineCap:'round'})
+      .bindPopup(`<b>${r.label}</b> — ${r.name}`)
+      .addTo(map);
+
+    // Paraderos
+    r.stops.forEach(s=>{
+      const icon=L.divIcon({
+        className:'',
+        html:`<div style="width:10px;height:10px;border-radius:50%;background:#fff;border:2.5px solid ${r.color};box-shadow:0 1px 4px rgba(0,0,0,.25)"></div>`,
+        iconSize:[10,10],iconAnchor:[5,5]
+      });
+      L.marker([s.lat,s.lng],{icon}).bindPopup(`<b>${s.name}</b><br><span style="color:${r.color};font-weight:600">${r.label}</span>`).addTo(map);
+    });
+  });
+
+  // Ubicación del usuario (Miraflores)
+  const uIcon=L.divIcon({
+    className:'',
+    html:`<div style="position:relative">
+      <div style="width:14px;height:14px;border-radius:50%;background:#1A4E8C;border:3px solid #fff;box-shadow:0 0 0 5px rgba(26,78,140,.2)"></div>
+    </div>`,
+    iconSize:[14,14],iconAnchor:[7,7]
+  });
+  L.marker([-12.0983,-77.0366],{icon:uIcon,zIndexOffset:1000})
+    .bindPopup('<b>Tu ubicación</b><br>San Isidro')
+    .addTo(map);
+
+  // Buses animados — uno por ruta en posición inicial sobre la ruta
+  const busPositions=[
+    {routeIdx:0,posIdx:7,label:'B12',c:'#1A4E8C'},  // B12 en el tramo Javier Prado
+    {routeIdx:1,posIdx:5,label:'C45',c:'#2BB673'},   // C45 en La Marina
+    {routeIdx:2,posIdx:3,label:'A07',c:'#F5A623'},   // A07 en Lima Centro
+    {routeIdx:3,posIdx:4,label:'MET',c:'#9333ea'},   // Metropolitano
+    {routeIdx:0,posIdx:3,label:'B12',c:'#1A4E8C'},   // otro B12
+    {routeIdx:1,posIdx:9,label:'C45',c:'#2BB673'},   // otro C45
+  ];
+
+  busMarkers=busPositions.map(b=>{
+    const route=ROUTES[b.routeIdx];
+    const pos=route.coords[b.posIdx];
+    const icon=L.divIcon({
+      className:'',
+      html:`<div style="background:${b.c};color:#fff;border-radius:6px;padding:3px 7px;font-size:9px;font-weight:800;border:2px solid rgba(255,255,255,.5);box-shadow:0 2px 8px rgba(0,0,0,.3);white-space:nowrap;line-height:1">${b.label}</div>`,
+      iconSize:[34,18],iconAnchor:[17,9]
+    });
+    return {
+      m:L.marker(pos,{icon,zIndexOffset:500}).addTo(map),
+      routeIdx:b.routeIdx,
+      posIdx:b.posIdx,
+      dir:1
+    };
+  });
+
+  // Incidentes
+  [{lat:-12.0876,lng:-77.0283,t:'⚠️ Accidente — carril bloqueado'},{lat:-12.0634,lng:-77.0856,t:'🔴 Semáforo averiado'}].forEach(i=>{
+    const icon=L.divIcon({className:'',html:'<div style="background:#E6394618;border:2px solid #E63946;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 2px 6px rgba(230,57,70,.4)">⚠️</div>',iconSize:[22,22],iconAnchor:[11,11]});
+    L.marker([i.lat,i.lng],{icon}).bindPopup(i.t).addTo(map);
+  });
+
+  // Animar buses moviéndose punto a punto sobre la ruta
+  setInterval(()=>{
+    busMarkers.forEach(b=>{
+      const coords=ROUTES[b.routeIdx].coords;
+      b.posIdx+=b.dir;
+      if(b.posIdx>=coords.length-1) b.dir=-1;
+      if(b.posIdx<=0) b.dir=1;
+      b.m.setLatLng(coords[b.posIdx]);
+    });
+  },1800);
+}
+
+// ===== BUS COUNTDOWN =====
+let bt1=2,bt2=8;
+function startBusCountdown(){
+  setInterval(()=>{
+    bt1=Math.max(1,bt1+(Math.random()>.7?1:-1));
+    bt2=Math.max(bt1+4,bt2+(Math.random()>.5?1:-1));
+    const e=document.getElementById('nextBusTime');
+    if(e) e.innerHTML=bt1+' <span>min</span>';
+    const u=document.getElementById('ubus1');
+    if(u) u.textContent=bt2+' min';
+  },7000);
+}
+
+// ===== TABS =====
+function setTab(i){
+  document.querySelectorAll('.nav-tab').forEach((t,j)=>t.classList.toggle('active',j===i));
+  document.getElementById('navIndicator').style.left=(i*20)+'%';
+}
+function closeAllPanels(){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('open'));
+}
+
+// ===== MODE =====
+function switchMode(mode){
+  currentMode=mode;
+  document.getElementById('modePass').classList.toggle('active',mode==='passenger');
+  document.getElementById('modeDriv').classList.toggle('active',mode==='driver');
+  document.getElementById('driverStatus').style.display=mode==='driver'?'flex':'none';
+  document.getElementById('passengerSheet').style.display=mode==='passenger'?'block':'none';
+  document.getElementById('driverSheet').style.display=mode==='driver'?'block':'none';
+  if(mode==='driver'){
+    document.getElementById('greetSub').textContent='MT-2347 · En ruta';
+    document.getElementById('avatarEl').textContent='DR';
+    setInterval(()=>{
+      const s=document.getElementById('driverSpeed');
+      if(s) s.textContent=Math.floor(12+Math.random()*38)+' km/h';
+    },3000);
+  } else {
+    document.getElementById('greetSub').textContent='¿A dónde vas hoy?';
+    document.getElementById('avatarEl').textContent='LR';
+  }
+}
+
+// ===== PANELS =====
+function openPanel(id){ document.getElementById(id).classList.add('open'); }
+function closePanel(id){ document.getElementById(id).classList.remove('open'); }
+
+// ===== REPORT =====
+function selectReportType(el){
+  document.querySelectorAll('.report-type-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function sendReport(){
+  closePanel('reportPanel');
+  setTab(0);
+  setTimeout(()=>showToast('✅ Reporte enviado. La ATU lo revisará pronto. ¡Gracias!','green'),200);
+  document.getElementById('reportDesc').value='';
+}
+
+// ===== CHAT =====
+const BOT_RESP={
+  bus:'El próximo Bus B12 llega en <b>2 minutos</b>. 🚌\n\nB12 → 2 min (baja ocupación ✅)\nC45 → 8 min (media ⚠️)\nA07 → 19 min',
+  mir:'Para ir a <b>Miraflores</b>:\n\n⚡ <b>Rápido (22 min):</b> Metro→Bus B12 · S/ 2.50\n💰 <b>Barato (35 min):</b> Bus C45 directo · S/ 1.50\n🚇 <b>Directo (28 min):</b> Metro L1 + caminata · S/ 3.00',
+  traf:'🚦 <b>Tráfico ahora:</b>\n\n🔴 Crítico: Javier Prado Km 8 (accidente)\n🟡 Moderado: Arequipa cdra 42-50\n🟡 Moderado: La Marina & Brasil\n✅ Normal: Metro L1, Universitaria',
+  rec:'💳 <b>Recargar tarjeta:</b>\n\nVe a \'Perfil\' → Mis tarjetas → Recargar\n\nMétodos: Yape, Plin, tarjeta bancaria o agente físico.\n\nTu saldo TIT: <b>S/ 12.50</b>',
+  def:'Entendido. 🤖 Consultando la red de transporte...\n\nHay <b>1,247 buses activos</b> y el nivel de servicio es <b>87%</b>. ¿Algo más específico?',
+};
+function getResp(m){
+  const t=m.toLowerCase();
+  if(t.includes('bus')||t.includes('llega')||t.includes('próximo')) return BOT_RESP.bus;
+  if(t.includes('miraflores')||t.includes('cómo llego')||t.includes('ruta')) return BOT_RESP.mir;
+  if(t.includes('tráfico')||t.includes('demorando')||t.includes('congestion')) return BOT_RESP.traf;
+  if(t.includes('recarg')||t.includes('tarjeta')||t.includes('saldo')) return BOT_RESP.rec;
+  return BOT_RESP.def;
+}
+function addMsg(who,txt){
+  const b=document.getElementById('chatBody');
+  const d=document.createElement('div');
+  d.className='msg-bubble msg-'+who;
+  const t=new Date().toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'});
+  d.innerHTML=txt.replace(/\n/g,'<br>')+'<div class="msg-time">'+t+'</div>';
+  b.appendChild(d);
+  b.scrollTop=b.scrollHeight;
+}
+function sendChat(msg){
+  openPanel('chatPanel');
+  setTimeout(()=>{addMsg('user',msg);setTimeout(()=>addMsg('bot',getResp(msg)),700);},150);
+}
+function sendChatInput(){
+  const i=document.getElementById('chatInput');
+  const m=i.value.trim();
+  if(!m) return;
+  addMsg('user',m); i.value='';
+  setTimeout(()=>addMsg('bot',getResp(m)),700);
+}
+
+// ===== RECHARGE =====
+function selectAmount(el,val){
+  document.querySelectorAll('.amount-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected'); selectedAmount=val;
+}
+function doRecharge(){
+  if(selectedAmount==='otro'){showToast('Ingresa monto personalizado','yellow');return;}
+  const a=parseFloat(selectedAmount);
+  currentBalance+=a;
+  const e=document.getElementById('balanceAmount');
+  if(e) e.textContent='S/ '+currentBalance.toFixed(2);
+  showToast('✅ Recarga S/ '+a+' exitosa. Saldo: S/ '+currentBalance.toFixed(2),'green');
+}
+
+// ===== ROUTE HELPER =====
+function setDest(d){
+  document.getElementById('destInput').value=d;
+  showToast('Buscando rutas a '+d+'...','yellow');
+}
+
+// ===== NOTIFICATIONS =====
+const NOTIFS=[
+  {icon:'🚌',title:'Bus B12 llega en 2 min',body:'Paradero Arequipa cdra. 42',time:'Hace 1 min',c:'var(--primary)'},
+  {icon:'⚠️',title:'Tráfico moderado en tu ruta',body:'Av. Javier Prado +8 min',time:'Hace 5 min',c:'var(--yellow)'},
+  {icon:'🔴',title:'Semáforo averiado',body:'La Marina & Brasil — evita esa zona',time:'Hace 18 min',c:'var(--red)'},
+  {icon:'✅',title:'Reporte confirmado',body:'Tu reporte REC-312 fue recibido',time:'Hace 1 h',c:'var(--green)'},
+  {icon:'💳',title:'Saldo bajo',body:'Tarjeta TIT: S/ 12.50 — ¿Recargar?',time:'Hace 2 h',c:'var(--yellow)'},
+];
+function renderNotifications(){
+  document.getElementById('notifList').innerHTML=NOTIFS.map(n=>`
+    <div class="notif-item" onclick="closePanel('notifPanel')">
+      <div style="width:38px;height:38px;border-radius:10px;background:${n.c}22;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${n.icon}</div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--text)">${n.title}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${n.body}</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:3px">${n.time}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== TOAST =====
+function showToast(msg,type='green'){
+  const w=document.getElementById('toastWrap');
+  const t=document.createElement('div');
+  t.className='toast';
+  t.style.borderLeft='3px solid '+(type==='red'?'var(--red)':type==='yellow'?'var(--yellow)':'var(--green)');
+  t.innerHTML='<span>'+(type==='red'?'🚨':type==='yellow'?'⚠️':'✅')+'</span><span style="font-size:11px">'+msg+'</span>';
+  w.appendChild(t);
+  setTimeout(()=>t.remove(),3200);
+}
+
+// ===== LIVE ALERTS =====
+const LIVE=[
+  {m:'Bus B12 llega en 1 min',t:'green'},
+  {m:'⚠️ Congestión en tu ruta. +8 min',t:'yellow'},
+  {m:'🚌 Bus C45 sale en 12 min',t:'yellow'},
+  {m:'🔴 Accidente en Javier Prado',t:'red'},
+];
+let li=0;
+setInterval(()=>{
+  if(document.getElementById('app').style.display==='flex'){
+    const a=LIVE[li%LIVE.length]; showToast(a.m,a.t); li++;
+  }
+},20000);
+</script>
+</body>
+</html>
