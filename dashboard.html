@@ -262,6 +262,12 @@ tbody tr:hover td{background:#f9fbfd}
 
 @media(max-width:1100px){.sb{width:56px;min-width:56px}.ni span,.nav-sec,.brand-name,.brand-sub,.u-name,.u-role{display:none}.ni{justify-content:center}.sb-logo{justify-content:center}.sb-foot .u-name,.sb-foot .u-role{display:none}}
 
+/* Route filter tabs */
+.rtab{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid var(--bd);background:transparent;color:var(--mu);cursor:pointer;transition:all .2s;font-family:inherit;white-space:nowrap}
+.rtab:hover{border-color:var(--rc,var(--p));color:var(--rc,var(--p));background:rgba(0,0,0,.03)}
+.rtab.active{background:var(--rc,var(--p));color:#fff;border-color:var(--rc,var(--p));box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.rtab.all{--rc:var(--p)}
+
 /* Route editor edit mode */
 .edit-active #toggleEditBtn{background:rgba(245,166,35,.15);color:var(--y);border-color:rgba(245,166,35,.3)}
 .vtx-tip{font-size:10px;color:var(--p);line-height:1.55;padding:7px 10px;background:#f8fafc;border-radius:6px;margin-bottom:8px;border-left:2px solid #0052A3}
@@ -303,6 +309,36 @@ tbody tr:hover td{background:#f9fbfd}
   .kpi-grid { grid-template-columns: 1fr 1fr; }
   .rep-sidebar { display: none; }
 }
+
+/* ── UX/UI improvements ── */
+
+/* Sync badge shown after publish */
+.sync-published {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(43,182,115,.12); border: 1px solid rgba(43,182,115,.3);
+  color: #059669; font-size: 10px; font-weight: 700;
+  padding: 3px 9px; border-radius: 8px; margin-left: 8px;
+  animation: fadeIn .4s ease;
+}
+
+/* Route list items — better hover */
+#routesList > div:hover { background: rgba(0,82,163,.06) !important; border-color: rgba(0,82,163,.3) !important; }
+
+/* KPI bar glow on hover */
+.kpi:hover .kpi-fill { filter: brightness(1.15); }
+
+/* Cam toolbar dark header fix */
+.cam-toolbar { background: #1e2a3a !important; }
+.cam-toolbar span, .cam-toolbar select { color: #e2e8f0; }
+.cam-toolbar .fi { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.15); color: #e2e8f0; }
+
+/* Sidebar active item stronger accent */
+.ni.active { background: linear-gradient(90deg, rgba(0,82,163,.16) 0%, transparent 100%) !important; }
+.ni.active svg { color: var(--p); }
+
+/* Report sidebar header area */
+.rep-sidebar { border-right: 2px solid var(--bd); }
+
 
 </style>
 </head>
@@ -387,6 +423,15 @@ tbody tr:hover td{background:#f9fbfd}
     <span class="live-dot">EN VIVO</span>
     <span class="sys-badge" id="sysStatus">Sistema Operativo</span>
     <div class="tb-ticker" id="tbTicker"></div>
+    <!-- Filtro de ruta global — visible en todas las secciones -->
+    <div style="display:flex;align-items:center;gap:5px;margin-left:8px;flex-shrink:0" id="routeFilterRow">
+      <span style="font-size:10px;color:var(--mu);font-weight:600;white-space:nowrap">Ruta:</span>
+      <button class="rtab all active" data-route="" onclick="setRouteFilter(null)">Todas</button>
+      <button class="rtab" data-route="B12" onclick="setRouteFilter('B12')" style="--rc:#1A4E8C">B12</button>
+      <button class="rtab" data-route="C45" onclick="setRouteFilter('C45')" style="--rc:#2BB673">C45</button>
+      <button class="rtab" data-route="A07" onclick="setRouteFilter('A07')" style="--rc:#F5A623">A07</button>
+      <button class="rtab" data-route="MET" onclick="setRouteFilter('MET')" style="--rc:#9333ea">MET</button>
+    </div>
     <div class="tb-right">
       <div class="clock" id="clk">00:00:00</div>
       <div class="ib" title="Notificaciones" onclick="toggleNotif()">
@@ -455,7 +500,7 @@ tbody tr:hover td{background:#f9fbfd}
     <section class="sec" id="sec-monitoreo">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;height:100%">
         <div style="position:relative;border-right:1px solid var(--bd)">
-          <div style="position:absolute;top:10px;left:10px;z-index:400;background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:600;color:#fff;display:flex;align-items:center;gap:6px">
+          <div style="position:absolute;top:10px;left:10px;z-index:400;background:rgba(15,23,42,.88);border:1px solid rgba(0,82,163,.3);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:600;color:#fff;display:flex;align-items:center;gap:6px">
             🚦 Estado Semafórico
             <span class="badge red" id="semCritBadge">3 críticos</span>
           </div>
@@ -492,7 +537,7 @@ tbody tr:hover td{background:#f9fbfd}
     <section class="sec" id="sec-flota">
       <div style="display:grid;grid-template-columns:1fr 300px;height:100%;gap:0">
         <div style="position:relative">
-          <div style="position:absolute;top:10px;left:10px;z-index:400;background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:7px 11px;font-size:12px;color:#fff;font-weight:600;display:flex;align-items:center;gap:6px">
+          <div style="position:absolute;top:10px;left:10px;z-index:400;background:rgba(15,23,42,.88);border:1px solid rgba(0,82,163,.3);border-radius:8px;padding:7px 11px;font-size:12px;color:#fff;font-weight:600;display:flex;align-items:center;gap:6px">
             🚌 Flota Activa
             <span class="badge green">1,247 unidades</span>
           </div>
@@ -529,7 +574,7 @@ tbody tr:hover td{background:#f9fbfd}
           </div>
           <div class="re-body">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-              <div style="font-size:14px;font-weight:700;color:#fff" id="reTitle">Nueva Ruta</div>
+              <div style="font-size:14px;font-weight:700;color:var(--tx)" id="reTitle">Nueva Ruta</div>
               <button class="btn btn-gh btn-sm ml-auto" onclick="resetRouteForm()" title="Nueva ruta">+ Nueva</button>
             </div>
             <div class="fg">
@@ -692,7 +737,7 @@ tbody tr:hover td{background:#f9fbfd}
     <section class="sec" id="sec-reporteria">
       <div style="display:flex;height:100%">
         <div class="rep-sidebar">
-          <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:12px">Generador de Reportes</div>
+          <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:12px">Generador de Reportes</div>
           <div class="fg">
             <label class="fl">Tipo de Reporte</label>
             <select class="fsel" id="repType">
@@ -741,7 +786,7 @@ tbody tr:hover td{background:#f9fbfd}
           </div>
         </div>
         <div class="rep-main">
-          <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:12px" id="repPreviewTitle">Vista Previa — Validaciones por Estación (3 meses)</div>
+          <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:12px" id="repPreviewTitle">Vista Previa — Validaciones por Estación (3 meses)</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
             <div class="card" style="height:210px">
               <div class="ch"><div class="ct">Pasajeros por Estación</div></div>
@@ -803,32 +848,142 @@ tbody tr:hover td{background:#f9fbfd}
 
 <script>
 // ===== CONSTANTS =====
-const LIMA=[-12.0464,-77.0428];
+// Centro geográfico de Lima Metropolitana (entre Lince y San Isidro)
+const LIMA=[-12.0720,-77.0380];
 
+// ===== ROUTE FILTER — filtro global que afecta todos los mapas y listas =====
+let activeRoute = null;
+
+// Almacena capas de rutas por mapa para poder filtrarlas
+const MAP_LAYERS = { main:{}, monit:{}, flota:{}, semf:{}, semaf:{} };
+
+function setRouteFilter(routeId) {
+  activeRoute = routeId || null;
+
+  // 1. Actualizar tabs
+  document.querySelectorAll('.rtab').forEach(t => {
+    const match = routeId ? t.dataset.route === routeId : t.dataset.route === '';
+    t.classList.toggle('active', match);
+  });
+
+  // 2. Filtrar polylines en todos los mapas inicializados
+  const DEFAULT_OPACITY = {main:.5, monit:.5, flota:.35, semf:.55, semaf:.55};
+  Object.entries(MAP_LAYERS).forEach(([mapKey, layers]) => {
+    const defOp = DEFAULT_OPACITY[mapKey] || .4;
+    Object.entries(layers).forEach(([rId, layer]) => {
+      if(!routeId){
+        layer.setStyle({opacity:defOp, weight:mapKey==='main'?3:mapKey==='flota'?3.5:4.5});
+      } else {
+        const active = rId === routeId;
+        layer.setStyle({opacity: active ? 0.92 : 0.06, weight: active ? 5.5 : 2});
+      }
+    });
+  });
+
+  // 3. Filtrar marcadores de buses (flota)
+  if(busMs && busMs.length){
+    busMs.forEach(b=>{
+      const rData = EDIT_ROUTES.find(r => b.data && b.data.route && b.data.route.includes(r.id));
+      const show = !routeId || (rData && rData.id === routeId);
+      try{ const el=b.marker.getElement(); if(el) el.style.opacity = show?'1':'0.05'; }catch(e){}
+    });
+  }
+
+  // 4. Filtrar marcadores de semáforos
+  _semMapMkrs.forEach(sm=>{
+    const sem = SEMAFOROS.find(s=>s.id===sm.id);
+    const show = !routeId || (sem && sem.routeId===routeId);
+    try{ const el=sm.marker.getElement(); if(el) el.style.opacity = show?'1':'0'; }catch(e){}
+  });
+
+  // 5. Refrescar listas en la sección activa
+  const activeSec = document.querySelector('.sec.active');
+  if(activeSec){
+    const sid = activeSec.id.replace('sec-','');
+    if(sid==='flota')     renderFlota(routeId ? FLOTA.filter(b=>b.route&&b.route.includes(routeId)) : FLOTA);
+    if(sid==='semaforos') renderSemafs();
+    if(sid==='monitoreo') renderIncList();
+    if(sid==='alertas')   renderAlertasFull();
+    if(sid==='overview')  renderAlerts();
+    if(sid==='reclamos')  filterReclamos();
+  }
+
+  // Toast informativo
+  if(routeId){
+    const r = EDIT_ROUTES.find(x=>x.id===routeId);
+    showToast(`Filtrando: ${r ? r.name : routeId}`,'yellow');
+  } else {
+    showToast('Mostrando todas las rutas','green');
+  }
+}
+
+// Cámaras CCTV en intersecciones reales de Lima — semId vincula al semáforo real
 const CAMERAS=[
-  {id:'CAM-001',name:'Javier Prado / Arequipa',lat:-12.0876,lng:-77.0365,status:'active',v:47,p:12},
-  {id:'CAM-002',name:'Aviación / Javier Prado',lat:-12.0876,lng:-77.0283,status:'active',v:63,p:8},
-  {id:'CAM-003',name:'28 de Julio / Arequipa',lat:-12.0736,lng:-77.0365,status:'warning',v:29,p:34},
-  {id:'CAM-004',name:'Plaza Mayor — Jr. Unión',lat:-12.0464,lng:-77.0297,status:'active',v:18,p:87},
-  {id:'CAM-005',name:'Angamos / Arequipa',lat:-12.1176,lng:-77.0365,status:'active',v:55,p:21},
-  {id:'CAM-006',name:'La Marina / Brasil',lat:-12.0634,lng:-77.0856,status:'active',v:71,p:15},
-  {id:'CAM-007',name:'Benavides / Arequipa',lat:-12.1067,lng:-77.0365,status:'active',v:38,p:19},
-  {id:'CAM-008',name:'Tomás Valle / Universitaria',lat:-12.0087,lng:-77.0634,status:'inactive',v:0,p:0},
+  {id:'CAM-001',name:'Arequipa & Javier Prado',semId:'SEM-003',lat:-12.0876,lng:-77.0283,status:'active'},
+  {id:'CAM-002',name:'Arequipa & Angamos',semId:'SEM-001',lat:-12.1073,lng:-77.0283,status:'active'},
+  {id:'CAM-003',name:'Arequipa & 28 de Julio',semId:'SEM-004',lat:-12.0736,lng:-77.0280,status:'warning'},
+  {id:'CAM-004',name:'Abancay & Jr. Unión — Centro',semId:'SEM-005',lat:-12.0464,lng:-77.0297,status:'active'},
+  {id:'CAM-005',name:'La Marina & Brasil',semId:'SEM-009',lat:-12.0487,lng:-77.0838,status:'active'},
+  {id:'CAM-006',name:'La Marina & Universitaria',semId:'SEM-010',lat:-12.0487,lng:-77.0756,status:'active'},
+  {id:'CAM-007',name:'Vía Expresa & Javier Prado',semId:'SEM-008',lat:-12.0875,lng:-77.0448,status:'active'},
+  {id:'CAM-008',name:'Próceres & Gran Chimú (SJL)',semId:'SEM-011',lat:-12.0171,lng:-77.0018,status:'inactive'},
 ];
 
+// Semáforos reales — intersecciones consecutivas a lo largo de cada corredor
+// routePos = posición fraccional (0=inicio, 1=fin) sobre la ruta asociada
+// lat/lng iniciales reales; calibrateGeoPositions() los ajusta a la geometría OSRM
 const SEMAFOROS=[
-  {id:'SEM-001',routeId:'B12',routePos:.18,name:'Arequipa & Benavides',phase:'green',cycle:90,optimal:75,status:'suboptimo',lat:-12.0464,lng:-77.0297},
-  {id:'SEM-002',routeId:'B12',routePos:.38,name:'Arequipa & Javier Prado',phase:'red',cycle:120,optimal:90,status:'critico',lat:-12.0464,lng:-77.0297},
-  {id:'SEM-003',routeId:'B12',routePos:.60,name:'Arequipa & 28 de Julio',phase:'yellow',cycle:60,optimal:55,status:'ok',lat:-12.0464,lng:-77.0297},
-  {id:'SEM-004',routeId:'B12',routePos:.85,name:'Wilson & Plaza Grau',phase:'green',cycle:85,optimal:80,status:'ok',lat:-12.0464,lng:-77.0297},
-  {id:'SEM-005',routeId:'MET',routePos:.42,name:'Vía Expresa & 28 de Julio',phase:'red',cycle:110,optimal:70,status:'critico',lat:-12.0464,lng:-77.0297},
-  {id:'SEM-006',routeId:'C45',routePos:.55,name:'La Marina & Brasil',phase:'green',cycle:75,optimal:70,status:'ok',lat:-12.0464,lng:-77.0297},
-  {id:'SEM-007',routeId:'MET',routePos:.65,name:'Vía Expresa & Javier Prado',phase:'yellow',cycle:95,optimal:80,status:'suboptimo',lat:-12.0464,lng:-77.0297},
-  {id:'SEM-008',routeId:'C45',routePos:.75,name:'La Marina & Salaverry',phase:'red',cycle:140,optimal:90,status:'critico',lat:-12.0464,lng:-77.0297},
-  {id:'SEM-009',routeId:'A07',routePos:.30,name:'Javier Prado & Aviación',phase:'green',cycle:70,optimal:70,status:'ok',lat:-12.0464,lng:-77.0297},
-  {id:'SEM-010',routeId:'A07',routePos:.60,name:'Javier Prado & La Molina',phase:'red',cycle:100,optimal:85,status:'suboptimo',lat:-12.0464,lng:-77.0297},
-  {id:'SEM-011',routeId:'MET',routePos:.22,name:'Vía Expresa & Aramburú',phase:'green',cycle:80,optimal:75,status:'ok',lat:-12.0464,lng:-77.0297},
-  {id:'SEM-012',routeId:'B12',routePos:.05,name:'Arequipa & Angamos',phase:'yellow',cycle:65,optimal:60,status:'ok',lat:-12.0464,lng:-77.0297},
+  // ─── Corredor B12: Av. Arequipa (de sur a norte — Miraflores → Centro) ───
+  {id:'SEM-001',routeId:'B12',routePos:.18,name:'Arequipa & Angamos',
+   phase:'green',cycle:90,optimal:75,status:'suboptimo',
+   lat:-12.1073,lng:-77.0283},   // Miraflores/Surquillo — intersección con Angamos
+
+  {id:'SEM-002',routeId:'B12',routePos:.33,name:'Arequipa & Aramburú',
+   phase:'red',cycle:120,optimal:90,status:'critico',
+   lat:-12.0976,lng:-77.0283},   // San Isidro — intersección con Aramburú
+
+  {id:'SEM-003',routeId:'B12',routePos:.50,name:'Arequipa & Javier Prado',
+   phase:'yellow',cycle:95,optimal:75,status:'suboptimo',
+   lat:-12.0876,lng:-77.0283},   // San Isidro — intersección con Javier Prado (muy congestionado)
+
+  {id:'SEM-004',routeId:'B12',routePos:.65,name:'Arequipa & 28 de Julio',
+   phase:'green',cycle:80,optimal:78,status:'ok',
+   lat:-12.0736,lng:-77.0280},   // Lince — intersección con 28 de Julio
+
+  {id:'SEM-005',routeId:'B12',routePos:.82,name:'Arequipa & España',
+   phase:'green',cycle:70,optimal:68,status:'ok',
+   lat:-12.0591,lng:-77.0283},   // Breña — intersección con España
+
+  // ─── Corredor MET: Vía Expresa / Paseo de la República (norte → sur) ───
+  {id:'SEM-006',routeId:'MET',routePos:.38,name:'Vía Expresa & España (Quilca)',
+   phase:'red',cycle:110,optimal:70,status:'critico',
+   lat:-12.0600,lng:-77.0448},   // Lima Centro — acceso Paseo de la República
+
+  {id:'SEM-007',routeId:'MET',routePos:.55,name:'Vía Expresa & 28 de Julio',
+   phase:'yellow',cycle:100,optimal:80,status:'suboptimo',
+   lat:-12.0720,lng:-77.0448},   // Lima Centro / San Isidro — 28 de Julio
+
+  {id:'SEM-008',routeId:'MET',routePos:.72,name:'Vía Expresa & Javier Prado',
+   phase:'red',cycle:130,optimal:90,status:'critico',
+   lat:-12.0875,lng:-77.0448},   // San Isidro — intersección más crítica del BRT
+
+  // ─── Corredor C45: Av. La Marina (oeste → este, Callao → San Isidro) ───
+  {id:'SEM-009',routeId:'C45',routePos:.32,name:'La Marina & Brasil',
+   phase:'green',cycle:75,optimal:72,status:'ok',
+   lat:-12.0487,lng:-77.0838},   // Pueblo Libre — La Marina & Brasil
+
+  {id:'SEM-010',routeId:'C45',routePos:.48,name:'La Marina & Universitaria',
+   phase:'yellow',cycle:85,optimal:70,status:'suboptimo',
+   lat:-12.0487,lng:-77.0756},   // San Miguel — La Marina & Universitaria
+
+  // ─── Corredor A07: Próceres → Abancay → Javier Prado Este (SJL → Ate) ───
+  {id:'SEM-011',routeId:'A07',routePos:.22,name:'Próceres & Gran Chimú',
+   phase:'green',cycle:80,optimal:75,status:'ok',
+   lat:-12.0171,lng:-77.0018},   // SJL — Próceres & Gran Chimú (congestionado mañanas)
+
+  {id:'SEM-012',routeId:'A07',routePos:.68,name:'Javier Prado Este & Aviación',
+   phase:'red',cycle:105,optimal:85,status:'suboptimo',
+   lat:-12.0834,lng:-76.9856},   // La Victoria/SJM — Javier Prado Este & Aviación
 ];
 
 const INCIDENTS=[
@@ -969,11 +1124,17 @@ let mainMap;
 function initMainMap(){
   mainMap=L.map('map-main',{zoomControl:true,attributionControl:false}).setView(LIMA,12);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(mainMap);
+  // Puntos de calor en intersecciones reales congestionadas de Lima
   const hs=[
-    {lat:-12.0876,lng:-77.0365,r:400,c:'#E63946',o:.35},{lat:-12.0876,lng:-77.0283,r:350,c:'#E63946',o:.3},
-    {lat:-12.1176,lng:-77.0365,r:300,c:'#F5A623',o:.25},{lat:-12.0636,lng:-77.0856,r:250,c:'#F5A623',o:.22},
-    {lat:-12.0087,lng:-77.0634,r:200,c:'#2BB673',o:.18},{lat:-12.0983,lng:-77.0366,r:280,c:'#2BB673',o:.15},
-    {lat:-12.0464,lng:-77.0297,r:180,c:'#F5A623',o:.2},
+    {lat:-12.0876,lng:-77.0283,r:420,c:'#E63946',o:.35}, // Arequipa & Javier Prado — crítico
+    {lat:-12.0736,lng:-77.0280,r:350,c:'#E63946',o:.28}, // Arequipa & 28 de Julio
+    {lat:-12.0875,lng:-77.0448,r:380,c:'#E63946',o:.32}, // Vía Expresa & Javier Prado
+    {lat:-12.0487,lng:-77.0838,r:300,c:'#F5A623',o:.25}, // La Marina & Brasil
+    {lat:-12.0487,lng:-77.0756,r:260,c:'#F5A623',o:.22}, // La Marina & Universitaria
+    {lat:-12.0171,lng:-77.0018,r:320,c:'#F5A623',o:.28}, // Próceres & Gran Chimú (SJL)
+    {lat:-12.1073,lng:-77.0283,r:280,c:'#F5A623',o:.22}, // Arequipa & Angamos
+    {lat:-12.0600,lng:-77.0448,r:200,c:'#2BB673',o:.18}, // Vía Expresa & España — moderado
+    {lat:-12.0464,lng:-77.0297,r:220,c:'#F5A623',o:.20}, // Abancay / Centro Lima
   ];
   hs.forEach(h=>L.circle([h.lat,h.lng],{radius:h.r,color:'transparent',fillColor:h.c,fillOpacity:h.o}).addTo(mainMap));
   CAMERAS.forEach(cam=>{
@@ -987,8 +1148,11 @@ function initMainMap(){
   });
   ensureRoutesSnapped().then(()=>{
     mainRouteLayers.forEach(l=>{try{mainMap.removeLayer(l);}catch(e){}});
+    MAP_LAYERS.main = {};
     EDIT_ROUTES.filter(r=>r.estado==='Activa').forEach(r=>{
-      L.polyline(r.coords,{color:r.color,weight:3,opacity:.5,interactive:false}).addTo(mainMap);
+      MAP_LAYERS.main[r.id] = L.polyline(r.coords,{color:r.color,weight:5,opacity:.55,interactive:true})
+        .on('click',()=>setRouteFilter(r.id)).bindTooltip(`<b>${r.id}</b> — ${r.name.split('—')[1]?.trim()||r.name}`,{sticky:true,opacity:.9})
+        .addTo(mainMap);
     });
     INCIDENTS.forEach(inc=>{
       const col=inc.sev==='red'?'#E63946':'#F5A623';
@@ -1006,11 +1170,15 @@ async function initMapSemaf(){
   semafMap=L.map('map-semaf',{zoomControl:true,attributionControl:false}).setView(LIMA,12);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(semafMap);
   // Routes with traffic-level highlight
+  MAP_LAYERS.monit = {};
   EDIT_ROUTES.filter(r=>r.estado==='Activa').forEach(r=>{
-    L.polyline(r.coords,{color:r.color,weight:4,opacity:.5,interactive:false}).addTo(semafMap);
+    MAP_LAYERS.monit[r.id] = L.polyline(r.coords,{color:r.color,weight:5,opacity:.55,interactive:true})
+      .on('click',()=>setRouteFilter(r.id)).bindTooltip(`<b>${r.id}</b>`,{sticky:true})
+      .addTo(semafMap);
     const n=r.coords.length,h1=Math.floor(n*.25),h2=Math.floor(n*.75);
     if(h2>h1)L.polyline(r.coords.slice(h1,h2+1),{color:'#F5A623',weight:5,opacity:.35,interactive:false}).addTo(semafMap);
   });
+  if(activeRoute) setRouteFilter(activeRoute);
   // Incidents only — no semaphore markers here
   INCIDENTS.forEach(inc=>{
     const col=inc.sev==='red'?'#E63946':'#F5A623';
@@ -1028,8 +1196,11 @@ async function initMapSemaforos(){
   semfMap=L.map('map-semaforos',{zoomControl:true,attributionControl:false}).setView(LIMA,12);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(semfMap);
   // Routes
+  MAP_LAYERS.semf = {};
   EDIT_ROUTES.filter(r=>r.estado==='Activa').forEach(r=>{
-    L.polyline(r.coords,{color:r.color,weight:4.5,opacity:.55,interactive:false}).addTo(semfMap);
+    MAP_LAYERS.semf[r.id] = L.polyline(r.coords,{color:r.color,weight:5.5,opacity:.6,interactive:true})
+      .on('click',()=>setRouteFilter(r.id)).bindTooltip(`<b>${r.id}</b>`,{sticky:true})
+      .addTo(semfMap);
   });
   // Live semaphore markers — small, on routes, cycling in real time
   SEMAFOROS.forEach(s=>{
@@ -1039,6 +1210,7 @@ async function initMapSemaforos(){
       .addTo(semfMap);
     _semMapMkrs.push({id:s.id,marker});
   });
+  if(activeRoute) setRouteFilter(activeRoute);
 }
 
 // ===== FLOTA MAP =====
@@ -1048,8 +1220,11 @@ async function initMapFlota(){
   await ensureRoutesSnapped();
   flotaMap=L.map('map-flota',{zoomControl:true,attributionControl:false}).setView(LIMA,12);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(flotaMap);
+  MAP_LAYERS.flota = {};
   EDIT_ROUTES.filter(r=>r.estado==='Activa').forEach(r=>{
-    L.polyline(r.coords,{color:r.color,weight:3.5,opacity:.35,interactive:false}).addTo(flotaMap);
+    MAP_LAYERS.flota[r.id] = L.polyline(r.coords,{color:r.color,weight:5,opacity:.5,interactive:true})
+      .on('click',()=>setRouteFilter(r.id)).bindTooltip(`<b>${r.id}</b> — click para filtrar`,{sticky:true})
+      .addTo(flotaMap);
   });
   // Match each bus to its route coordinates
   function resolveRoute(routeName){
@@ -1073,17 +1248,21 @@ async function initMapFlota(){
     };
   });
   renderFlota(FLOTA);
+  // Intervalo cada 600ms; paso proporcional a densidad para recorrer la ruta en ~60s
   setInterval(()=>{
     busMs.forEach(b=>{
-      if(b.data.status==='red')return; // averiado — no se mueve
-      b.ptIdx+=b.dir;
-      if(b.ptIdx>=b.coords.length-1){b.ptIdx=b.coords.length-1;b.dir=-1;}
-      if(b.ptIdx<=0){b.ptIdx=0;b.dir=1;}
+      if(b.data.status==='red')return;
+      const step = Math.max(1, Math.ceil(b.coords.length / 100));
+      b.ptIdx += b.dir * step;
+      if(b.ptIdx >= b.coords.length-1){b.ptIdx=b.coords.length-1; b.dir=-1;}
+      if(b.ptIdx <= 0){b.ptIdx=0; b.dir=1;}
       const pos=b.coords[b.ptIdx];
-      b.lat=pos[0];b.lng=pos[1];
+      b.lat=pos[0]; b.lng=pos[1];
       b.marker.setLatLng(pos);
     });
-  },4000);
+  }, 600);
+  renderFlota(activeRoute ? FLOTA.filter(b=>b.route&&b.route.includes(activeRoute)) : FLOTA);
+  if(activeRoute) setRouteFilter(activeRoute);
 }
 
 function filterFlota(q){
@@ -1109,15 +1288,74 @@ function renderFlota(list){
 function focusBus(id){
   const bm=busMs.find(b=>b.data.id===id);
   if(bm&&flotaMap){flotaMap.setView([bm.lat,bm.lng],15);bm.marker.openPopup();}
-  showToast(`Unidad ${id} localizada en el mapa`,'yellow');
+  // Filtrar al corredor de este bus
+  const rData=EDIT_ROUTES.find(r=>bm&&bm.data&&bm.data.route&&bm.data.route.includes(r.id));
+  if(rData) setRouteFilter(rData.id);
+  showToast(`Unidad ${id} — ${bm?.data.route||''}`,'yellow');
 }
 
-// ===== EXISTING ROUTES DATA =====
+// ===== EXISTING ROUTES DATA — Corredores viales reales de Lima =====
 const EDIT_ROUTES=[
-  {id:'B12',name:'Ruta B12 — Miraflores ↔ Centro Lima',tipo:'Regular',estado:'Activa',origen:'Paradero Larco — Av. Larco 1200',destino:'Paradero Plaza Mayor — Jr. Unión',desde:'05:00',hasta:'23:30',frec:8,flota:14,notas:'Ruta principal corredor Arequipa. Alta demanda horas punta.',color:'#1A4E8C',coords:[[-12.1185,-77.0283],[-12.0983,-77.0356],[-12.0876,-77.0388],[-12.0521,-77.0352],[-12.0464,-77.0297]]},
-  {id:'C45',name:'Ruta C45 — Callao ↔ San Isidro',tipo:'Regular',estado:'Activa',origen:'Terminal Callao — Av. Elmer Faucett s/n',destino:'Paradero San Isidro — Av. Rivera Navarrete',desde:'05:30',hasta:'22:00',frec:10,flota:10,notas:'Conecta Callao con San Isidro vía La Marina.',color:'#2BB673',coords:[[-12.0564,-77.1197],[-12.0487,-77.0756],[-12.0464,-77.0428],[-12.0983,-77.0366]]},
-  {id:'A07',name:'Ruta A07 — SJL ↔ Ate Vitarte',tipo:'Regular',estado:'Activa',origen:'Terminal SJL — Av. Próceres cdra. 1',destino:'Terminal Ate — Carretera Central Km 12',desde:'05:00',hasta:'22:30',frec:12,flota:8,notas:'Corredor Este — alta demanda en hora punta mañana.',color:'#F5A623',coords:[[-12.0089,-77.0023],[-12.0464,-77.0297],[-12.0834,-76.9756]]},
-  {id:'MET',name:'Metropolitano — Naranjal ↔ Benavides',tipo:'Expreso',estado:'Activa',origen:'Est. Naranjal — Av. Universitaria',destino:'Est. Benavides — Av. Benavides s/n',desde:'05:00',hasta:'22:30',frec:5,flota:32,notas:'Servicio BRT. Sin paradas intermedias entre Est. España y Est. Javier Prado (expreso).',color:'#9333ea',coords:[[-11.9798,-77.0423],[-12.0364,-77.0356],[-12.0712,-77.0298],[-12.1267,-77.0298]]},
+  {id:'B12',name:'Ruta B12 — Miraflores ↔ Centro Lima',tipo:'Regular',estado:'Activa',
+   origen:'Paradero Larco — Parque Kennedy, Miraflores',destino:'Plaza Bolognesi — Av. Tacna, Centro Lima',
+   desde:'05:00',hasta:'23:30',frec:8,flota:14,
+   notas:'Corredor Av. Arequipa. Ruta principal norte-sur de Lima. Alta demanda en horas punta (7-9h y 17-20h). Pasa por Miraflores, San Isidro, Lince, Jesús María, Breña y Centro.',
+   color:'#1A4E8C',
+   coords:[
+     [-12.1255,-77.0299], // Paradero Larco — Parque Kennedy
+     [-12.1103,-77.0370], // Ovalo Gutierrez (Arequipa & Santa Cruz)
+     [-12.1073,-77.0283], // Arequipa & Angamos
+     [-12.0976,-77.0283], // Arequipa & Aramburú
+     [-12.0876,-77.0283], // Arequipa & Javier Prado
+     [-12.0736,-77.0280], // Arequipa & 28 de Julio
+     [-12.0591,-77.0283], // Arequipa & España
+     [-12.0521,-77.0297], // Arequipa & Wilson
+     [-12.0464,-77.0297]  // Plaza Bolognesi — Centro Lima
+   ]},
+  {id:'C45',name:'Ruta C45 — Callao ↔ San Isidro',tipo:'Regular',estado:'Activa',
+   origen:'Terminal Callao — Bertello & Colonial',destino:'Av. Rivera Navarrete — San Isidro',
+   desde:'05:30',hasta:'22:00',frec:10,flota:10,
+   notas:'Corredor Av. La Marina. Conecta el Puerto del Callao con el distrito financiero de San Isidro pasando por Pueblo Libre. Alta demanda en tramo Callao-Universitaria.',
+   color:'#2BB673',
+   coords:[
+     [-12.0481,-77.1145], // Terminal Callao — Bertello & Colonial
+     [-12.0487,-77.0900], // La Marina (Bocanegra / San Miguel)
+     [-12.0487,-77.0838], // La Marina & Brasil
+     [-12.0487,-77.0756], // La Marina & Universitaria
+     [-12.0487,-77.0558], // La Marina & Salaverry (Pueblo Libre)
+     [-12.0620,-77.0450], // Salaverry → ingreso San Isidro
+     [-12.0920,-77.0270]  // Rivera Navarrete — San Isidro
+   ]},
+  {id:'A07',name:'Ruta A07 — SJL ↔ Ate Vitarte',tipo:'Regular',estado:'Activa',
+   origen:'Estación Bayóvar — Av. Próceres, San Juan de Lurigancho',destino:'Terminal Ate Vitarte — Carretera Central',
+   desde:'05:00',hasta:'22:30',frec:12,flota:8,
+   notas:'Corredor Próceres → Abancay → Javier Prado Este. Une el distrito más poblado de Lima (SJL) con Ate Vitarte pasando por el Centro Histórico. Alta congestión en tramo Próceres.',
+   color:'#F5A623',
+   coords:[
+     [-11.9596,-76.9874], // Estación Bayóvar — SJL
+     [-12.0089,-77.0023], // Av. Próceres de la Independencia
+     [-12.0171,-77.0018], // Próceres & Gran Chimú
+     [-12.0464,-77.0297], // Av. Abancay — Centro Lima
+     [-12.0590,-77.0148], // Javier Prado Este — ingreso autopista
+     [-12.0723,-76.9581], // Javier Prado Este & La Molina
+     [-12.0398,-76.9318]  // Terminal Ate Vitarte
+   ]},
+  {id:'MET',name:'Metropolitano — Naranjal ↔ Benavides',tipo:'Expreso',estado:'Activa',
+   origen:'Est. Naranjal — Av. Universitaria s/n, Independencia',destino:'Est. Benavides — Av. Benavides cdra. 5, Miraflores',
+   desde:'05:00',hasta:'22:30',frec:5,flota:32,
+   notas:'BRT Vía Expresa / Paseo de la República. 9 estaciones reales. Servicio express entre Est. España y Est. Javier Prado (sin paradas intermedias). Frecuencia cada 5 min en hora punta.',
+   color:'#9333ea',
+   coords:[
+     [-11.9827,-77.0586], // Est. Naranjal (Independencia)
+     [-12.0087,-77.0565], // Est. Tomás Valle
+     [-12.0364,-77.0480], // Est. UNI
+     [-12.0514,-77.0448], // Est. Caquetá
+     [-12.0600,-77.0448], // Est. España
+     [-12.0720,-77.0448], // Est. 28 de Julio / Quilca
+     [-12.0875,-77.0448], // Est. Javier Prado
+     [-12.1073,-77.0448], // Est. Angamos
+     [-12.1267,-77.0448]  // Est. Benavides
+   ]},
 ];
 
 let currentEditRoute=null,currentRouteData=null;
@@ -1131,7 +1369,7 @@ function renderRoutesList(){
     <div onclick="loadRoute('${r.id}')" id="rl-${r.id}" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;border:1px solid ${currentEditRoute===r.id?'rgba(26,78,140,.5)':'var(--bd)'};cursor:pointer;transition:all .12s;background:${currentEditRoute===r.id?'rgba(26,78,140,.2)':'transparent'}">
       <div style="width:4px;height:32px;border-radius:2px;background:${r.color};flex-shrink:0"></div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.id} — ${r.name.split('—')[1]?.trim()||r.name}</div>
+        <div style="font-size:11px;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.id} — ${r.name.split('—')[1]?.trim()||r.name}</div>
         <div style="font-size:9.5px;color:var(--mu);margin-top:1px">${r.tipo} · cada ${r.frec} min</div>
       </div>
       <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;background:${r.estado==='Activa'?'rgba(43,182,115,.15)':r.estado==='Suspendida'?'rgba(230,57,70,.15)':'rgba(245,166,35,.15)'};color:${r.estado==='Activa'?'var(--g)':r.estado==='Suspendida'?'var(--r)':'var(--y)'};flex-shrink:0">${r.estado}</span>
@@ -1156,6 +1394,8 @@ function loadRoute(id, fromAlert=null){
   const sels=document.querySelectorAll('.re-body .fsel');
   if(sels[0])sels[0].value=r.tipo; if(sels[1])sels[1].value=r.estado;
   renderRoutesList();
+  // Filtrar todos los mapas a esta ruta
+  setRouteFilter(id);
   // Incident info bar
   const incBar=document.getElementById('incAlertBar');
   if(fromAlert&&fromAlert.inc){
@@ -1219,9 +1459,25 @@ function rebuildVertexMarkers(){
       editCoords[idx]=[m.getLatLng().lat,m.getLatLng().lng];
       drawDetourLine();
     });
+    m.on('dragend',()=>{
+      // Sincronizar con index al soltar el punto (no durante el drag para no saturar)
+      if(currentRouteData){
+        currentRouteData.coords=[...editCoords];
+        syncRoutesToPassengerApp(currentRouteData.id, true);
+      }
+    });
     m.on('contextmenu',(e)=>{
       L.DomEvent.stopPropagation(e);
-      if(editCoords.length>2){editCoords.splice(idx,1);rebuildVertexMarkers();drawDetourLine();updatePtCount();}
+      if(editCoords.length>2){
+        editCoords.splice(idx,1);
+        rebuildVertexMarkers();
+        drawDetourLine();
+        updatePtCount();
+        if(currentRouteData){
+          currentRouteData.coords=[...editCoords];
+          syncRoutesToPassengerApp(currentRouteData.id, true);
+        }
+      }
     });
     m.addTo(routesMap);
     editVertexMarkers.push(m);
@@ -1315,7 +1571,10 @@ function publishDetour(){
   const lbl=L.divIcon({className:'',html:`<div style="background:rgba(245,166,35,.9);color:#000;border-radius:5px;padding:3px 7px;font-size:9px;font-weight:800;white-space:nowrap">DESVÍO ACTIVO — ${currentRouteData.id}</div>`,iconSize:[0,0],iconAnchor:[0,0]});
   L.marker(mid,{icon:lbl,interactive:false}).addTo(routesMap);
   exitEditMode();
-  showToast(`✓ Desvío temporal publicado — Ruta ${currentRouteData.id}. Conductores notificados en tiempo real.`,'green');
+  // Update in-memory coords and sync
+  currentRouteData.coords = [...editCoords];
+  syncRoutesToPassengerApp(currentRouteData.id);
+  showToast(`✓ Desvío temporal publicado — Ruta ${currentRouteData.id}. 📡 App Pasajero actualizada.`,'green');
   document.getElementById('incAlertBar').style.display='none';
 }
 
@@ -1361,6 +1620,44 @@ function clearRoute(){
   showToast('Edición cancelada — ruta original restaurada','yellow');
 }
 
+// ===== ROUTE SYNC: dashboard → index via localStorage + BroadcastChannel =====
+function decimateCoords(coords, maxPts){
+  if(coords.length <= maxPts) return coords;
+  const step = Math.ceil((coords.length - 2) / (maxPts - 2));
+  const out = [coords[0]];
+  for(let i = 1; i < coords.length - 1; i += step) out.push(coords[i]);
+  out.push(coords[coords.length - 1]);
+  return out;
+}
+
+// broadcast=true → envía BroadcastChannel (actualiza index en tiempo real)
+// broadcast=false → solo guarda en localStorage (index lo leerá al cargar)
+function syncRoutesToPassengerApp(changedRouteId, broadcast=true){
+  try {
+    const payload = EDIT_ROUTES.map(r => ({
+      id: r.id, name: r.name, color: r.color,
+      coords: decimateCoords(r.coords && r.coords.length ? r.coords : [], 25)
+    }));
+    // Sobreescribir con editCoords actuales si aplica (pueden ser distintos de r.coords)
+    if(changedRouteId && editCoords.length >= 2){
+      const idx = payload.findIndex(r => r.id === changedRouteId);
+      if(idx !== -1) payload[idx].coords = decimateCoords(editCoords, 25);
+    }
+    localStorage.setItem('sf_routes', JSON.stringify(payload));
+    if(broadcast){
+      try {
+        const ch = new BroadcastChannel('smartflow_routes');
+        const changedRoute = changedRouteId
+          ? (EDIT_ROUTES.find(r => r.id === changedRouteId)?.name || changedRouteId)
+          : 'todas las rutas';
+        ch.postMessage({ type: 'routes_updated', routes: payload, changedRoute });
+        ch.close();
+      } catch(ex) {}
+    }
+    return true;
+  } catch(ex) { console.warn('Sync failed', ex); return false; }
+}
+
 function saveRouteDraft(){
   const n=document.getElementById('rNombre').value.trim();
   if(!n){showToast('Ingresa un nombre de ruta','red');return;}
@@ -1371,7 +1668,14 @@ function publishRoute(){
   const n=document.getElementById('rNombre').value.trim();
   if(!n){showToast('Ingresa un nombre de ruta','red');return;}
   if(editCoords.length<2){showToast('Traza al menos 2 puntos en el mapa','yellow');return;}
-  showToast(`✓ Ruta "${n}" publicada. Conductores la reciben ahora.`,'green');
+  // Update in-memory route data with edited coords
+  if(currentRouteData){
+    currentRouteData.coords = [...editCoords];
+    syncRoutesToPassengerApp(currentRouteData.id);
+    showToast(`✓ Ruta "${n}" publicada. 📡 Sincronizada con la App Pasajero.`,'green');
+  } else {
+    showToast(`✓ Ruta "${n}" publicada. Conductores la reciben ahora.`,'green');
+  }
 }
 
 function simRoute(){
@@ -1395,6 +1699,8 @@ async function ensureRoutesSnapped(){
     }
     calibrateGeoPositions();
     _snapDone=true;
+    // Guardar rutas ajustadas a calles en localStorage (index las leerá al cargar)
+    syncRoutesToPassengerApp(null, false);
   })();
   return _snapProm;
 }
@@ -1489,7 +1795,15 @@ function applyAlt(idx){
   drawDetourLine();
   if(editMode)rebuildVertexMarkers();
   updatePtCount();
-  showToast('Ruta aplicada — arrastra los puntos para ajustar si lo necesitas','green');
+
+  // Sincronizar la alternativa elegida con el index en tiempo real
+  if(currentRouteData){
+    currentRouteData.coords=[...editCoords];
+    syncRoutesToPassengerApp(currentRouteData.id, true);
+    showToast(`Alternativa aplicada — 📡 sincronizada con App Pasajero (${currentRouteData.id})`,'green');
+  } else {
+    showToast('Ruta aplicada — arrastra los puntos para ajustar si lo necesitas','green');
+  }
 }
 
 function clearAltPanel(){
@@ -1533,7 +1847,14 @@ function toggleFreeDrawMode(){
         drawDetourLine();
         if(editMode)rebuildVertexMarkers();
         updatePtCount();
-        showToast(`Ruta trazada con ${editCoords.length} puntos — puedes editarla arrastrando los nodos`,'green');
+        // Sincronizar ruta trazada libremente con index
+        if(currentRouteData){
+          currentRouteData.coords=[...editCoords];
+          syncRoutesToPassengerApp(currentRouteData.id, true);
+          showToast(`Ruta trazada (${editCoords.length} pts) — 📡 sincronizada con App Pasajero`,'green');
+        } else {
+          showToast(`Ruta trazada con ${editCoords.length} puntos — puedes editarla arrastrando los nodos`,'green');
+        }
       }
     }
     // Clean up temp markers
@@ -1651,78 +1972,259 @@ setInterval(()=>{
   });
 },1000);
 
-// ===== CAMERAS =====
+// ===== CAMERAS — Simulación de intersección sincronizada con semáforos =====
 const camCtx={};
 let expandedCamIdx=null;
+
+const CAR_COLORS=['#c0392b','#2980b9','#f39c12','#ecf0f1','#27ae60','#8e44ad','#e67e22','#95a5a6','#1abc9c','#2c3e50'];
+function randCarColor(){ return CAR_COLORS[Math.floor(Math.random()*CAR_COLORS.length)]; }
+
 function initCams(){
   const layout=document.getElementById('camLayout').value;
-  const cols=layout==='9'?3:2,rows=layout==='9'?3:2,count=cols*rows;
+  const cols=layout==='9'?3:2, rows=layout==='9'?3:2, count=cols*rows;
   const cams=CAMERAS.slice(0,count);
   const grid=document.getElementById('camGrid');
   grid.style.gridTemplateColumns=`repeat(${cols},1fr)`;
   grid.style.gridTemplateRows=`repeat(${rows},1fr)`;
   grid.innerHTML='';
   Object.keys(camCtx).forEach(k=>{if(camCtx[k].raf)cancelAnimationFrame(camCtx[k].raf);delete camCtx[k];});
+
   cams.forEach((cam,i)=>{
-    const col=cam.status==='active'?'#2BB673':cam.status==='warning'?'#F5A623':'#E63946';
+    const statusCol=cam.status==='active'?'#2BB673':cam.status==='warning'?'#F5A623':'#E63946';
     const cell=document.createElement('div');
-    cell.className='cam-cell';cell.id='cc'+i;
-    cell.innerHTML=`<canvas id="cv${i}" style="width:100%;height:100%;display:block"></canvas>
-      <div style="position:absolute;top:6px;left:8px;font-family:JetBrains Mono,monospace;font-size:10px;color:#0af;opacity:.9" id="ct${i}">--:--:--</div>
-      <div style="position:absolute;top:22px;left:8px;font-family:JetBrains Mono,monospace;font-size:9px;color:#0f8;opacity:.9" id="cai${i}">🚗${cam.v} 🚶${cam.p}</div>
-      <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.9));padding:7px 8px;font-size:10.5px;font-family:JetBrains Mono,monospace;color:#0af">${cam.id} — ${cam.name}</div>
-      <div style="position:absolute;top:6px;right:8px;width:7px;height:7px;border-radius:50%;background:${col};box-shadow:0 0 5px ${col}"></div>
-      <div style="position:absolute;top:6px;right:22px;font-size:10px;cursor:pointer;color:#fff;opacity:.7" onclick="event.stopPropagation();expandCam(${i})" title="Expandir">⛶</div>`;
+    cell.className='cam-cell'; cell.id='cc'+i;
+    cell.innerHTML=`
+      <canvas id="cv${i}" style="width:100%;height:100%;display:block"></canvas>
+      <div style="position:absolute;top:6px;right:22px;font-size:11px;cursor:pointer;color:rgba(255,255,255,.7)" onclick="event.stopPropagation();expandCam(${i})" title="Expandir">⛶</div>
+      <div style="position:absolute;top:6px;right:8px;width:7px;height:7px;border-radius:50%;background:${statusCol};box-shadow:0 0 5px ${statusCol}"></div>`;
     cell.addEventListener('click',()=>expandCam(i));
     grid.appendChild(cell);
+
     setTimeout(()=>{
-      const cv=document.getElementById('cv'+i);if(!cv)return;
-      cv.width=cv.offsetWidth||320;cv.height=cv.offsetHeight||200;
+      const cv=document.getElementById('cv'+i); if(!cv)return;
+      cv.width=cv.offsetWidth||320; cv.height=cv.offsetHeight||180;
       const ctx=cv.getContext('2d');
-      const vehs=[];
-      for(let v=0;v<7;v++) vehs.push({x:Math.random()*cv.width,y:cv.height*(.38+Math.random()*.24),spd:(Math.random()+.4)*(cam.status==='active'?1.2:.15),w:20+Math.random()*14,h:9+Math.random()*5,c:['#e74c3c','#3498db','#f39c12','#2ecc71','#9b59b6','#e67e22','#1abc9c','#fff'][Math.floor(Math.random()*8)]});
-      camCtx[i]={ctx,cv,cam,vehs,frame:0};
+      const sem=cam.semId ? SEMAFOROS.find(s=>s.id===cam.semId) : null;
+      camCtx[i]={
+        ctx, cv, cam, sem,
+        // Contadores acumulados (sesión de hoy)
+        vehTotal: Math.floor(Math.random()*4000+800),
+        pedTotal: Math.floor(Math.random()*1200+200),
+        // Contadores del ciclo actual
+        vehCycle:0, pedCycle:0,
+        // Colas y flujos
+        queueEast:[], queueWest:[], flowing:[], peds:[],
+        prevPhase: sem ? sem.phase : 'green',
+        frame:0
+      };
       if(cam.status!=='inactive') drawCam(i);
-    },80);
+    },80+i*30);
   });
 }
 
 function drawCam(i){
-  const c=camCtx[i];if(!c)return;
-  const{ctx,cv,cam,vehs}=c;
-  ctx.fillStyle=cam.status==='warning'?'#12120a':'#0a0c12';
-  ctx.fillRect(0,0,cv.width,cv.height);
-  const my=cv.height*.5;
-  ctx.fillStyle='#181818';ctx.fillRect(0,my-38,cv.width,76);
-  ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.moveTo(0,my-38);ctx.lineTo(cv.width,my-38);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(0,my+38);ctx.lineTo(cv.width,my+38);ctx.stroke();
-  ctx.strokeStyle='rgba(255,255,255,.04)';ctx.setLineDash([14,10]);
-  ctx.beginPath();ctx.moveTo(0,my);ctx.lineTo(cv.width,my);ctx.stroke();ctx.setLineDash([]);
-  for(let b=0;b<9;b++){
-    const bx=(b/8)*cv.width;const bh=28+Math.sin(b*1.7)*16;
-    ctx.fillStyle=`rgba(20,25,45,${.4+b%2*.1})`;
-    ctx.fillRect(bx,my-38-bh,cv.width/10,bh);
+  const c=camCtx[i]; if(!c)return;
+  const{ctx,cv,cam,sem}=c;
+  const W=cv.width, H=cv.height;
+  const phase=sem ? sem.phase : 'green';
+  const st=sem ? _semSt[sem.id] : null;
+  const countdown=st ? Math.round(st.cd) : 0;
+  c.frame++;
+
+  // ── Detectar cambio de fase ─────────────────────────────────────────
+  if(c.prevPhase!==phase){
+    if(phase==='green'){
+      // Liberar vehículos en cola — arrancan gradualmente
+      c.vehCycle=0;
+    }
+    if(phase==='red'){
+      c.pedCycle=0;
+      // Lanzar tanda de peatones cruzando (N-S)
+      const numPeds=Math.floor(Math.random()*8+3);
+      for(let p=0;p<numPeds;p++){
+        const goDown=Math.random()<0.5;
+        c.peds.push({
+          x: W*0.47 + Math.random()*W*0.06,
+          y: goDown ? -8 : H*0.28+H*0.44+8,
+          spd: (Math.random()*0.5+0.3)*(goDown?1:-1),
+          done:false
+        });
+      }
+    }
+    c.prevPhase=phase;
   }
-  vehs.forEach(v=>{
-    v.x+=v.spd;if(v.x>cv.width+30)v.x=-30;
-    ctx.save();ctx.shadowColor=v.c;ctx.shadowBlur=3;
-    ctx.fillStyle=v.c;ctx.fillRect(v.x,v.y-v.h/2,v.w,v.h);
-    ctx.fillStyle='rgba(255,255,200,.85)';ctx.fillRect(v.x+v.w-2,v.y-1.5,2,3);
+
+  // ── Spawnear vehículos ─────────────────────────────────────────────
+  if(phase==='green'||phase==='yellow'){
+    // Soltar cola acumulada
+    if(c.queueEast.length>0 && c.frame%5===0){
+      const v=c.queueEast.shift(); v.stopped=false; v.spd=1.6+Math.random(); c.flowing.push(v);
+    }
+    if(c.queueWest.length>0 && c.frame%5===0){
+      const v=c.queueWest.shift(); v.stopped=false; v.spd=-(1.6+Math.random()); c.flowing.push(v);
+    }
+    // Vehículos nuevos que fluyen libremente
+    if(c.frame%10===0 && Math.random()<0.6){
+      const goEast=Math.random()<0.5;
+      c.flowing.push({x:goEast?-24:W+24, y:H*0.38+H*0.12*Math.random(), spd:goEast?1.7+Math.random()*0.6:-(1.7+Math.random()*0.6), w:22,h:9, col:randCarColor(), stopped:false});
+    }
+    if(c.frame%10===3 && Math.random()<0.5){
+      const goEast=Math.random()<0.5;
+      c.flowing.push({x:goEast?-24:W+24, y:H*0.56+H*0.08*Math.random(), spd:goEast?1.5+Math.random()*0.5:-(1.5+Math.random()*0.5), w:20,h:9, col:randCarColor(), stopped:false});
+    }
+  } else {
+    // RED — vehículos llegan y se detienen antes de la línea de stop
+    if(c.frame%14===0 && Math.random()<0.55){
+      const stopX=W*0.44-24;
+      c.queueEast.push({x:-24, y:H*0.36+H*0.12*Math.random(), spd:1.4+Math.random(), stopX, w:22,h:9, col:randCarColor(), stopped:false});
+    }
+    if(c.frame%14===7 && Math.random()<0.45){
+      const stopX=W*0.56+24;
+      c.queueWest.push({x:W+24, y:H*0.54+H*0.08*Math.random(), spd:-(1.4+Math.random()), stopX, w:22,h:9, col:randCarColor(), stopped:false});
+    }
+  }
+
+  // ── DIBUJAR ESCENA ─────────────────────────────────────────────────
+  // Fondo nocturno (CCTV)
+  ctx.fillStyle='#090c12'; ctx.fillRect(0,0,W,H);
+
+  // Aceras (arriba y abajo)
+  ctx.fillStyle='#10131c'; ctx.fillRect(0,0,W,H*0.28);
+  ctx.fillStyle='#10131c'; ctx.fillRect(0,H*0.72,W,H*0.28);
+
+  // Silueta de edificios (arriba)
+  for(let b=0;b<7;b++){
+    const bx=(b/6.2)*W, bh=14+((b*47)%22);
+    ctx.fillStyle='#0a0d15';
+    ctx.fillRect(bx,0,W/8,bh);
+  }
+
+  // Superficie de calle (carriles E-O)
+  ctx.fillStyle='#1a1f2e'; ctx.fillRect(0,H*0.28,W,H*0.44);
+
+  // Zona de intersección (tono ligeramente diferente)
+  ctx.fillStyle='#161b28'; ctx.fillRect(W*0.44,H*0.28,W*0.12,H*0.44);
+
+  // Separador de carriles (línea punteada central)
+  ctx.strokeStyle='rgba(255,255,200,0.18)'; ctx.setLineDash([10,8]); ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.moveTo(0,H*0.5); ctx.lineTo(W*0.44,H*0.5); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(W*0.56,H*0.5); ctx.lineTo(W,H*0.5); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Franjas del cruce peatonal (N-S) — brilla en fase roja
+  const cwAlpha=phase==='red'?0.55:0.12;
+  ctx.fillStyle=`rgba(255,255,255,${cwAlpha})`;
+  for(let s=0;s<6;s++){
+    const sy=H*0.28 + s*(H*0.44/6);
+    ctx.fillRect(W*0.455,sy+1,W*0.09,H*0.44/6-2);
+  }
+
+  // Líneas de STOP (visibles en rojo/amarillo)
+  if(phase==='red'||phase==='yellow'){
+    ctx.strokeStyle='rgba(255,255,255,0.75)'; ctx.lineWidth=2.5; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(W*0.44,H*0.28); ctx.lineTo(W*0.44,H*0.5); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W*0.56,H*0.5); ctx.lineTo(W*0.56,H*0.72); ctx.stroke();
+  }
+
+  // ── Dibujar colas (vehículos esperando) ────────────────────────────
+  [...c.queueEast,...c.queueWest].forEach(v=>{
+    if(!v.stopped){
+      v.x+=v.spd;
+      if(v.spd>0 && v.x>=v.stopX){ v.x=v.stopX; v.stopped=true; }
+      if(v.spd<0 && v.x<=v.stopX){ v.x=v.stopX; v.stopped=true; }
+    }
+    drawVehicle(ctx,v);
+  });
+
+  // ── Dibujar vehículos en flujo ─────────────────────────────────────
+  c.flowing=c.flowing.filter(v=>{
+    v.x+=v.spd;
+    const alive=v.spd>0?v.x<W+30:v.x>-30;
+    if(!alive){ c.vehTotal++; c.vehCycle++; }
+    return alive;
+  });
+  c.flowing.forEach(v=>drawVehicle(ctx,v));
+
+  // ── Dibujar peatones ───────────────────────────────────────────────
+  c.peds=c.peds.filter(p=>{
+    p.y+=p.spd;
+    const alive=p.spd>0?p.y<H*0.72+12:p.y>H*0.28-12;
+    if(!alive){ c.pedTotal++; c.pedCycle++; }
+    return alive;
+  });
+  c.peds.forEach(p=>{
+    ctx.save();
+    ctx.shadowColor='#0f8'; ctx.shadowBlur=4;
+    ctx.fillStyle='rgba(80,220,120,0.88)';
+    ctx.beginPath(); ctx.arc(p.x,p.y,3.5,0,Math.PI*2); ctx.fill();
     ctx.restore();
   });
-  if(c.frame%25<18){
-    ctx.strokeStyle='#0f8';ctx.lineWidth=.8;
-    vehs.slice(0,3).forEach(v=>{
-      ctx.strokeRect(v.x-1,v.y-v.h/2-1,v.w+2,v.h+2);
-      ctx.fillStyle='#0f8';ctx.font='7px monospace';
-      ctx.fillText(Math.floor(v.spd*22)+'km/h',v.x,v.y-v.h/2-3);
+
+  // ── Semáforo gráfico (esquina sup. derecha) ────────────────────────
+  const tlx=W-32,tly=6;
+  ctx.fillStyle='rgba(15,15,20,0.9)'; ctx.fillRect(tlx,tly,24,58);
+  ctx.strokeStyle='#333'; ctx.lineWidth=1; ctx.strokeRect(tlx,tly,24,58);
+  [[14,'#330000','#E63946'],[28,'#221100','#F5A623'],[42,'#001100','#2BB673']].forEach(([dy,off,on],pi)=>{
+    const phMap=['red','yellow','green'];
+    const isOn=phase===phMap[pi];
+    ctx.fillStyle=isOn?on:off;
+    if(isOn){ctx.shadowColor=on;ctx.shadowBlur=10;} else{ctx.shadowBlur=0;}
+    ctx.beginPath(); ctx.arc(tlx+12,tly+dy,8,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+  });
+
+  // ── HUD inferior ───────────────────────────────────────────────────
+  ctx.fillStyle='rgba(0,0,0,0.72)'; ctx.fillRect(0,H-42,W,42);
+  // Nombre de cámara e intersección
+  ctx.fillStyle='#2af'; ctx.font=`bold 8px 'JetBrains Mono',monospace`;
+  ctx.fillText(cam.id+' — '+cam.name, 5, H-30);
+  // Fase + cuenta regresiva
+  const phaseCol={green:'#2BB673',red:'#E63946',yellow:'#F5A623'};
+  const phaseNm={green:'VERDE',red:'ROJO',yellow:'AMARILLO'};
+  ctx.fillStyle=phaseCol[phase]||'#aaa';
+  ctx.fillText(`● ${phaseNm[phase]||phase.toUpperCase()}  ${countdown}s`, 5, H-17);
+  // Contadores del día
+  ctx.fillStyle='rgba(255,255,255,0.75)'; ctx.font=`8px 'JetBrains Mono',monospace`;
+  ctx.fillText(`🚗 HOY: ${c.vehTotal.toLocaleString()}  👥 ${c.pedTotal.toLocaleString()}`, W*0.42, H-17);
+  // Timestamp
+  ctx.fillStyle='rgba(0,170,255,0.6)';
+  ctx.fillText(new Date().toLocaleTimeString('es-PE',{hour12:false}), W-55, H-30);
+  // Barra de cola (proporción de vehículos esperando)
+  const qLen=c.queueEast.length+c.queueWest.length;
+  if(qLen>0){
+    const qPct=Math.min(qLen/16,1);
+    ctx.fillStyle=`rgba(230,57,70,${0.3+qPct*0.5})`; ctx.fillRect(0,H-43,W*qPct,2);
+    ctx.fillStyle='rgba(230,57,70,0.8)';
+    ctx.font=`7px 'JetBrains Mono',monospace`;
+    ctx.fillText(`Cola: ${qLen} veh`, W-60, H-30);
+  }
+  // Bounding boxes IA (cada N frames)
+  if(c.frame%20<14){
+    ctx.strokeStyle='#0f8'; ctx.lineWidth=0.7;
+    c.flowing.slice(0,3).forEach(v=>{
+      ctx.strokeRect(v.x-(v.spd<0?v.w:0)-2,v.y-v.h/2-2,v.w+4,v.h+4);
+      ctx.fillStyle='#0f8'; ctx.font='6px monospace';
+      ctx.fillText(Math.abs(Math.round(v.spd*18))+'km/h', v.x-(v.spd<0?v.w:0), v.y-v.h/2-4);
     });
   }
-  const now=new Date();
-  const ct=document.getElementById('ct'+i);if(ct)ct.textContent=now.toLocaleTimeString('es-PE',{hour12:false});
-  if(c.frame%80===0){const ca=document.getElementById('cai'+i);if(ca)ca.textContent=`🚗${Math.floor(cam.v+Math.random()*8-4)} 🚶${Math.floor(cam.p+Math.random()*5-2)}`;}
-  c.frame++;c.raf=requestAnimationFrame(()=>drawCam(i));
+
+  c.raf=requestAnimationFrame(()=>drawCam(i));
+}
+
+function drawVehicle(ctx,v){
+  ctx.save();
+  ctx.shadowColor=v.col; ctx.shadowBlur=3;
+  ctx.fillStyle=v.col;
+  const vx=v.spd<0 ? v.x-v.w : v.x;
+  ctx.fillRect(vx,v.y-v.h/2,v.w,v.h);
+  // Faros (delante) y calaveras (detrás)
+  ctx.fillStyle='rgba(255,248,200,0.95)';
+  const hx=v.spd>=0?vx+v.w-2:vx;
+  ctx.fillRect(hx,v.y-2,2,4);
+  ctx.fillStyle='rgba(230,50,50,0.7)';
+  const tx=v.spd>=0?vx:vx+v.w-2;
+  ctx.fillRect(tx,v.y-1.5,2,3);
+  ctx.restore();
 }
 
 function expandCam(i){
@@ -1761,8 +2263,9 @@ function closeCamExpand(){
 
 // ===== INCIDENTS LIST =====
 function renderIncList(){
-  document.getElementById('incList').innerHTML=INCIDENTS.map(inc=>`
-    <div class="inc-card ${inc.sev}" onclick="openInc(${JSON.stringify(inc).replace(/"/g,'&quot;')})">
+  const list = activeRoute ? INCIDENTS.filter(i=>i.routeId===activeRoute) : INCIDENTS;
+  document.getElementById('incList').innerHTML=list.map(inc=>`
+    <div class="inc-card ${inc.sev}" onclick="openInc(${JSON.stringify(inc).replace(/"/g,'&quot;')});setRouteFilter('${inc.routeId}')">
       <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
         <span class="badge ${inc.sev}">${inc.type}</span>
         <span style="font-family:var(--mono);font-size:10px;color:var(--mu)">${inc.id} · ${inc.time}</span>
@@ -1771,7 +2274,7 @@ function renderIncList(){
       <div style="font-size:12px;color:var(--tx)">${inc.desc}</div>
       <div style="font-size:10.5px;color:var(--mu);margin-top:4px">📍 ${inc.loc}</div>
     </div>
-  `).join('');
+  `).join('')||`<div style="color:var(--mu);padding:20px;text-align:center;font-size:12px">No hay incidentes en esta ruta</div>`;
 }
 
 function addRandInc(){
@@ -1811,7 +2314,11 @@ function closeMo(){document.getElementById('incModal').classList.remove('open');
 // ===== SEMAPHORES =====
 function renderSemafs(){
   const filter=document.getElementById('sfFilter').value;
-  const list=filter?SEMAFOROS.filter(s=>s.status===filter):SEMAFOROS;
+  const list=SEMAFOROS.filter(s=>{
+    const statusOk = !filter || s.status===filter;
+    const routeOk  = !activeRoute || s.routeId===activeRoute;
+    return statusOk && routeOk;
+  });
   document.getElementById('sfGrid').innerHTML=list.map(s=>{
     const col=s.status==='critico'?'var(--r)':s.status==='suboptimo'?'var(--y)':'var(--g)';
     return`<div class="sfc ${s.status}" id="sfc-${s.id}" onclick="openSemaf('${s.id}')">
@@ -1831,10 +2338,11 @@ function renderSemafs(){
 
 function openSemaf(id){
   const s=SEMAFOROS.find(x=>x.id===id);
+  if(s && s.routeId) setRouteFilter(s.routeId); // Filtrar al corredor de este semáforo
   document.getElementById('moTitle').textContent=`${s.id} — ${s.name}`;
   document.getElementById('moBody').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
-      <div class="mi-info" style="text-align:center"><div class="mi-lbl">Ciclo Actual</div><div style="font-size:22px;font-weight:700;color:#fff;font-family:var(--mono)">${s.cycle}s</div></div>
+      <div class="mi-info" style="text-align:center"><div class="mi-lbl">Ciclo Actual</div><div style="font-size:22px;font-weight:700;color:var(--tx);font-family:var(--mono)">${s.cycle}s</div></div>
       <div class="mi-info" style="text-align:center"><div class="mi-lbl">Óptimo IA</div><div style="font-size:22px;font-weight:700;color:var(--g);font-family:var(--mono)">${s.optimal}s</div></div>
       <div class="mi-info" style="text-align:center"><div class="mi-lbl">Ahorro</div><div style="font-size:22px;font-weight:700;color:var(--y);font-family:var(--mono)">${s.cycle-s.optimal}s</div></div>
     </div>
@@ -1863,7 +2371,10 @@ function aiOptimizeAll(){
 
 // ===== ALERTS =====
 function renderAlerts(){
-  document.getElementById('alertsList').innerHTML=ALERTS.slice(0,4).map(a=>`
+  const alertList = activeRoute
+    ? ALERTS.filter(a=>!a.routeId||a.routeId===activeRoute)
+    : ALERTS.slice(0,4);
+  document.getElementById('alertsList').innerHTML=alertList.map(a=>`
     <div class="ai">
       <div class="adot ${a.color}"></div>
       <div style="flex:1">
@@ -1879,7 +2390,11 @@ function renderAlerts(){
 
 function renderAlertasFull(){
   const filter=document.getElementById('alertFilter').value;
-  const list=filter?ALERTS.filter(a=>a.color===filter):ALERTS;
+  const list=ALERTS.filter(a=>{
+    const colorOk = !filter || a.color===filter;
+    const routeOk = !activeRoute || !a.routeId || a.routeId===activeRoute;
+    return colorOk && routeOk;
+  });
   document.getElementById('alertasFull').innerHTML=list.map(a=>`
     <div class="ai" style="padding:13px 0;gap:12px">
       <div style="display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0">

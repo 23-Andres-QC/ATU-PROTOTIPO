@@ -157,9 +157,14 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
 .mc-btn:active{transform:scale(.93)}
 
 /* Route legend — same level as map controls */
-.rleg{position:absolute;left:11px;bottom:310px;z-index:400;background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(8px);border-radius:12px;padding:10px 12px;border:1px solid rgba(0,82,163,.1);display:flex;flex-direction:column;gap:6px;box-shadow:0 8px 20px rgba(0,0,0,0.08)}
-.rleg-row{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:700;color:var(--t2)}
-.rleg-line{width:18px;height:3px;border-radius:2px}
+.rleg{position:absolute;left:11px;bottom:310px;z-index:400;background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:12px;padding:8px 10px;border:1px solid rgba(0,82,163,.1);display:flex;flex-direction:column;gap:3px;box-shadow:0 8px 20px rgba(0,0,0,0.08)}
+.rleg-row{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:700;color:var(--t2);cursor:pointer;border-radius:7px;padding:4px 5px;transition:all .18s;user-select:none}
+.rleg-row:hover{background:rgba(0,82,163,.1);color:var(--p)}
+.rleg-row.dim{opacity:.35}
+.rleg-row.sel{background:rgba(0,82,163,.14);color:var(--p);font-weight:800}
+.rleg-all{font-size:8px;color:var(--t3);text-align:center;padding:2px 5px;cursor:pointer;border-radius:6px;transition:.15s;margin-top:1px}
+.rleg-all:hover{color:var(--p);background:rgba(0,82,163,.08)}
+.rleg-line{width:18px;height:3px;border-radius:2px;flex-shrink:0}
 
 /* Bottom sheet */
 .bs{position:absolute;background:var(--glass);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);left:0;right:0;bottom:54px;z-index:300;background:var(--sf);border-radius:20px 20px 0 0;box-shadow:0 -8px 32px rgba(0,82,163,.14);transition:transform .3s cubic-bezier(.4,0,.2,1);border-top:2px solid rgba(0,82,163,.08)}
@@ -405,7 +410,7 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
   transform: translateY(100%) scale(0.95);
   opacity: 0;
   pointer-events: none;
-  display: flex !important; /* Override inline none if any */
+  display: flex !important;
   z-index: -1;
 }
 .panel.open {
@@ -414,6 +419,18 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
   pointer-events: all;
   z-index: 1000;
 }
+
+/* Route-sync notification banner */
+.sync-banner {
+  position: absolute; top: 55px; left: 8px; right: 8px; z-index: 2000;
+  background: linear-gradient(135deg, #0052A3, #0066CC);
+  color: #fff; border-radius: 12px; padding: 10px 14px;
+  font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 9px;
+  box-shadow: 0 8px 24px rgba(0,82,163,.35); cursor: pointer;
+  animation: syncSlide .4s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes syncSlide { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.sync-banner .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #FFD700; box-shadow: 0 0 6px #FFD700; animation: blink2 1s infinite; flex-shrink: 0; }
 
 </style>
 </head>
@@ -480,16 +497,12 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
       <div class="mc-btn" onclick="toggleLayers()" title="Capas" id="layerBtn">🗺️</div>
     </div>
 
-    <!-- Route legend -->
-    <div class="rleg" id="rlegend">
-      <div class="rleg-row"><div class="rleg-line" style="background:#1A4E8C"></div>B12 Arequipa</div>
-      <div class="rleg-row"><div class="rleg-line" style="background:#2BB673"></div>C45 La Marina</div>
-      <div class="rleg-row"><div class="rleg-line" style="background:#F5A623"></div>A07 Javier Prado</div>
-      <div class="rleg-row"><div class="rleg-line" style="background:#9333ea"></div>MET Metropolitano</div>
-    </div>
 
     <!-- Passenger bottom sheet -->
     <div class="bs" id="bs">
+      <div class="bs-handle"></div>
+
+      <!-- Passenger sheet -->
       <!-- Driver sheet -->
       <div class="drv-sheet" id="bsDrv">
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px">
@@ -771,20 +784,185 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
 </div>
 
 <script>
+// ── ROUTE SYNC (dashboard → index) ──
+function mergeRoutesFromDashboard(saved){
+  if(!Array.isArray(saved)) return;
+  saved.forEach(sr => {
+    const rd = ROUTES_DATA.find(r => r.id === sr.id);
+    if(rd && sr.coords && sr.coords.length >= 2){
+      rd.coords = sr.coords;
+      rd.col = sr.color || rd.col;
+      rd.nm  = sr.name  || rd.nm;
+    }
+  });
+}
+
+function showSyncBanner(routeName){
+  const existing = document.querySelector('.sync-banner');
+  if(existing) existing.remove();
+  const b = document.createElement('div');
+  b.className = 'sync-banner';
+  b.innerHTML = `<div class="sync-dot"></div><span>📡 Ruta actualizada desde el Centro de Control ATU: <b>${routeName}</b></span>`;
+  b.onclick = () => b.remove();
+  const screen = document.querySelector('.screen');
+  if(screen){ screen.appendChild(b); setTimeout(() => b && b.remove(), 7000); }
+}
+
+// Listen for real-time updates from dashboard in the same browser
+try {
+  const _sfCh = new BroadcastChannel('smartflow_routes');
+  _sfCh.onmessage = (e) => {
+    if(e.data && e.data.type === 'routes_updated' && Array.isArray(e.data.routes)){
+      mergeRoutesFromDashboard(e.data.routes);
+      if(map && routeLayers.length){
+        rebuildMapRoutes();
+        showSyncBanner(e.data.changedRoute || 'varias rutas');
+      }
+    }
+  };
+} catch(ex) { console.warn('BroadcastChannel not supported', ex); }
+
+function rebuildMapRoutes(){
+  if(!map) return;
+
+  // Remove only route layers — keeps map, user marker, incidents, zoom level
+  routeLayers.forEach(({shadow, line, stopsGroup}) => {
+    try { shadow.remove(); } catch(e){}
+    try { line.remove(); }   catch(e){}
+    try { stopsGroup && stopsGroup.remove(); } catch(e){}
+  });
+  routeLayers = [];
+
+  // Remove animated bus markers
+  busMs.forEach(b => { try { b.m.remove(); } catch(e){} });
+  busMs = [];
+
+  // Redraw all routes using updated ROUTES_DATA coords
+  Promise.all(ROUTES_DATA.map(async r => {
+    const shadow = L.polyline(r.coords, {color:r.out, weight:8, opacity:.35, lineJoin:'round', lineCap:'round'}).addTo(map);
+    const line   = L.polyline(r.coords, {color:r.col, weight:4.5, opacity:.92, lineJoin:'round', lineCap:'round'})
+      .bindPopup(`<b style="color:${r.col}">${r.id}</b><br>${r.nm}`).addTo(map);
+
+    // Road-snap; si OSRM falla se densifica por interpolación
+    const res = await osrmRoute(r.coords, false);
+    if(res && res[0] && res[0].coords.length > 10){
+      r.coords = res[0].coords;
+    } else {
+      r.coords = densifyRoute(r.coords);
+    }
+    line.setLatLngs(r.coords);
+    shadow.setLatLngs(r.coords);
+
+    const stopsGroup = L.layerGroup().addTo(map);
+    r.stops.forEach(s => {
+      const ic = L.divIcon({className:'smooth-marker', html:`<div style="width:10px;height:10px;border-radius:50%;background:#fff;border:2.5px solid ${r.col};box-shadow:0 1px 4px rgba(0,0,0,.2)"></div>`, iconSize:[10,10], iconAnchor:[5,5]});
+      L.marker([s.lat, s.lng], {icon:ic})
+        .bindPopup(`<b>${s.nm}</b><br><span style="color:${r.col};font-size:11px;font-weight:700">${r.id}</span>`)
+        .addTo(stopsGroup);
+    });
+    routeLayers.push({shadow, line, r, stopsGroup});
+  })).then(() => {
+    // Respawn animated buses on the updated routes
+    const bInits = [{ri:0,pct:.2},{ri:0,pct:.7},{ri:1,pct:.4},{ri:2,pct:.3},{ri:3,pct:.1},{ri:3,pct:.8}];
+    bInits.forEach(b => {
+      const r  = ROUTES_DATA[b.ri];
+      const pi = Math.floor(r.coords.length * b.pct);
+      const pos = r.coords[pi] || r.coords[0];
+      const ic = L.divIcon({className:'smooth-marker', html:`<div style="background:${r.col};color:#fff;border-radius:6px;padding:3px 7px;font-size:9px;font-weight:800;border:2px solid rgba(255,255,255,.5);box-shadow:0 3px 10px rgba(0,0,0,.28);white-space:nowrap;line-height:1.2">${r.id}</div>`, iconSize:[36,18], iconAnchor:[18,9]});
+      busMs.push({m: L.marker(pos, {icon:ic, zIndexOffset:500}).addTo(map), ri:b.ri, pi, dir:1});
+    });
+  });
+}
+
 // ── DATA ──
+// Rutas reales del sistema de transporte urbano de Lima
+// Coordenadas verificadas sobre corredores viales reales (Av. Arequipa, Vía Expresa, La Marina, Próceres)
 const ROUTES_DATA=[
   {id:'B12',nm:'B12 — Miraflores ↔ Centro Lima',col:'#1A4E8C',out:'#0d3a72',
-   coords:[[-12.1185,-77.0283],[-12.0983,-77.0356],[-12.0876,-77.0388],[-12.0521,-77.0352],[-12.0464,-77.0297]],
-   stops:[{lat:-12.1185,lng:-77.0283,nm:'Paradero Pardo'},{lat:-12.0983,lng:-77.0356,nm:'Paradero Aramburú'},{lat:-12.0876,lng:-77.0388,nm:'Paradero Javier Prado (Arequipa)'},{lat:-12.0521,lng:-77.0352,nm:'Paradero España'},{lat:-12.0464,lng:-77.0297,nm:'Paradero Tacna'}]},
+   // Corredor Av. Arequipa: Paradero Larco (Miraflores) → Ovalo Gutierrez → Centro Lima
+   coords:[
+     [-12.1255,-77.0299], // Paradero Larco — Parque Kennedy
+     [-12.1103,-77.0370], // Ovalo Gutierrez (Arequipa & Santa Cruz)
+     [-12.1073,-77.0283], // Arequipa & Angamos
+     [-12.0976,-77.0283], // Arequipa & Aramburú
+     [-12.0876,-77.0283], // Arequipa & Javier Prado
+     [-12.0736,-77.0280], // Arequipa & 28 de Julio
+     [-12.0591,-77.0283], // Arequipa & España
+     [-12.0521,-77.0297], // Arequipa & Wilson (Garcilaso)
+     [-12.0464,-77.0297]  // Plaza Bolognesi — Centro Lima
+   ],
+   stops:[
+     {lat:-12.1255,lng:-77.0299,nm:'Paradero Larco — Parque Kennedy'},
+     {lat:-12.1103,lng:-77.0370,nm:'Ovalo Gutierrez'},
+     {lat:-12.1073,lng:-77.0283,nm:'Arequipa & Angamos'},
+     {lat:-12.0976,lng:-77.0283,nm:'Arequipa & Aramburú'},
+     {lat:-12.0876,lng:-77.0283,nm:'Arequipa & Javier Prado'},
+     {lat:-12.0736,lng:-77.0280,nm:'Arequipa & 28 de Julio'},
+     {lat:-12.0591,lng:-77.0283,nm:'Arequipa & España'},
+     {lat:-12.0521,lng:-77.0297,nm:'Arequipa & Wilson'},
+     {lat:-12.0464,lng:-77.0297,nm:'Plaza Bolognesi — Centro Lima'}
+   ]},
   {id:'C45',nm:'C45 — Callao ↔ San Isidro',col:'#2BB673',out:'#1a8050',
-   coords:[[-12.0564,-77.1197],[-12.0487,-77.0756],[-12.0464,-77.0428],[-12.0983,-77.0366]],
-   stops:[{lat:-12.0564,lng:-77.1197,nm:'Paradero Faucett'},{lat:-12.0487,lng:-77.0756,nm:'Paradero Universitaria'},{lat:-12.0464,lng:-77.0428,nm:'Paradero Pershing'},{lat:-12.0983,lng:-77.0366,nm:'Paradero Rivera Navarrete'}]},
+   // Av. La Marina: Terminal Callao → Pueblo Libre → San Isidro
+   coords:[
+     [-12.0481,-77.1145], // Terminal Callao (Bertello & Colonial)
+     [-12.0487,-77.0900], // La Marina (Bocanegra)
+     [-12.0487,-77.0838], // La Marina & Brasil
+     [-12.0487,-77.0756], // La Marina & Universitaria
+     [-12.0487,-77.0558], // La Marina & Salaverry (Pueblo Libre)
+     [-12.0620,-77.0450], // Salaverry → Arequipa / Ingreso San Isidro
+     [-12.0920,-77.0270]  // Rivera Navarrete — San Isidro
+   ],
+   stops:[
+     {lat:-12.0481,lng:-77.1145,nm:'Terminal Callao — Bertello & Colonial'},
+     {lat:-12.0487,lng:-77.0838,nm:'La Marina & Brasil'},
+     {lat:-12.0487,lng:-77.0756,nm:'La Marina & Universitaria'},
+     {lat:-12.0487,lng:-77.0558,nm:'La Marina & Salaverry'},
+     {lat:-12.0920,lng:-77.0270,nm:'Rivera Navarrete — San Isidro'}
+   ]},
   {id:'A07',nm:'A07 — SJL ↔ Ate Vitarte',col:'#F5A623',out:'#b87a10',
-   coords:[[-12.0089,-77.0023],[-12.0464,-77.0297],[-12.0834,-76.9756]],
-   stops:[{lat:-12.0089,lng:-77.0023,nm:'Estación Bayóvar (SJL)'},{lat:-12.0464,lng:-77.0297,nm:'Paradero Abancay'},{lat:-12.0834,lng:-76.9756,nm:'Paradero Ceres (Ate)'}]},
+   // Bayóvar (SJL) → Próceres → Abancay → Javier Prado Este → Ate
+   coords:[
+     [-11.9596,-76.9874], // Estación Bayóvar — San Juan de Lurigancho
+     [-12.0089,-77.0023], // Av. Próceres de la Independencia
+     [-12.0171,-77.0018], // Próceres & Gran Chimú
+     [-12.0464,-77.0297], // Av. Abancay — Centro Lima
+     [-12.0590,-77.0148], // Javier Prado Este — ingreso vía expresa
+     [-12.0723,-76.9581], // Javier Prado Este & La Molina
+     [-12.0398,-76.9318]  // Terminal Ate Vitarte
+   ],
+   stops:[
+     {lat:-11.9596,lng:-76.9874,nm:'Estación Bayóvar — SJL'},
+     {lat:-12.0089,lng:-77.0023,nm:'Próceres de la Independencia'},
+     {lat:-12.0171,lng:-77.0018,nm:'Próceres & Gran Chimú'},
+     {lat:-12.0464,lng:-77.0297,nm:'Av. Abancay — Centro Lima'},
+     {lat:-12.0723,lng:-76.9581,nm:'Javier Prado Este — La Molina'},
+     {lat:-12.0398,lng:-76.9318,nm:'Terminal Ate Vitarte'}
+   ]},
   {id:'MET',nm:'Metropolitano — Naranjal ↔ Benavides',col:'#9333ea',out:'#6b21a8',
-   coords:[[-11.9798,-77.0423],[-12.0364,-77.0356],[-12.0712,-77.0298],[-12.1267,-77.0298]],
-   stops:[{lat:-11.9798,lng:-77.0423,nm:'Estación Naranjal'},{lat:-12.0364,lng:-77.0356,nm:'Estación UNI'},{lat:-12.0712,lng:-77.0298,nm:'Estación Central'},{lat:-12.1267,lng:-77.0298,nm:'Estación Benavides'}]}
+   // BRT Vía Expresa / Paseo de la República — estaciones reales del Metropolitano
+   coords:[
+     [-11.9827,-77.0586], // Est. Naranjal (Independencia)
+     [-12.0087,-77.0565], // Est. Tomás Valle
+     [-12.0364,-77.0480], // Est. UNI
+     [-12.0514,-77.0448], // Est. Caquetá
+     [-12.0600,-77.0448], // Est. España
+     [-12.0720,-77.0448], // Est. 28 de Julio / Quilca
+     [-12.0875,-77.0448], // Est. Javier Prado
+     [-12.1073,-77.0448], // Est. Angamos
+     [-12.1267,-77.0448]  // Est. Benavides (Miraflores)
+   ],
+   stops:[
+     {lat:-11.9827,lng:-77.0586,nm:'Est. Naranjal'},
+     {lat:-12.0087,lng:-77.0565,nm:'Est. Tomás Valle'},
+     {lat:-12.0364,lng:-77.0480,nm:'Est. UNI'},
+     {lat:-12.0514,lng:-77.0448,nm:'Est. Caquetá'},
+     {lat:-12.0600,lng:-77.0448,nm:'Est. España'},
+     {lat:-12.0720,lng:-77.0448,nm:'Est. 28 de Julio'},
+     {lat:-12.0875,lng:-77.0448,nm:'Est. Javier Prado'},
+     {lat:-12.1073,lng:-77.0448,nm:'Est. Angamos'},
+     {lat:-12.1267,lng:-77.0448,nm:'Est. Benavides'}
+   ]}
 ];
 
 async function osrmRoute(coords,alts=false){
@@ -863,8 +1041,35 @@ function launch(role){
   if(role==='driver') setTimeout(()=>toast('⚠️ Desvío activo: Av. Arequipa desde cdra. 42','y'),3500);
 }
 
+// ── Densifica una ruta con ≥target puntos (interpolación lineal).
+//    Se usa como fallback cuando OSRM no responde o devuelve demasiado pocos puntos.
+function densifyRoute(coords, target=200){
+  if(!coords || coords.length<2) return coords||[];
+  if(coords.length >= target) return coords;
+  const out=[], segs=coords.length-1;
+  const pps=Math.ceil(target/segs);
+  for(let i=0;i<segs;i++){
+    const [la1,ln1]=coords[i],[la2,ln2]=coords[i+1];
+    for(let j=0;j<pps;j++){
+      const t=j/pps;
+      out.push([la1+(la2-la1)*t, ln1+(ln2-ln1)*t]);
+    }
+  }
+  out.push(coords[coords.length-1]);
+  return out;
+}
+
 // ── MAP ──
+function initMapRoutes(){ initMap(); }
+
 function initMap(){
+  // Merge any routes saved by the dashboard
+  try {
+    const saved = localStorage.getItem('sf_routes');
+    if(saved) mergeRoutesFromDashboard(JSON.parse(saved));
+  } catch(ex) {}
+
+  if(map) { map.remove(); map = null; }
   map=L.map('map',{zoomControl:false,attributionControl:false}).setView([-12.0720,-77.0400],13);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
 
@@ -872,13 +1077,15 @@ function initMap(){
     const shadow=L.polyline(r.coords,{color:r.out,weight:8,opacity:.35,lineJoin:'round',lineCap:'round'}).addTo(map);
     const line=L.polyline(r.coords,{color:r.col,weight:4.5,opacity:.92,lineJoin:'round',lineCap:'round'}).bindPopup(`<b style="color:${r.col}">${r.id}</b><br>${r.nm}`).addTo(map);
 
-    // Fetch precise street routing from OSRM
+    // OSRM ajusta la ruta a calles reales; si falla → interpolación densa como fallback
     const res = await osrmRoute(r.coords, false);
-    if(res && res[0]){
-      line.setLatLngs(res[0].coords);
-      shadow.setLatLngs(res[0].coords);
-      r.coords = res[0].coords; // Update base array to dense array for buses to follow
+    if(res && res[0] && res[0].coords.length > 10){
+      r.coords = res[0].coords;          // denso, sigue calles reales
+    } else {
+      r.coords = densifyRoute(r.coords); // fallback: 200+ pts interpolados
     }
+    line.setLatLngs(r.coords);
+    shadow.setLatLngs(r.coords);
 
     const stopsGroup = L.layerGroup().addTo(map);
     r.stops.forEach(s=>{
@@ -887,27 +1094,32 @@ function initMap(){
     });
     routeLayers.push({shadow,line,r,stopsGroup});
   })).then(() => {
-    // Animated buses initialized AFTER routes become dense
+    // Buses inicializados DESPUÉS de que las coords ya son densas
     const bInits=[
-      {ri:0,pct:0.2},{ri:0,pct:0.7},{ri:1,pct:0.4},{ri:2,pct:0.3},{ri:3,pct:0.1},{ri:3,pct:0.8}
+      {ri:0,pct:0.15},{ri:0,pct:0.65},
+      {ri:1,pct:0.25},{ri:1,pct:0.75},
+      {ri:2,pct:0.40},
+      {ri:3,pct:0.10},{ri:3,pct:0.55},{ri:3,pct:0.85}
     ];
     bInits.forEach(b=>{
       const r=ROUTES_DATA[b.ri];
       const pi=Math.floor(r.coords.length * b.pct);
-      const pos=r.coords[pi];
+      const pos=r.coords[pi] || r.coords[0];
       const ic=L.divIcon({className:'smooth-marker',html:`<div style="background:${r.col};color:#fff;border-radius:6px;padding:3px 7px;font-size:9px;font-weight:800;border:2px solid rgba(255,255,255,.5);box-shadow:0 3px 10px rgba(0,0,0,.28);white-space:nowrap;line-height:1.2">${r.id}</div>`,iconSize:[36,18],iconAnchor:[18,9]});
-      busMs.push({m:L.marker(pos,{icon:ic,zIndexOffset:500}).addTo(map),ri:b.ri,pi:pi,dir:1});
+      busMs.push({m:L.marker(pos,{icon:ic,zIndexOffset:500}).addTo(map),ri:b.ri,pi,dir:b.pct>0.5?-1:1});
     });
 
+    // Animación: paso proporcional → recorre la ruta en ~16 segundos (200pts × 80ms)
     setInterval(()=>{
       busMs.forEach(b=>{
         const coords=ROUTES_DATA[b.ri].coords;
-        b.pi+=b.dir;
-        if(b.pi>=coords.length-1){b.pi=coords.length-1; b.dir=-1;}
-        if(b.pi<=0){b.pi=0; b.dir=1;}
+        const step=Math.max(1, Math.ceil(coords.length/200));
+        b.pi+=b.dir*step;
+        if(b.pi>=coords.length-1){b.pi=coords.length-1;b.dir=-1;}
+        if(b.pi<=0){b.pi=0;b.dir=1;}
         b.m.setLatLng(coords[b.pi]);
       });
-    }, 120); // Faster interval for dense points
+    }, 80);
   });
 
   // User marker
@@ -981,7 +1193,7 @@ function setMode(m){
   if(document.getElementById('mP')) document.getElementById('mP').classList.toggle('on',m==='passenger');
   if(document.getElementById('mD')) document.getElementById('mD').classList.toggle('on',m==='driver');
   if(document.getElementById('dvBar')) document.getElementById('dvBar').style.display=m==='driver'?'flex':'none';
-  if(document.getElementById('bsPass')) document.getElementById('bsPass').style.display=m==='passenger'?'block':'none';
+  if(document.getElementById('bs')) document.getElementById('bs').style.display=m==='passenger'||m==='driver'?'block':'none';
   if(document.getElementById('bsDrv')) document.getElementById('bsDrv').style.display=m==='driver'?'flex':'none';
   if(m==='driver'){
     if(document.getElementById('grn')) document.getElementById('grn').textContent='Conductor · MT-2347';
@@ -1011,42 +1223,63 @@ function closeMod(id){document.getElementById(id).classList.remove('open');}
 
 // ── ROUTE SELECT ──
 function selRoute(id){
-  cl('searchP');ntab(0);
-  if(document.getElementById('srchLbl')) {
-    document.getElementById('srchLbl').textContent = id === 'ALL' ? '¿A dónde vas?' : 'Ruta aislada: '+id;
-    document.getElementById('srchLbl').style.color = id === 'ALL' ? 'var(--t3)' : 'var(--p)';
+  cl('searchP'); ntab(0);
+
+  // Actualizar barra de búsqueda
+  const srchLbl = document.getElementById('srchLbl');
+  if(srchLbl){
+    srchLbl.textContent = id==='ALL' ? '¿A dónde vas?' : `Ruta ${id} seleccionada`;
+    srchLbl.style.color = id==='ALL' ? 'var(--t3)' : 'var(--p)';
   }
+
+  // Actualizar leyenda visual
+  document.querySelectorAll('.rleg-row[data-route]').forEach(el => {
+    const isSelected = id==='ALL' || el.dataset.route===id;
+    el.classList.toggle('sel', el.dataset.route===id && id!=='ALL');
+    el.classList.toggle('dim', !isSelected);
+  });
+  const rlegAll = document.getElementById('rlegAll');
+  if(rlegAll) rlegAll.style.display = id==='ALL' ? 'none' : 'block';
+
   if(map){
-    routeLayers.forEach(({shadow,line,r,stopsGroup})=>{
-      if(id==='ALL' || r.id===id){
+    routeLayers.forEach(({shadow, line, r, stopsGroup}) => {
+      const show = id==='ALL' || r.id===id;
+      if(show){
         if(!map.hasLayer(shadow)) shadow.addTo(map);
-        if(!map.hasLayer(line)) line.addTo(map);
+        if(!map.hasLayer(line))   line.addTo(map);
         if(!map.hasLayer(stopsGroup)) stopsGroup.addTo(map);
-        line.setStyle({opacity: 0.92, weight: id==='ALL'?4.5:6});
+        // Ruta seleccionada: más gruesa y opaca; todas: estilo normal
+        line.setStyle({opacity:.92, weight: id==='ALL' ? 4.5 : 6});
+        shadow.setStyle({opacity: id==='ALL' ? .35 : .55, weight: id==='ALL' ? 8 : 10});
       } else {
+        // Ocultar completamente las otras rutas
         if(map.hasLayer(shadow)) shadow.remove();
-        if(map.hasLayer(line)) line.remove();
+        if(map.hasLayer(line))   line.remove();
         if(map.hasLayer(stopsGroup)) stopsGroup.remove();
       }
     });
+
+    // Filtrar buses animados
     if(typeof busMs !== 'undefined'){
-      busMs.forEach(b=>{
-        const r=ROUTES_DATA[b.ri];
-        if(id==='ALL' || r.id===id){
-          if(!map.hasLayer(b.m)) b.m.addTo(map);
-        } else {
-          if(map.hasLayer(b.m)) b.m.remove();
-        }
+      busMs.forEach(b => {
+        const r = ROUTES_DATA[b.ri];
+        const show = id==='ALL' || r.id===id;
+        if(show){ if(!map.hasLayer(b.m)) b.m.addTo(map); }
+        else    { if(map.hasLayer(b.m))  b.m.remove(); }
       });
     }
+
+    // Zoom a la ruta seleccionada o vista general
     if(id!=='ALL'){
-      const r=ROUTES_DATA.find(x=>x.id===id);
-      if(r) map.fitBounds(L.polyline(r.coords).getBounds(),{padding:[20,20],animate:true,duration:.8});
+      const r = ROUTES_DATA.find(x=>x.id===id);
+      if(r && r.coords && r.coords.length>1)
+        map.fitBounds(L.polyline(r.coords).getBounds(), {padding:[30,30], animate:true, duration:.8});
     } else {
-      map.setView([-12.0720,-77.0400],13,{animate:true,duration:.8});
+      map.setView([-12.0720,-77.0400], 13, {animate:true, duration:.8});
     }
   }
-  toast(id==='ALL'?'Todas las rutas visibles':'Ruta '+id+' aislada en el mapa','g');
+
+  toast(id==='ALL' ? 'Mostrando todas las rutas' : `Ruta ${id} — solo esta ruta visible`, 'g');
 }
 function setDst(d){document.getElementById('destI').value=d;toast('Buscando rutas hacia '+d+'...','y');}
 

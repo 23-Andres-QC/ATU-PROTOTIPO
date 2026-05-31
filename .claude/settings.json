@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(start \"\" \"c:\\\\web\\\\ATU PROPUESTA\\\\index.html\")",
+      "Bash(start \"\" \"c:\\\\web\\\\ATU PROPUESTA\\\\dashboard.html\")",
+      "WebSearch",
+      "WebFetch(domain:en.wikipedia.org)",
+      "WebFetch(domain:nominatim.openstreetmap.org)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\andre\\.claude\\projects\\c--web-ATU-PROPUESTA\\memory"
+    ]
+  }
+}
