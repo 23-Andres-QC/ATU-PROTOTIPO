@@ -11,1228 +11,1980 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --primary:#1A4E8C;--primary-light:#2563eb;--primary-dark:#0f2d5a;
-  --green:#2BB673;--yellow:#F5A623;--red:#E63946;
-  --bg:#0f1724;--surface:#161f2e;--surface2:#1e2a3d;--surface3:#243044;
-  --border:#2a3a52;--text:#e8edf5;--muted:#6b7fa0;--mono:JetBrains Mono,monospace;
+  --p:#1A4E8C;--pl:#2563eb;--pd:#0f2d5a;
+  --g:#2BB673;--y:#F5A623;--r:#E63946;
+  --bg:#0b1120;--s1:#111827;--s2:#1a2235;--s3:#222d42;
+  --bd:#1e2d47;--tx:#e2e8f5;--mu:#5a6b8a;--mo:#8a9ab8;
+  --mono:'JetBrains Mono',monospace;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
 }
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;font-size:14px}
-/* LAYOUT */
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font-family:Inter,system-ui,sans-serif;font-size:14px}
 .layout{display:flex;height:100vh}
+
 /* SIDEBAR */
-.sidebar{width:220px;min-width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:10}
-.sidebar-logo{padding:18px 16px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.sidebar-logo svg{flex-shrink:0}
-.sidebar-logo .brand-text{font-size:13px;font-weight:700;color:#fff;line-height:1.2}
-.sidebar-logo .brand-sub{font-size:11px;color:var(--muted);font-weight:400}
-.sidebar-nav{flex:1;padding:10px 0;overflow-y:auto}
-.nav-section{padding:8px 16px 4px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;color:var(--muted);font-weight:500;font-size:13px;transition:all .15s;border-left:3px solid transparent;user-select:none}
-.nav-item:hover{background:var(--surface2);color:var(--text)}
-.nav-item.active{background:rgba(26,78,140,.18);color:#6ba3f5;border-left-color:#1A4E8C}
-.nav-item .nav-icon{width:16px;height:16px;flex-shrink:0}
-.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:700}
-.sidebar-footer{padding:12px 16px;border-top:1px solid var(--border)}
-.user-info{display:flex;align-items:center;gap:8px}
-.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#2563eb);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
-.user-name{font-size:12px;font-weight:600;color:var(--text)}
-.user-role{font-size:10px;color:var(--muted)}
-/* MAIN */
+.sb{width:224px;min-width:224px;background:var(--s1);border-right:1px solid var(--bd);display:flex;flex-direction:column;z-index:20}
+.sb-logo{padding:16px 14px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
+.logo-box{width:34px;height:34px;background:linear-gradient(135deg,var(--p),var(--pl));border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-name{font-size:13px;font-weight:700;color:#fff;line-height:1.2}
+.brand-sub{font-size:10px;color:var(--mu)}
+.sb-nav{flex:1;padding:8px 0;overflow-y:auto}
+.nav-sec{padding:8px 14px 3px;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--mu);font-weight:700}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 14px;cursor:pointer;color:var(--mu);font-weight:500;font-size:12.5px;transition:all .12s;border-left:2px solid transparent;user-select:none;position:relative}
+.ni:hover{background:var(--s2);color:var(--tx)}
+.ni.active{background:rgba(26,78,140,.2);color:#7ab3f7;border-left-color:var(--p)}
+.ni svg{width:15px;height:15px;flex-shrink:0}
+.ni-badge{margin-left:auto;background:var(--r);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px;font-weight:700;min-width:18px;text-align:center}
+.ni-badge.yellow{background:var(--y);color:#1a1a00}
+.sb-foot{padding:12px 14px;border-top:1px solid var(--bd)}
+.ava{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--pl));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.u-name{font-size:12px;font-weight:600;color:var(--tx)}
+.u-role{font-size:10px;color:var(--mu)}
+
+/* TOPBAR */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
-.topbar-title{font-weight:700;font-size:15px;color:#fff}
-.topbar-badge{background:rgba(43,182,115,.15);color:var(--green);border:1px solid rgba(43,182,115,.3);font-size:11px;padding:2px 8px;border-radius:12px;font-weight:600}
-.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.clock{font-family:var(--mono);font-size:13px;color:var(--muted);background:var(--surface2);padding:4px 10px;border-radius:6px;border:1px solid var(--border)}
-.icon-btn{width:32px;height:32px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;position:relative}
-.icon-btn:hover{background:var(--surface3)}
-.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--red);border-radius:50%;border:1px solid var(--surface)}
+.topbar{height:50px;background:var(--s1);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0}
+.tb-title{font-weight:700;font-size:14px;color:#fff}
+.live-dot{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--r);font-weight:700;letter-spacing:.04em}
+.live-dot::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--r);animation:blink 1.4s infinite}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 4px var(--r)}50%{opacity:.3;box-shadow:none}}
+.sys-badge{background:rgba(43,182,115,.12);color:var(--g);border:1px solid rgba(43,182,115,.25);font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.clock{font-family:var(--mono);font-size:12px;color:var(--mo);background:var(--s2);padding:4px 10px;border-radius:6px;border:1px solid var(--bd)}
+.ib{width:30px;height:30px;border-radius:7px;background:var(--s2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s;position:relative;flex-shrink:0}
+.ib:hover{background:var(--s3);border-color:var(--p)}
+.ib svg{width:15px;height:15px}
+.nd{position:absolute;top:4px;right:4px;width:6px;height:6px;background:var(--r);border-radius:50%;border:1.5px solid var(--s1)}
+.tb-ticker{font-size:11px;color:var(--y);font-family:var(--mono);max-width:260px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+
+/* CONTENT */
 .content{flex:1;overflow:hidden;position:relative}
-/* SECTIONS */
-.section{display:none;height:100%;overflow-y:auto}
-.section.active{display:flex;flex-direction:column}
-/* KPI CARDS */
-.kpi-row{display:flex;gap:12px;padding:16px 20px 0;flex-shrink:0}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;flex:1;min-width:0}
-.kpi-label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.05em}
-.kpi-value{font-size:26px;font-weight:700;color:#fff;margin:4px 0 2px;font-family:var(--mono);line-height:1}
-.kpi-delta{font-size:11px;font-weight:600}
-.kpi-delta.up{color:var(--green)}
-.kpi-delta.down{color:var(--red)}
-.kpi-delta.warn{color:var(--yellow)}
-.kpi-bar{height:3px;background:var(--border);border-radius:3px;margin-top:10px;overflow:hidden}
-.kpi-bar-fill{height:100%;border-radius:3px;transition:width 1s ease}
+.sec{display:none;height:100%;overflow-y:auto;overflow-x:hidden}
+.sec.active{display:flex;flex-direction:column}
+
+/* KPI */
+.kpi-row{display:flex;gap:10px;padding:14px 18px 0;flex-shrink:0}
+.kpi{background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:13px 15px;flex:1;min-width:0;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px}
+.kpi.kv::before{background:var(--g)}
+.kpi.ka::before{background:var(--r)}
+.kpi.kc::before{background:var(--y)}
+.kpi.ks::before{background:var(--pl)}
+.kpi.kr::before{background:var(--p)}
+.kpi-lbl{font-size:10px;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.kpi-val{font-size:24px;font-weight:700;color:#fff;margin:3px 0 2px;font-family:var(--mono);line-height:1}
+.kpi-d{font-size:11px;font-weight:600}
+.kpi-d.up{color:var(--g)}.kpi-d.dn{color:var(--r)}.kpi-d.wn{color:var(--y)}
+.kpi-bar{height:2px;background:var(--bd);border-radius:2px;margin-top:10px;overflow:hidden}
+.kpi-fill{height:100%;border-radius:2px;transition:width 1.2s ease}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.ch{padding:10px 13px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.ct{font-size:12.5px;font-weight:600;color:#fff}
+.cb{flex:1;overflow:hidden;position:relative}
+.cs{height:100%;overflow-y:auto;padding:10px 13px}
+.cs::-webkit-scrollbar{width:3px}
+.cs::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+
 /* GRID LAYOUTS */
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 20px;flex:1;min-height:0}
-.grid-3{display:grid;grid-template-columns:2fr 1.2fr 1fr;gap:12px;padding:12px 20px;flex:1;min-height:0}
-.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;padding:12px 20px;flex:1;min-height:0}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
-.card-header{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0}
-.card-title{font-size:13px;font-weight:600;color:#fff}
-.card-body{flex:1;overflow:hidden;position:relative}
-.card-scroll{height:100%;overflow-y:auto;padding:10px 14px}
-/* MAP */
-#map-main,#map-flota,#map-routes{height:100%;width:100%}
-.leaflet-container{background:#1a2740!important}
-/* CAMERA GRID */
-.cam-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;height:100%}
-.cam-cell{position:relative;background:#000;overflow:hidden;cursor:pointer}
-.cam-cell canvas{width:100%;height:100%;display:block}
-.cam-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.85));padding:8px;font-size:11px;font-family:var(--mono);color:#0ff}
-.cam-status{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
-.cam-time{position:absolute;top:6px;left:6px;font-family:var(--mono);font-size:10px;color:#fff;opacity:.8}
-.cam-ai{position:absolute;top:24px;left:6px;font-family:var(--mono);font-size:9px;color:#0ff;opacity:.9}
-.cam-cell.expanded{grid-column:span 2;grid-row:span 2}
-/* ALERTS */
-.alert-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
-.alert-item:last-child{border-bottom:none}
-.alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
-.alert-dot.red{background:var(--red);box-shadow:0 0 6px var(--red)}
-.alert-dot.yellow{background:var(--yellow);box-shadow:0 0 6px var(--yellow)}
-.alert-dot.green{background:var(--green);box-shadow:0 0 6px var(--green)}
-.alert-text{font-size:12px;color:var(--text);line-height:1.5}
-.alert-meta{font-size:10px;color:var(--muted);margin-top:2px;font-family:var(--mono)}
-.alert-action{margin-left:auto;flex-shrink:0}
-/* REPORTS TABLE */
-.table-wrap{overflow-x:auto;height:100%}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 18px;flex:1;min-height:0}
+.g3{display:grid;grid-template-columns:2fr 1.2fr 1fr;gap:10px;padding:10px 18px;flex:1;min-height:0}
+.charts-row{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;padding:0 18px 10px;flex-shrink:0;height:190px}
+
+/* OVERVIEW MAP ROW */
+.map-row{display:grid;grid-template-columns:1.8fr 1fr;gap:10px;padding:0 18px 14px;flex:1;min-height:0}
+
+/* TABLE */
+.tw{overflow-x:auto;height:100%}
 table{width:100%;border-collapse:collapse;font-size:12px}
-thead th{padding:10px 12px;text-align:left;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1}
-tbody td{padding:10px 12px;border-bottom:1px solid rgba(42,58,82,.5);color:var(--text)}
-tbody tr:hover{background:var(--surface2)}
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+thead th{padding:9px 11px;text-align:left;color:var(--mu);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--s1);z-index:1}
+tbody td{padding:9px 11px;border-bottom:1px solid rgba(30,45,71,.5);color:var(--tx)}
+tbody tr:hover td{background:var(--s2)}
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:600}
 .badge.red{background:rgba(230,57,70,.15);color:#ff6b75;border:1px solid rgba(230,57,70,.3)}
 .badge.yellow{background:rgba(245,166,35,.15);color:#f5c842;border:1px solid rgba(245,166,35,.3)}
 .badge.green{background:rgba(43,182,115,.15);color:#2BB673;border:1px solid rgba(43,182,115,.3)}
-.badge.blue{background:rgba(37,99,235,.15);color:#6ba3f5;border:1px solid rgba(37,99,235,.3)}
-/* SEMAFOROS */
-.semaf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;padding:14px}
-.semaf-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s}
-.semaf-card:hover{border-color:var(--primary-light);background:var(--surface3)}
-.semaf-id{font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:4px}
-.semaf-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px}
-.semaf-lights{display:flex;gap:6px;align-items:center}
-.s-light{width:14px;height:14px;border-radius:50%;background:var(--surface);border:1px solid var(--border);transition:all .3s}
-.s-light.on-red{background:var(--red);box-shadow:0 0 8px var(--red)}
-.s-light.on-yellow{background:var(--yellow);box-shadow:0 0 8px var(--yellow)}
-.s-light.on-green{background:var(--green);box-shadow:0 0 8px var(--green)}
-.semaf-cycle{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:6px}
-.semaf-status{font-size:10px;margin-top:4px;font-weight:600}
-/* CHARTS */
-.chart-wrap{position:relative;flex:1;min-height:0;padding:10px}
-/* FLOTA LIST */
-.flota-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(42,58,82,.4);cursor:pointer}
-.flota-item:hover{background:rgba(26,78,140,.1);margin:0 -14px;padding-left:14px;padding-right:14px}
-.flota-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.flota-icon.green{background:rgba(43,182,115,.15);border:1px solid rgba(43,182,115,.3)}
-.flota-icon.yellow{background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.3)}
-.flota-icon.red{background:rgba(230,57,70,.15);border:1px solid rgba(230,57,70,.3)}
-.flota-name{font-size:12px;font-weight:600;color:var(--text)}
-.flota-meta{font-size:10px;color:var(--muted);font-family:var(--mono)}
-.flota-speed{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.badge.blue{background:rgba(37,99,235,.15);color:#7ab3f7;border:1px solid rgba(37,99,235,.3)}
+
+/* ALERTS */
+.ai{display:flex;gap:9px;padding:11px 0;border-bottom:1px solid rgba(30,45,71,.5)}
+.ai:last-child{border-bottom:none}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.adot.red{background:var(--r);box-shadow:0 0 6px var(--r)}
+.adot.yellow{background:var(--y);box-shadow:0 0 6px var(--y)}
+.adot.green{background:var(--g);box-shadow:0 0 6px var(--g)}
+.a-text{font-size:12px;color:var(--tx);line-height:1.5}
+.a-meta{font-size:10px;color:var(--mu);margin-top:2px;font-family:var(--mono)}
+
+/* SEMAPHORES */
+.sf-toolbar{padding:10px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sf-grid{display:grid;grid-template-columns:1fr;gap:7px;padding:8px 10px;overflow-y:auto;flex:1}
+.sfc{background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:11px 12px;cursor:pointer;transition:all .15s}
+.sfc:hover{border-color:var(--pl);transform:translateY(-1px)}
+.sfc.critico{border-left:3px solid var(--r)}
+.sfc.suboptimo{border-left:3px solid var(--y)}
+.sfc.ok{border-left:3px solid var(--g)}
+.sf-id{font-family:var(--mono);font-size:9px;color:var(--mu);margin-bottom:3px}
+.sf-name{font-size:11.5px;font-weight:600;color:var(--tx);margin-bottom:9px;line-height:1.3}
+.sf-lights{display:flex;gap:6px;align-items:center}
+.sl{width:13px;height:13px;border-radius:50%;background:var(--s3);border:1px solid var(--bd);transition:all .25s}
+.sl.on-r{background:var(--r);box-shadow:0 0 8px var(--r)}
+.sl.on-y{background:var(--y);box-shadow:0 0 8px var(--y)}
+.sl.on-g{background:var(--g);box-shadow:0 0 8px var(--g)}
+.sf-cycle{font-family:var(--mono);font-size:9px;color:var(--mu);margin-top:6px}
+.sf-sts{font-size:10px;margin-top:3px;font-weight:600}
+
+/* FLOTA */
+.fl-item{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid rgba(30,45,71,.4);cursor:pointer;transition:background .12s}
+.fl-item:hover{background:rgba(26,78,140,.1);margin:0 -13px;padding-left:13px;padding-right:13px}
+.fl-ico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.fl-ico.green{background:rgba(43,182,115,.15);border:1px solid rgba(43,182,115,.3)}
+.fl-ico.yellow{background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.3)}
+.fl-ico.red{background:rgba(230,57,70,.15);border:1px solid rgba(230,57,70,.3)}
+.fl-name{font-size:12px;font-weight:600;color:var(--tx)}
+.fl-meta{font-size:10px;color:var(--mu);font-family:var(--mono)}
+.fl-spd{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--mo);flex-shrink:0}
+
+/* CAMERAS */
+.cam-toolbar{padding:9px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.cam-grid-wrap{flex:1;padding:10px 18px;display:grid;gap:6px;min-height:0}
+.cam-cell{position:relative;background:#000;overflow:hidden;border-radius:7px;cursor:pointer;border:1px solid var(--bd);transition:border-color .15s}
+.cam-cell:hover{border-color:var(--pl)}
+.cam-cell canvas{width:100%;height:100%;display:block}
+
 /* ROUTE EDITOR */
-.route-editor{display:flex;flex-direction:column;gap:12px;padding:14px;height:100%;overflow-y:auto}
-.form-group{display:flex;flex-direction:column;gap:6px}
-.form-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.form-input,.form-select,.form-textarea{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;font-family:inherit;outline:none;transition:border .15s}
-.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--primary-light)}
-.form-textarea{resize:vertical;min-height:80px}
-.form-row{display:flex;gap:10px}
-.form-row .form-group{flex:1}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}
-.btn-primary{background:var(--primary);color:#fff}
-.btn-primary:hover{background:var(--primary-light)}
-.btn-success{background:var(--green);color:#fff}
-.btn-danger{background:var(--red);color:#fff}
-.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
-.btn-ghost:hover{background:var(--surface2);color:var(--text)}
-/* TOAST */
-.toast-container{position:fixed;top:60px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:8px}
-.toast{background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:12px 16px;min-width:280px;box-shadow:0 8px 24px rgba(0,0,0,.4);animation:slideIn .3s ease;display:flex;align-items:flex-start;gap:10px}
-.toast.red{border-left:3px solid var(--red)}
-.toast.yellow{border-left:3px solid var(--yellow)}
-.toast.green{border-left:3px solid var(--green)}
-@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.re-panel{background:var(--s1);border-right:1px solid var(--bd);overflow-y:auto;width:320px;flex-shrink:0}
+.re-body{padding:14px}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}
+.fl{font-size:10.5px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em}
+.fi,.fsel,.fta{background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:8px 11px;border-radius:7px;font-size:12.5px;font-family:inherit;outline:none;transition:border .12s;width:100%}
+.fi:focus,.fsel:focus,.fta:focus{border-color:var(--pl)}
+.fta{resize:vertical;min-height:70px}
+.fr{display:flex;gap:8px}
+.fr .fg{flex:1}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:all .12s;font-family:inherit;white-space:nowrap}
+.btn-p{background:var(--p);color:#fff}.btn-p:hover{background:var(--pl)}
+.btn-g{background:var(--g);color:#fff}.btn-g:hover{filter:brightness(1.1)}
+.btn-r{background:var(--r);color:#fff}
+.btn-gh{background:transparent;color:var(--mo);border:1px solid var(--bd)}.btn-gh:hover{background:var(--s2);color:var(--tx)}
+.btn-sm{padding:5px 9px;font-size:11px}
+
+/* REPORTERIA */
+.rep-sidebar{width:290px;min-width:290px;background:var(--s1);border-right:1px solid var(--bd);padding:14px;overflow-y:auto}
+.rep-main{flex:1;overflow-y:auto;padding:14px 18px}
+
 /* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;width:500px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.modal-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:16px}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:600;display:none;align-items:center;justify-content:center}
+.mo.open{display:flex}
+.mo-box{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px;width:480px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.mo-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:14px}
+.mi-info{background:var(--s2);border-radius:8px;padding:11px}
+.mi-lbl{font-size:10px;color:var(--mu);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.mi-val{font-size:12.5px;color:var(--tx)}
+
+/* NOTIF PANEL */
+.np{position:fixed;top:0;right:0;bottom:0;width:340px;background:var(--s1);border-left:1px solid var(--bd);z-index:400;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;box-shadow:-8px 0 30px rgba(0,0,0,.4)}
+.np.open{transform:translateX(0)}
+.np-head{padding:14px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.np-title{font-size:14px;font-weight:700;color:#fff}
+.np-body{flex:1;overflow-y:auto;padding:6px 0}
+.np-item{padding:12px 16px;border-bottom:1px solid rgba(30,45,71,.5);cursor:pointer;transition:background .12s}
+.np-item:hover{background:var(--s2)}
+.np-item.unread::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--pl);margin-right:6px;vertical-align:middle}
+.np-text{font-size:12px;color:var(--tx);line-height:1.5}
+.np-time{font-size:10px;color:var(--mu);margin-top:3px;font-family:var(--mono)}
+.np-overlay{position:fixed;inset:0;z-index:399;display:none}
+.np-overlay.open{display:block}
+
+/* CAM OVERLAY */
+.cam-expand{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:700;display:none;align-items:center;justify-content:center;flex-direction:column}
+.cam-expand.open{display:flex}
+.cam-expand canvas{max-width:90vw;max-height:80vh;border-radius:8px;border:1px solid var(--bd)}
+.cam-exp-info{margin-top:10px;font-family:var(--mono);font-size:12px;color:#0af;display:flex;gap:20px;align-items:center}
+
+/* TOAST */
+.tc{position:fixed;top:56px;right:18px;z-index:800;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.toast{background:var(--s3);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;min-width:270px;box-shadow:var(--shadow);animation:tIn .25s ease;display:flex;align-items:center;gap:9px;pointer-events:all}
+.toast.red{border-left:3px solid var(--r)}
+.toast.yellow{border-left:3px solid var(--y)}
+.toast.green{border-left:3px solid var(--g)}
+@keyframes tIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes tOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(110%)}}
+.toast.out{animation:tOut .2s ease forwards}
+.t-msg{font-size:12px;color:#fff;font-weight:500}
+
+/* LEAFLET */
+.leaflet-container{background:#111827!important}
+.leaflet-popup-content-wrapper{background:var(--s2);border:1px solid var(--bd);color:var(--tx);font-size:12px;font-family:Inter,sans-serif}
+.leaflet-popup-tip{background:var(--s2)}
+.leaflet-popup-close-button{color:var(--mo)!important}
+.bm{background:var(--g);color:#fff;border-radius:5px;padding:2px 5px;font-size:9px;font-weight:700;border:1px solid rgba(255,255,255,.3);font-family:var(--mono);white-space:nowrap}
+
 /* SCROLLBAR */
-::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-/* Leaflet custom icons */
-.bus-marker{background:var(--green);color:#fff;border-radius:6px;width:28px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:2px solid rgba(255,255,255,.4);font-family:var(--mono)}
-.cam-marker{background:rgba(0,170,255,.2);border:2px solid #0af;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px}
-.incident-marker{background:rgba(230,57,70,.2);border:2px solid var(--red);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px}
-/* PULSE */
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-.pulse{animation:pulse 2s infinite}
-/* LIVE INDICATOR */
-.live{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--red);font-weight:700}
-.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--red);animation:pulse 1.5s infinite}
-/* OVERVIEW CHARTS ROW */
-.charts-row{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;padding:0 20px 12px;flex-shrink:0;height:200px}
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+
+/* CHART */
+.chart-wrap{position:relative;flex:1;min-height:0;padding:8px}
+
+/* SECTION TOOLBAR */
+.stb{padding:9px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;flex-shrink:0;background:var(--s1)}
+.stb-title{font-size:13px;font-weight:700;color:#fff}
+
+/* INCIDENT CARD */
+.inc-card{border:1px solid var(--bd);border-radius:8px;padding:11px 12px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.inc-card:hover{background:var(--s2);transform:translateX(2px)}
+.inc-card.red{border-left:3px solid var(--r)}
+.inc-card.yellow{border-left:3px solid var(--y)}
+
+/* UTILS */
+.row{display:flex;align-items:center;gap:8px}
+.ml-auto{margin-left:auto}
+.gap2{gap:6px}
+.mt8{margin-top:8px}
+.fmono{font-family:var(--mono)}
+
+@media(max-width:1100px){.sb{width:56px;min-width:56px}.ni span,.nav-sec,.brand-name,.brand-sub,.u-name,.u-role{display:none}.ni{justify-content:center}.sb-logo{justify-content:center}.sb-foot .u-name,.sb-foot .u-role{display:none}}
+
+/* Route editor edit mode */
+.edit-active #toggleEditBtn{background:rgba(245,166,35,.15);color:var(--y);border-color:rgba(245,166,35,.3)}
+.vtx-tip{font-size:10px;color:var(--mu);line-height:1.55;padding:7px 10px;background:var(--s2);border-radius:6px;margin-bottom:8px}
+
+/* Alternatives panel */
+.alt-panel{display:none;flex-direction:column;gap:5px;padding:10px 14px;border-top:1px solid var(--bd)}
+.alt-card{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;border:1px solid var(--bd);cursor:pointer;transition:all .12s;background:var(--s2)}
+.alt-card:hover,.alt-card.active{border-color:var(--y);background:rgba(245,166,35,.08)}
+.free-draw-hint{font-size:10px;color:var(--mu);line-height:1.5;padding:6px 8px;background:var(--s2);border-radius:6px;border-left:2px solid var(--y)}
 </style>
 </head>
 <body>
 <div class="layout">
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-logo">
-      <svg width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#1A4E8C"/><path d="M8 16h16M8 11h10M8 21h7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+<!-- SIDEBAR -->
+<aside class="sb">
+  <div class="sb-logo">
+    <div class="logo-box">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M3 12h18M3 6l4 3M3 18l4-3M21 6l-4 3M21 18l-4-3"/></svg>
+    </div>
+    <div>
+      <div class="brand-name">SmartFlow Lima</div>
+      <div class="brand-sub">Centro de Control ATU</div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-sec">Principal</div>
+    <div class="ni active" data-sec="overview">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Resumen General</span>
+    </div>
+    <div class="ni" data-sec="monitoreo">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      <span>Monitoreo Tráfico</span>
+      <span class="ni-badge" id="nb-mon">3</span>
+    </div>
+    <div class="ni" data-sec="camaras">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      <span>Cámaras en Vivo</span>
+    </div>
+    <div class="ni" data-sec="semaforos">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="17" r="2"/></svg>
+      <span>Semáforos</span>
+      <span class="ni-badge yellow" id="nb-sem">8</span>
+    </div>
+    <div class="ni" data-sec="flota">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8zM5.5 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM18.5 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>
+      <span>Flota GPS</span>
+    </div>
+    <div class="nav-sec">Gestión</div>
+    <div class="ni" data-sec="rutas">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3l18 18M3 21l7-7m4-4l4-4M9 3h12v12"/></svg>
+      <span>Crear / Editar Rutas</span>
+    </div>
+    <div class="ni" data-sec="alertas">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span>Alertas</span>
+      <span class="ni-badge" id="nb-alertas">5</span>
+    </div>
+    <div class="ni" data-sec="reclamos">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <span>Reclamos</span>
+      <span class="ni-badge" id="nb-reclamos">12</span>
+    </div>
+    <div class="ni" data-sec="reporteria">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      <span>Reportería</span>
+    </div>
+  </nav>
+  <div class="sb-foot">
+    <div class="row">
+      <div class="ava">JR</div>
       <div>
-        <div class="brand-text">SmartFlow Lima</div>
-        <div class="brand-sub">Centro de Control ATU</div>
+        <div class="u-name">Ing. J. Ríos</div>
+        <div class="u-role">Supervisor ATU</div>
       </div>
     </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section">Principal</div>
-      <div class="nav-item active" data-section="overview">
-        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-        Resumen General
+    <div style="margin-top:10px">
+      <a href="index.html" target="_blank" style="font-size:10px;color:var(--mu);text-decoration:none;display:flex;align-items:center;gap:4px">
+        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        <span>Ver App Pasajero</span>
+      </a>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div class="tb-title" id="tbTitle">Resumen General</div>
+    <span class="live-dot">EN VIVO</span>
+    <span class="sys-badge" id="sysStatus">Sistema Operativo</span>
+    <div class="tb-ticker" id="tbTicker"></div>
+    <div class="tb-right">
+      <div class="clock" id="clk">00:00:00</div>
+      <div class="ib" title="Notificaciones" onclick="toggleNotif()">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="nd" id="notifDot"></span>
       </div>
-      <div class="nav-item" data-section="monitoreo">
-        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-        Monitoreo Tráfico
-        <span class="nav-badge pulse">3</span>
-      </div>
-      <div class="nav-item" data-section="camaras">
-        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-        Cámaras en Vivo
-      </div>
-      <div class="nav-item" data-section="flota">
-        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8zM5.5 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM18.5 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>
-        Flota GPS
-      </div>
-      <div class="nav-section">Gestión</div>
-      <div class="nav-item" data-section="rutas">
-        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-        Crear / Editar Rutas
-      </div>
-      <div class="nav-item" data-section="semaforos">
-        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="17" r="2"/></svg>
-        Semáforos
-      </div>
-      <div class="nav-item" data-section="alertas">
-        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        Alertas
-        <span class="nav-badge pulse" id="alertsBadge">5</span>
-      </div>
-      <div class="nav-item" data-section="reclamos">
-        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-        Reclamos
-        <span class="nav-badge">12</span>
-      </div>
-      <div class="nav-item" data-section="reporteria">
-        <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-        Reportería
-      </div>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="user-info">
-        <div class="avatar">JR</div>
-        <div>
-          <div class="user-name">Ing. J. Ríos</div>
-          <div class="user-role">Supervisor ATU</div>
-        </div>
-      </div>
-      <div style="margin-top:10px">
-        <a href="index.html" style="font-size:11px;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:4px">
-          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-          Ver App Pasajero
-        </a>
+      <div class="ib" title="Pantalla completa" onclick="toggleFS()">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>
       </div>
     </div>
-  </aside>
+  </header>
 
-  <!-- MAIN -->
-  <div class="main">
-    <header class="topbar">
-      <div class="topbar-title" id="topbarTitle">Resumen General</div>
-      <span class="live">EN VIVO</span>
-      <span class="topbar-badge">Sistema Operativo</span>
-      <div class="topbar-right">
-        <div class="clock" id="clockDisplay">00:00:00</div>
-        <div class="icon-btn" onclick="toggleNotifPanel()">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
-          <span class="notif-dot"></span>
+  <div class="content">
+
+    <!-- ===== OVERVIEW ===== -->
+    <section class="sec active" id="sec-overview">
+      <div class="kpi-row">
+        <div class="kpi kv">
+          <div class="kpi-lbl">Vehículos Activos</div>
+          <div class="kpi-val" id="kv">1,247</div>
+          <div class="kpi-d up">▲ +34 vs ayer</div>
+          <div class="kpi-bar"><div class="kpi-fill" style="width:78%;background:var(--g)"></div></div>
         </div>
-        <div class="icon-btn">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <div class="kpi ka">
+          <div class="kpi-lbl">Alertas Activas</div>
+          <div class="kpi-val" id="ka" style="color:var(--r)">5</div>
+          <div class="kpi-d dn">▲ +2 última hora</div>
+          <div class="kpi-bar"><div class="kpi-fill" style="width:22%;background:var(--r)"></div></div>
+        </div>
+        <div class="kpi kc">
+          <div class="kpi-lbl">Congestión Media</div>
+          <div class="kpi-val" id="kc" style="color:var(--y)">43%</div>
+          <div class="kpi-d wn">▲ Moderado</div>
+          <div class="kpi-bar"><div class="kpi-fill" style="width:43%;background:var(--y)"></div></div>
+        </div>
+        <div class="kpi kr">
+          <div class="kpi-lbl">Reportes Ciudadanos</div>
+          <div class="kpi-val" id="kr">84</div>
+          <div class="kpi-d up">▲ +7 hoy</div>
+          <div class="kpi-bar"><div class="kpi-fill" style="width:60%;background:var(--p)"></div></div>
         </div>
       </div>
-    </header>
-
-    <div class="content">
-      <!-- ==================== OVERVIEW ==================== -->
-      <section class="section active" id="section-overview">
-        <div class="kpi-row">
-          <div class="kpi">
-            <div class="kpi-label">Vehículos Activos</div>
-            <div class="kpi-value" id="kpi-vehicles">1,247</div>
-            <div class="kpi-delta up">▲ +34 vs ayer</div>
-            <div class="kpi-bar"><div class="kpi-bar-fill" style="width:78%;background:var(--green)"></div></div>
-          </div>
-          <div class="kpi">
-            <div class="kpi-label">Alertas Activas</div>
-            <div class="kpi-value" id="kpi-alerts" style="color:var(--red)">5</div>
-            <div class="kpi-delta down">▲ +2 última hora</div>
-            <div class="kpi-bar"><div class="kpi-bar-fill" style="width:22%;background:var(--red)"></div></div>
-          </div>
-          <div class="kpi">
-            <div class="kpi-label">Nivel de Congestión</div>
-            <div class="kpi-value" id="kpi-cong" style="color:var(--yellow)">43%</div>
-            <div class="kpi-delta warn">▲ Moderado</div>
-            <div class="kpi-bar"><div class="kpi-bar-fill" style="width:43%;background:var(--yellow)"></div></div>
-          </div>
-          <div class="kpi">
-            <div class="kpi-label">Velocidad Media</div>
-            <div class="kpi-value">22 <small style="font-size:14px;color:var(--muted)">km/h</small></div>
-            <div class="kpi-delta down">▼ -4 vs promedio</div>
-            <div class="kpi-bar"><div class="kpi-bar-fill" style="width:55%;background:var(--primary-light)"></div></div>
-          </div>
-          <div class="kpi">
-            <div class="kpi-label">Reportes Ciudadanos</div>
-            <div class="kpi-value" id="kpi-reports">84</div>
-            <div class="kpi-delta up">▲ +7 hoy</div>
-            <div class="kpi-bar"><div class="kpi-bar-fill" style="width:60%;background:var(--primary)"></div></div>
-          </div>
+      <div style="margin-top:10px;padding:0 18px 10px;flex-shrink:0;height:190px">
+        <div class="card" style="height:100%">
+          <div class="ch"><div class="ct">Volumen de Tráfico — 24 horas</div><span style="margin-left:auto;font-size:10px;color:var(--mu)" id="trafficPeak"></span></div>
+          <div class="chart-wrap"><canvas id="chartTraffic"></canvas></div>
         </div>
-
-        <div class="charts-row" style="margin-top:12px">
-          <div class="card">
-            <div class="card-header"><div class="card-title">Volumen de Tráfico (últimas 24h)</div></div>
-            <div class="chart-wrap"><canvas id="chartTraffic"></canvas></div>
+      </div>
+      <div class="map-row">
+        <div class="card">
+          <div class="ch">
+            <div class="ct">Mapa de Calor — Congestión Lima</div>
+            <span class="live-dot" style="margin-left:auto">EN VIVO</span>
+            <span style="font-size:10px;color:var(--mu)" id="mapAge">Actualizado hace 30s</span>
           </div>
-          <div class="card">
-            <div class="card-header"><div class="card-title">Incidentes por Tipo</div></div>
-            <div class="chart-wrap"><canvas id="chartIncidents"></canvas></div>
-          </div>
-          <div class="card">
-            <div class="card-header"><div class="card-title">Nivel de Servicio</div></div>
-            <div class="chart-wrap"><canvas id="chartService"></canvas></div>
-          </div>
+          <div class="cb"><div id="map-main" style="height:100%"></div></div>
         </div>
-
-        <div style="display:grid;grid-template-columns:1.8fr 1fr;gap:12px;padding:0 20px 16px;flex:1;min-height:0;height:220px">
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Mapa de Calor — Congestión Lima</div>
-              <span style="margin-left:auto;font-size:11px;color:var(--muted)">Actualizado hace 30s</span>
-            </div>
-            <div class="card-body"><div id="map-main" style="height:100%;border-radius:0 0 10px 10px"></div></div>
-          </div>
-          <div class="card">
-            <div class="card-header"><div class="card-title">Alertas Recientes</div></div>
-            <div class="card-scroll" id="alertsList"></div>
-          </div>
+        <div class="card">
+          <div class="ch"><div class="ct">Alertas Recientes</div><button class="btn btn-gh btn-sm ml-auto" onclick="goSection('alertas')">Ver todas</button></div>
+          <div class="cs" id="alertsList"></div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- ==================== MONITOREO ==================== -->
-      <section class="section" id="section-monitoreo">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;height:100%">
-          <div style="position:relative;border-right:1px solid var(--border)">
-            <div style="position:absolute;top:10px;left:10px;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;color:#fff">
-              🚦 Estado Semafórico — Lima
-            </div>
-            <div id="map-semaf" style="height:100%"></div>
+    <!-- ===== MONITOREO ===== -->
+    <section class="sec" id="sec-monitoreo">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;height:100%">
+        <div style="position:relative;border-right:1px solid var(--bd)">
+          <div style="position:absolute;top:10px;left:10px;z-index:400;background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:600;color:#fff;display:flex;align-items:center;gap:6px">
+            🚦 Estado Semafórico
+            <span class="badge red" id="semCritBadge">3 críticos</span>
           </div>
-          <div style="display:flex;flex-direction:column">
-            <div style="padding:10px 14px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center">
-              <span style="font-size:13px;font-weight:600;color:#fff">Incidentes Activos</span>
-              <span class="badge red" id="incidentCount">3 Críticos</span>
-              <button class="btn btn-ghost" style="margin-left:auto;font-size:11px" onclick="addRandomIncident()">+ Simular</button>
-            </div>
-            <div style="flex:1;overflow-y:auto;padding:12px 14px" id="incidentsList"></div>
-          </div>
+          <div id="map-semaf" style="height:100%"></div>
         </div>
-      </section>
+        <div style="display:flex;flex-direction:column">
+          <div class="stb">
+            <span class="stb-title">Incidentes Activos</span>
+            <span class="badge red" id="incBadge">3 Críticos</span>
+            <button class="btn btn-gh btn-sm ml-auto" onclick="addRandInc()">+ Simular Incidente</button>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:10px 14px" id="incList"></div>
+        </div>
+      </div>
+    </section>
 
-      <!-- ==================== CÁMARAS ==================== -->
-      <section class="section" id="section-camaras">
-        <div style="padding:10px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);flex-shrink:0">
-          <span style="font-size:13px;font-weight:600;color:#fff">Cámaras Urbanas — Lima Metropolitana</span>
-          <span class="live">EN VIVO</span>
-          <span style="margin-left:auto;font-size:11px;color:var(--muted)">8/8 cámaras activas</span>
-          <select class="form-select" style="width:auto;font-size:11px;padding:5px 10px" id="camLayout" onchange="setCamLayout(this.value)">
-            <option value="4">4 cámaras</option>
-            <option value="9">9 cámaras (grid)</option>
+    <!-- ===== CÁMARAS ===== -->
+    <section class="sec" id="sec-camaras">
+      <div class="cam-toolbar">
+        <span style="font-size:13px;font-weight:700;color:#fff">Cámaras — Lima Metropolitana</span>
+        <span class="live-dot">EN VIVO</span>
+        <span style="font-size:11px;color:var(--mu)" id="camStatus">8/8 activas</span>
+        <div class="ml-auto row gap2">
+          <select class="fi" style="width:130px;font-size:11px;padding:5px 9px" id="camLayout" onchange="initCams()">
+            <option value="4">Vista 4 (2×2)</option>
+            <option value="9">Vista 9 (3×3)</option>
           </select>
         </div>
-        <div style="flex:1;padding:12px 20px;display:grid;gap:8px;min-height:0" id="camGridContainer">
-          <!-- generated by JS -->
-        </div>
-      </section>
+      </div>
+      <div style="flex:1;padding:10px 18px;display:grid;gap:6px;min-height:0" id="camGrid"></div>
+    </section>
 
-      <!-- ==================== FLOTA GPS ==================== -->
-      <section class="section" id="section-flota">
-        <div style="display:grid;grid-template-columns:1fr 320px;height:100%;gap:0">
-          <div style="position:relative">
-            <div style="position:absolute;top:10px;left:10px;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;color:#fff;font-weight:600">
-              🚌 Flota Activa — 1,247 unidades
-            </div>
-            <div id="map-flota" style="height:100%"></div>
+    <!-- ===== FLOTA ===== -->
+    <section class="sec" id="sec-flota">
+      <div style="display:grid;grid-template-columns:1fr 300px;height:100%;gap:0">
+        <div style="position:relative">
+          <div style="position:absolute;top:10px;left:10px;z-index:400;background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:7px 11px;font-size:12px;color:#fff;font-weight:600;display:flex;align-items:center;gap:6px">
+            🚌 Flota Activa
+            <span class="badge green">1,247 unidades</span>
           </div>
-          <div style="background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column">
-            <div style="padding:12px 14px;border-bottom:1px solid var(--border)">
-              <input class="form-input" placeholder="Buscar unidad..." style="width:100%;font-size:12px">
-            </div>
-            <div style="flex:1;overflow-y:auto;padding:4px 14px" id="flotaList"></div>
-          </div>
+          <div id="map-flota" style="height:100%"></div>
         </div>
-      </section>
+        <div style="background:var(--s1);border-left:1px solid var(--bd);display:flex;flex-direction:column">
+          <div style="padding:10px 13px;border-bottom:1px solid var(--bd)">
+            <input class="fi" id="flotaSearch" placeholder="Buscar unidad, ruta o chofer…" oninput="filterFlota(this.value)" style="font-size:12px">
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:4px 13px" id="flotaList"></div>
+        </div>
+      </div>
+    </section>
 
-      <!-- ==================== RUTAS ==================== -->
-      <section class="section" id="section-rutas">
-        <div style="display:grid;grid-template-columns:340px 1fr;height:100%;gap:0">
-          <div style="background:var(--surface);border-right:1px solid var(--border);overflow-y:auto">
-            <div class="route-editor">
-              <div style="font-size:14px;font-weight:700;color:#fff">Editor de Rutas</div>
-              <div class="form-group">
-                <label class="form-label">Nombre de Ruta</label>
-                <input class="form-input" placeholder="Ej: Ruta 36 — Miraflores Express">
+    <!-- ===== RUTAS ===== -->
+    <section class="sec" id="sec-rutas">
+      <div style="display:grid;grid-template-columns:320px 1fr;height:100%;gap:0">
+        <div class="re-panel">
+          <!-- Existing routes list -->
+          <div style="padding:12px 14px 0;border-bottom:1px solid var(--bd)">
+            <div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Rutas Existentes — haz click para editar</div>
+            <div id="routesList" style="display:flex;flex-direction:column;gap:5px;padding-bottom:12px"></div>
+          </div>
+          <!-- Incident alert bar (shown when loaded from alert) -->
+          <div id="incAlertBar" style="display:none;padding:10px 14px;background:rgba(230,57,70,.1);border-bottom:2px solid rgba(230,57,70,.3)">
+            <div style="font-size:10px;font-weight:700;color:var(--r);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">⚠️ Incidente Activo en esta Ruta</div>
+            <div style="font-size:11.5px;color:var(--tx)" id="incAlertText">—</div>
+            <div style="font-size:10px;color:var(--mu);margin-top:3px" id="incAlertMeta">—</div>
+          </div>
+          <!-- Edit mode bar -->
+          <div id="editModeBar" style="display:none;padding:9px 14px;background:rgba(245,166,35,.1);border-bottom:2px solid rgba(245,166,35,.25)">
+            <div style="font-size:10px;font-weight:700;color:var(--y);margin-bottom:5px">✏️ MODO EDICIÓN DE PUNTOS ACTIVO</div>
+            <div style="font-size:10.5px;color:var(--mo);line-height:1.55">• <b>Arrastra</b> los puntos naranjas para redirigir la ruta<br>• <b>Click en el mapa</b> para insertar nuevo punto<br>• <b>Click derecho</b> sobre un punto para eliminarlo</div>
+          </div>
+          <div class="re-body">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+              <div style="font-size:14px;font-weight:700;color:#fff" id="reTitle">Nueva Ruta</div>
+              <button class="btn btn-gh btn-sm ml-auto" onclick="resetRouteForm()" title="Nueva ruta">+ Nueva</button>
+            </div>
+            <div class="fg">
+              <label class="fl">Nombre de Ruta</label>
+              <input class="fi" placeholder="Ej: Ruta 36 — Miraflores Express" id="rNombre">
+            </div>
+            <div class="fr">
+              <div class="fg">
+                <label class="fl">Tipo</label>
+                <select class="fsel" id="rTipo">
+                  <option>Regular</option><option>Expreso</option><option>Temporal / Desvío</option><option>Emergencia</option>
+                </select>
               </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Tipo</label>
-                  <select class="form-select">
-                    <option>Regular</option>
-                    <option>Expreso</option>
-                    <option>Temporal / Desvío</option>
-                    <option>Emergencia</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Estado</label>
-                  <select class="form-select">
-                    <option>Activa</option>
-                    <option>Borrador</option>
-                    <option>Suspendida</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Punto de Origen</label>
-                <input class="form-input" placeholder="Buscar paradero de origen..." id="routeOrigin">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Punto de Destino</label>
-                <input class="form-input" placeholder="Buscar paradero de destino..." id="routeDest">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Horario de Operación</label>
-                <div class="form-row">
-                  <input class="form-input" type="time" value="05:00">
-                  <input class="form-input" type="time" value="23:00">
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Frecuencia (minutos)</label>
-                <input class="form-input" type="number" value="8" min="1" max="60">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Flota Asignada (unidades)</label>
-                <input class="form-input" type="number" value="12" min="1">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Notas</label>
-                <textarea class="form-textarea" placeholder="Información adicional sobre la ruta..."></textarea>
-              </div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <button class="btn btn-primary" onclick="showToast('Ruta guardada como borrador','green')">💾 Guardar Borrador</button>
-                <button class="btn btn-success" onclick="showToast('¡Ruta publicada! Los conductores ya la reciben.','green')">🚀 Publicar Ruta</button>
-                <button class="btn btn-ghost" onclick="showToast('Simulación iniciada...','yellow')">🔬 Simular Impacto</button>
+              <div class="fg">
+                <label class="fl">Estado</label>
+                <select class="fsel" id="rEstado">
+                  <option>Activa</option><option>Borrador</option><option>Suspendida</option>
+                </select>
               </div>
             </div>
-          </div>
-          <div style="position:relative">
-            <div style="position:absolute;top:10px;left:10px;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;color:#fff;font-weight:600">
-              Haz click en el mapa para trazar la ruta
+            <div class="fg">
+              <label class="fl">Origen</label>
+              <input class="fi" placeholder="Paradero de origen…" id="rOrigen">
             </div>
-            <div id="map-routes" style="height:100%"></div>
+            <div class="fg">
+              <label class="fl">Destino</label>
+              <input class="fi" placeholder="Paradero de destino…" id="rDest">
+            </div>
+            <div class="fr">
+              <div class="fg">
+                <label class="fl">Desde</label>
+                <input class="fi" type="time" value="05:00">
+              </div>
+              <div class="fg">
+                <label class="fl">Hasta</label>
+                <input class="fi" type="time" value="23:00">
+              </div>
+            </div>
+            <div class="fr">
+              <div class="fg">
+                <label class="fl">Frec. (min)</label>
+                <input class="fi" type="number" value="8" min="1">
+              </div>
+              <div class="fg">
+                <label class="fl">Flota (unid.)</label>
+                <input class="fi" type="number" value="12" min="1">
+              </div>
+            </div>
+            <div class="fg">
+              <label class="fl">Notas</label>
+              <textarea class="fta" placeholder="Información adicional…"></textarea>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <!-- Road snapping & free draw -->
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-gh btn-sm" style="flex:1" onclick="snapToRoads()" title="Calcula ruta exacta por calles usando OSRM">📡 Ajustar a calles</button>
+                <button class="btn btn-gh btn-sm" style="flex:1" id="freeDrawBtn" onclick="toggleFreeDrawMode()">✏️ Trazar libre</button>
+              </div>
+              <div id="freeDrawHint" style="display:none" class="free-draw-hint">
+                Haz click en el mapa para ir trazando la ruta — cada segmento se ajusta automáticamente a las calles.<br>
+                <b style="color:var(--y)">Click derecho</b> sobre el mapa = deshacer último punto
+              </div>
+              <!-- Edit mode & point count -->
+              <div style="display:flex;gap:6px;align-items:center">
+                <div style="font-size:10px;color:var(--mu)">Puntos: <b id="routePtCount" style="color:var(--y)">0</b></div>
+                <button class="btn btn-gh btn-sm ml-auto" id="toggleEditBtn" onclick="toggleEditMode()">✏️ Editar puntos</button>
+                <button class="btn btn-gh btn-sm" onclick="clearRouteEdit()" title="Restaurar ruta original">↺</button>
+              </div>
+              <!-- Alternatives panel -->
+              <div id="altPanel" class="alt-panel"></div>
+              <!-- Detour publish -->
+              <div id="publishDetourBtn" style="display:none">
+                <button class="btn btn-r" style="width:100%;justify-content:center;font-size:12.5px" onclick="publishDetour()">🔄 Publicar Desvío Temporal</button>
+                <div style="font-size:10px;color:var(--mu);margin-top:4px;text-align:center">Conductores recibirán la nueva ruta en tiempo real</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-p" style="flex:1" onclick="saveRouteDraft()">💾 Guardar Borrador</button>
+                <button class="btn btn-gh btn-sm" onclick="clearRoute()" title="Limpiar todo">✕ Limpiar</button>
+              </div>
+              <button class="btn btn-g" onclick="publishRoute()">🚀 Publicar Ruta Nueva</button>
+              <button class="btn btn-gh" onclick="simRoute()">🔬 Simular Impacto</button>
+            </div>
           </div>
         </div>
-      </section>
-
-      <!-- ==================== SEMÁFOROS ==================== -->
-      <section class="section" id="section-semaforos">
-        <div style="padding:10px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0">
-          <span style="font-size:13px;font-weight:600;color:#fff">Control Semafórico — Lima Metropolitana</span>
-          <span class="badge yellow">8 con ciclos subóptimos</span>
-          <button class="btn btn-ghost" style="margin-left:auto;font-size:11px" onclick="showToast('Optimización IA iniciada para todos los semáforos...','yellow')">⚡ Optimizar Todo con IA</button>
+        <div style="position:relative">
+          <div id="map-routes" style="height:100%"></div>
         </div>
-        <div style="flex:1;overflow-y:auto" id="semafGrid"></div>
-      </section>
+      </div>
+    </section>
 
-      <!-- ==================== ALERTAS ==================== -->
-      <section class="section" id="section-alertas">
-        <div style="padding:10px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0">
-          <span style="font-size:13px;font-weight:600;color:#fff">Alertas del Sistema</span>
-          <span class="badge red pulse">5 Críticas</span>
-          <button class="btn btn-ghost" style="margin-left:auto;font-size:11px" onclick="clearAlerts()">Marcar todas como leídas</button>
+    <!-- ===== SEMÁFOROS ===== -->
+    <section class="sec" id="sec-semaforos">
+      <div class="sf-toolbar">
+        <span class="stb-title">Control Semafórico — Lima Metropolitana</span>
+        <span class="badge yellow">8 subóptimos</span>
+        <span class="badge red" style="margin-left:4px">3 críticos</span>
+        <div class="ml-auto row gap2">
+          <select class="fi" style="width:140px;font-size:11px;padding:5px 9px" id="sfFilter" onchange="renderSemafs()">
+            <option value="">Todos los estados</option>
+            <option value="critico">Solo Críticos</option>
+            <option value="suboptimo">Solo Subóptimos</option>
+            <option value="ok">Solo Normales</option>
+          </select>
+          <button class="btn btn-gh btn-sm" onclick="aiOptimizeAll()">⚡ Optimizar con IA</button>
         </div>
-        <div style="flex:1;overflow-y:auto;padding:12px 20px" id="alertasFull"></div>
-      </section>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 300px;flex:1;min-height:0;gap:0">
+        <div style="position:relative">
+          <div id="map-semaforos" style="height:100%"></div>
+        </div>
+        <div style="background:var(--s1);border-left:1px solid var(--bd);display:flex;flex-direction:column">
+          <div style="padding:8px 12px;border-bottom:1px solid var(--bd);font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.07em">
+            Intersecciones monitoreadas
+          </div>
+          <div class="sf-grid" id="sfGrid" style="padding:8px 10px;gap:7px"></div>
+        </div>
+      </div>
+    </section>
 
-      <!-- ==================== RECLAMOS ==================== -->
-      <section class="section" id="section-reclamos">
-        <div style="padding:10px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0">
-          <span style="font-size:13px;font-weight:600;color:#fff">Gestión de Reclamos Ciudadanos</span>
-          <span class="badge red">12 Pendientes</span>
-          <div style="margin-left:auto;display:flex;gap:8px">
-            <select class="form-select" style="width:auto;font-size:11px;padding:5px 10px">
-              <option>Todos los tipos</option>
-              <option>Congestión</option>
-              <option>Accidente</option>
-              <option>Semáforo</option>
-              <option>Bus averiado</option>
+    <!-- ===== ALERTAS ===== -->
+    <section class="sec" id="sec-alertas">
+      <div class="stb">
+        <span class="stb-title">Alertas del Sistema</span>
+        <span class="badge red" id="alertCritBadge">5 Críticas</span>
+        <div class="ml-auto row gap2">
+          <select class="fi" style="width:140px;font-size:11px;padding:5px 9px" id="alertFilter" onchange="renderAlertasFull()">
+            <option value="">Todas las severidades</option>
+            <option value="red">Solo Críticas</option>
+            <option value="yellow">Solo Medias</option>
+            <option value="green">Solo Informativas</option>
+          </select>
+          <button class="btn btn-gh btn-sm" onclick="markAllRead()">✓ Marcar leídas</button>
+        </div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:10px 18px" id="alertasFull"></div>
+    </section>
+
+    <!-- ===== RECLAMOS ===== -->
+    <section class="sec" id="sec-reclamos">
+      <div class="stb">
+        <span class="stb-title">Gestión de Reclamos Ciudadanos</span>
+        <span class="badge red" id="recPendBadge">12 Pendientes</span>
+        <div class="ml-auto row gap2">
+          <select class="fi" style="width:130px;font-size:11px;padding:5px 9px" id="rfTipo" onchange="filterReclamos()">
+            <option value="">Todos los tipos</option>
+            <option>Congestión</option><option>Accidente</option><option>Semáforo</option><option>Bus averiado</option><option>Paradero bloqueado</option>
+          </select>
+          <select class="fi" style="width:140px;font-size:11px;padding:5px 9px" id="rfEstado" onchange="filterReclamos()">
+            <option value="">Todos los estados</option>
+            <option>Pendiente</option><option>En revisión</option><option>Resuelto</option>
+          </select>
+        </div>
+      </div>
+      <div style="flex:1;overflow:auto;padding:0 18px 14px">
+        <div class="tw"><table><thead id="recHead"></thead><tbody id="recBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- ===== REPORTERÍA ===== -->
+    <section class="sec" id="sec-reporteria">
+      <div style="display:flex;height:100%">
+        <div class="rep-sidebar">
+          <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:12px">Generador de Reportes</div>
+          <div class="fg">
+            <label class="fl">Tipo de Reporte</label>
+            <select class="fsel" id="repType">
+              <option>Validaciones por estación</option>
+              <option>Incidencias por corredor</option>
+              <option>Cumplimiento de rutas</option>
+              <option>Flota operativa</option>
+              <option>Reclamos por servicio</option>
+              <option>Pasaje promedio</option>
             </select>
-            <select class="form-select" style="width:auto;font-size:11px;padding:5px 10px">
-              <option>Todos los estados</option>
-              <option>Pendiente</option>
-              <option>En revisión</option>
-              <option>Resuelto</option>
+          </div>
+          <div class="fg">
+            <label class="fl">Período</label>
+            <select class="fsel">
+              <option>Hoy</option><option>Última semana</option><option>Último mes</option><option selected>Últimos 3 meses</option><option>Año actual</option>
             </select>
           </div>
+          <div class="fr">
+            <div class="fg">
+              <label class="fl">Desde</label>
+              <input class="fi" type="date" value="2026-03-01">
+            </div>
+            <div class="fg">
+              <label class="fl">Hasta</label>
+              <input class="fi" type="date" value="2026-05-31">
+            </div>
+          </div>
+          <div class="fg">
+            <label class="fl">Corredor</label>
+            <select class="fsel">
+              <option>Todos</option><option>Javier Prado</option><option>Arequipa</option><option>Metropolitano</option><option>Metro Línea 1</option>
+            </select>
+          </div>
+          <div style="margin-top:14px;display:flex;flex-direction:column;gap:7px">
+            <button class="btn btn-p" onclick="genReport()" style="width:100%;justify-content:center">📊 Generar Reporte</button>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-g btn-sm" style="flex:1;justify-content:center" onclick="showToast('Exportando Excel…','green')">📥 Excel</button>
+              <button class="btn btn-gh btn-sm" style="flex:1;justify-content:center" onclick="showToast('Exportando PDF…','green')">📄 PDF</button>
+            </div>
+            <button class="btn btn-gh btn-sm" style="justify-content:center" onclick="showToast('Envío automático programado','yellow')">🔄 Programar Envío</button>
+          </div>
+          <div style="margin-top:12px;padding:10px;background:var(--s2);border-radius:8px;border:1px solid var(--bd)">
+            <div style="font-size:10px;color:var(--mu);margin-bottom:4px;font-weight:600">ÚLTIMO REPORTE GENERADO</div>
+            <div style="font-size:11px;color:var(--tx)">Validaciones por estación</div>
+            <div style="font-size:10px;color:var(--mu);font-family:var(--mono)" id="lastRepTime">31/05/2026 — 13:47</div>
+          </div>
         </div>
-        <div style="flex:1;overflow:auto;padding:0 20px 16px">
-          <div class="table-wrap"><table id="reclamosTable"></table></div>
+        <div class="rep-main">
+          <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:12px" id="repPreviewTitle">Vista Previa — Validaciones por Estación (3 meses)</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+            <div class="card" style="height:210px">
+              <div class="ch"><div class="ct">Pasajeros por Estación</div></div>
+              <div class="chart-wrap"><canvas id="chartRBar"></canvas></div>
+            </div>
+            <div class="card" style="height:210px">
+              <div class="ch"><div class="ct">Tendencia Mensual</div></div>
+              <div class="chart-wrap"><canvas id="chartRLine"></canvas></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch"><div class="ct">Resumen por Corredor</div><span style="margin-left:auto;font-size:10px;color:var(--mu)">Últimos 3 meses</span></div>
+            <div class="cs"><table id="repTable" style="width:100%"></table></div>
+          </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- ==================== REPORTERÍA ==================== -->
-      <section class="section" id="section-reporteria">
-        <div style="display:grid;grid-template-columns:300px 1fr;height:100%;gap:0">
-          <div style="background:var(--surface);border-right:1px solid var(--border);padding:16px;overflow-y:auto">
-            <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:14px">Generador de Reportes</div>
-            <div class="form-group" style="margin-bottom:12px">
-              <label class="form-label">Tipo de Reporte</label>
-              <select class="form-select" id="reportType">
-                <option>Validaciones por estación</option>
-                <option>Incidencias por corredor</option>
-                <option>Cumplimiento de rutas</option>
-                <option>Flota operativa</option>
-                <option>Reclamos por servicio</option>
-                <option>Pasaje promedio</option>
-              </select>
-            </div>
-            <div class="form-group" style="margin-bottom:12px">
-              <label class="form-label">Período</label>
-              <select class="form-select">
-                <option>Hoy</option>
-                <option>Última semana</option>
-                <option>Último mes</option>
-                <option selected>Últimos 3 meses</option>
-                <option>Año actual</option>
-                <option>Rango personalizado</option>
-              </select>
-            </div>
-            <div class="form-row" style="margin-bottom:12px">
-              <div class="form-group">
-                <label class="form-label">Desde</label>
-                <input class="form-input" type="date" value="2026-03-01">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Hasta</label>
-                <input class="form-input" type="date" value="2026-05-30">
-              </div>
-            </div>
-            <div class="form-group" style="margin-bottom:12px">
-              <label class="form-label">Corredor</label>
-              <select class="form-select">
-                <option>Todos los corredores</option>
-                <option>Corredor Javier Prado</option>
-                <option>Corredor Arequipa</option>
-                <option>Metropolitano</option>
-                <option>Metro Línea 1</option>
-              </select>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">
-              <button class="btn btn-primary" onclick="showToast('Generando reporte...','yellow');setTimeout(()=>showToast('Reporte listo','green'),2000)">📊 Generar Reporte</button>
-              <button class="btn btn-success" onclick="showToast('Exportando a Excel...','green')">📥 Exportar Excel</button>
-              <button class="btn btn-ghost" onclick="showToast('Exportando a PDF...','green')">📄 Exportar PDF</button>
-              <button class="btn btn-ghost" onclick="showToast('Programando envío automático...','yellow')">🔄 Programar Envío</button>
-            </div>
-          </div>
-          <div style="overflow-y:auto;padding:16px 20px">
-            <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:14px">Vista Previa — Validaciones por Estación (Últimos 3 meses)</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-              <div class="card" style="height:220px">
-                <div class="card-header"><div class="card-title">Pasajeros por Estación</div></div>
-                <div class="chart-wrap"><canvas id="chartRepBar"></canvas></div>
-              </div>
-              <div class="card" style="height:220px">
-                <div class="card-header"><div class="card-title">Tendencia Mensual</div></div>
-                <div class="chart-wrap"><canvas id="chartRepLine"></canvas></div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-header"><div class="card-title">Resumen por Corredor</div></div>
-              <div class="card-scroll">
-                <table id="reportTable" style="width:100%"></table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div><!-- /content -->
-  </div><!-- /main -->
+  </div><!-- /content -->
+</div><!-- /main -->
 </div><!-- /layout -->
 
-<!-- TOASTS -->
-<div class="toast-container" id="toastContainer"></div>
+<!-- NOTIFICATION PANEL -->
+<div class="np-overlay" id="npOv" onclick="toggleNotif()"></div>
+<div class="np" id="npanel">
+  <div class="np-head">
+    <div class="np-title">Notificaciones</div>
+    <button class="btn btn-gh btn-sm" onclick="clearNotifs()">Limpiar</button>
+    <button class="btn btn-gh btn-sm" onclick="toggleNotif()" style="margin-left:4px">✕</button>
+  </div>
+  <div class="np-body" id="npBody"></div>
+</div>
 
-<!-- INCIDENT MODAL -->
-<div class="modal-overlay" id="incidentModal">
-  <div class="modal">
-    <div class="modal-title" id="modalTitle">Detalle del Incidente</div>
-    <div id="modalBody"></div>
+<!-- INCIDENT / SEMAFORO MODAL -->
+<div class="mo" id="incModal">
+  <div class="mo-box">
+    <div class="mo-title" id="moTitle">Detalle</div>
+    <div id="moBody"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
-      <button class="btn btn-primary" onclick="showToast('Equipo asignado al incidente','green');closeModal()">Asignar Equipo</button>
-      <button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
+      <button class="btn btn-p" id="moAction" onclick="modalAction()">Asignar Equipo</button>
+      <button class="btn btn-gh" onclick="closeMo()">Cerrar</button>
     </div>
   </div>
 </div>
 
+<!-- CAMERA EXPANDED OVERLAY -->
+<div class="cam-expand" id="camExpand" onclick="closeCamExpand()">
+  <canvas id="camExpandCanvas"></canvas>
+  <div class="cam-exp-info" id="camExpInfo">
+    <span id="camExpId">CAM-001</span>
+    <span id="camExpTime">00:00:00</span>
+    <span id="camExpVeh">🚗 47 veh/min</span>
+    <span style="font-size:10px;color:var(--mu)">(click para cerrar)</span>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="tc" id="tc"></div>
+
 <script>
-// ===== DATA =====
-const LIMA = [-12.0464, -77.0428];
+// ===== CONSTANTS =====
+const LIMA=[-12.0464,-77.0428];
 
-const CAMERAS = [
-  {id:'CAM-001',name:'Javier Prado / Arequipa',lat:-12.0876,lng:-77.0365,status:'active',vehicles:47,pedestrians:12},
-  {id:'CAM-002',name:'Aviación / Javier Prado',lat:-12.0876,lng:-77.0283,status:'active',vehicles:63,pedestrians:8},
-  {id:'CAM-003',name:'28 de Julio / Arequipa',lat:-12.0736,lng:-77.0365,status:'warning',vehicles:29,pedestrians:34},
-  {id:'CAM-004',name:'Plaza Mayor — Jr. de la Unión',lat:-12.0464,lng:-77.0297,status:'active',vehicles:18,pedestrians:87},
-  {id:'CAM-005',name:'Angamos / Arequipa',lat:-12.1176,lng:-77.0365,status:'active',vehicles:55,pedestrians:21},
-  {id:'CAM-006',name:'La Marina / Brasil',lat:-12.0634,lng:-77.0856,status:'active',vehicles:71,pedestrians:15},
-  {id:'CAM-007',name:'Benavides / Arequipa',lat:-12.1067,lng:-77.0365,status:'active',vehicles:38,pedestrians:19},
-  {id:'CAM-008',name:'Tomás Valle / Universitaria',lat:-12.0087,lng:-77.0634,status:'inactive',vehicles:0,pedestrians:0},
+const CAMERAS=[
+  {id:'CAM-001',name:'Javier Prado / Arequipa',lat:-12.0876,lng:-77.0365,status:'active',v:47,p:12},
+  {id:'CAM-002',name:'Aviación / Javier Prado',lat:-12.0876,lng:-77.0283,status:'active',v:63,p:8},
+  {id:'CAM-003',name:'28 de Julio / Arequipa',lat:-12.0736,lng:-77.0365,status:'warning',v:29,p:34},
+  {id:'CAM-004',name:'Plaza Mayor — Jr. Unión',lat:-12.0464,lng:-77.0297,status:'active',v:18,p:87},
+  {id:'CAM-005',name:'Angamos / Arequipa',lat:-12.1176,lng:-77.0365,status:'active',v:55,p:21},
+  {id:'CAM-006',name:'La Marina / Brasil',lat:-12.0634,lng:-77.0856,status:'active',v:71,p:15},
+  {id:'CAM-007',name:'Benavides / Arequipa',lat:-12.1067,lng:-77.0365,status:'active',v:38,p:19},
+  {id:'CAM-008',name:'Tomás Valle / Universitaria',lat:-12.0087,lng:-77.0634,status:'inactive',v:0,p:0},
 ];
 
-const SEMAFOROS = [
-  {id:'SEM-001',name:'Javier Prado & Av. Arequipa',phase:'green',cycle:90,optimal:75,status:'suboptimo',lat:-12.0876,lng:-77.0365},
-  {id:'SEM-002',name:'Aviación & Javier Prado',phase:'red',cycle:120,optimal:90,status:'critico',lat:-12.0876,lng:-77.0283},
-  {id:'SEM-003',name:'28 de Julio & Arequipa',phase:'yellow',cycle:60,optimal:55,status:'ok',lat:-12.0736,lng:-77.0365},
-  {id:'SEM-004',name:'Plaza Grau & Wilson',phase:'green',cycle:85,optimal:80,status:'ok',lat:-12.0521,lng:-77.0298},
-  {id:'SEM-005',name:'Angamos & Arequipa',phase:'red',cycle:110,optimal:70,status:'critico',lat:-12.1176,lng:-77.0365},
-  {id:'SEM-006',name:'Naranjal & Universitaria',phase:'green',cycle:75,optimal:70,status:'ok',lat:-11.9798,lng:-77.0423},
-  {id:'SEM-007',name:'Paseo de la República & Benavides',phase:'yellow',cycle:95,optimal:80,status:'suboptimo',lat:-12.1067,lng:-77.0298},
-  {id:'SEM-008',name:'La Marina & Brasil',phase:'red',cycle:140,optimal:90,status:'critico',lat:-12.0634,lng:-77.0856},
-  {id:'SEM-009',name:'Tomás Valle & Faucett',phase:'green',cycle:70,optimal:70,status:'ok',lat:-12.0087,lng:-77.0634},
-  {id:'SEM-010',name:'Nicolás Arriola & Javier Prado',phase:'red',cycle:100,optimal:85,status:'suboptimo',lat:-12.0823,lng:-77.0023},
-  {id:'SEM-011',name:'Canaval y Moreyra & Rivera N.',phase:'green',cycle:80,optimal:75,status:'ok',lat:-12.0983,lng:-77.0366},
-  {id:'SEM-012',name:'Larco & Reducto',phase:'yellow',cycle:65,optimal:60,status:'ok',lat:-12.1185,lng:-77.0283},
+const SEMAFOROS=[
+  {id:'SEM-001',routeId:'B12',routePos:.18,name:'Arequipa & Benavides',phase:'green',cycle:90,optimal:75,status:'suboptimo',lat:-12.0464,lng:-77.0297},
+  {id:'SEM-002',routeId:'B12',routePos:.38,name:'Arequipa & Javier Prado',phase:'red',cycle:120,optimal:90,status:'critico',lat:-12.0464,lng:-77.0297},
+  {id:'SEM-003',routeId:'B12',routePos:.60,name:'Arequipa & 28 de Julio',phase:'yellow',cycle:60,optimal:55,status:'ok',lat:-12.0464,lng:-77.0297},
+  {id:'SEM-004',routeId:'B12',routePos:.85,name:'Wilson & Plaza Grau',phase:'green',cycle:85,optimal:80,status:'ok',lat:-12.0464,lng:-77.0297},
+  {id:'SEM-005',routeId:'MET',routePos:.42,name:'Vía Expresa & 28 de Julio',phase:'red',cycle:110,optimal:70,status:'critico',lat:-12.0464,lng:-77.0297},
+  {id:'SEM-006',routeId:'C45',routePos:.55,name:'La Marina & Brasil',phase:'green',cycle:75,optimal:70,status:'ok',lat:-12.0464,lng:-77.0297},
+  {id:'SEM-007',routeId:'MET',routePos:.65,name:'Vía Expresa & Javier Prado',phase:'yellow',cycle:95,optimal:80,status:'suboptimo',lat:-12.0464,lng:-77.0297},
+  {id:'SEM-008',routeId:'C45',routePos:.75,name:'La Marina & Salaverry',phase:'red',cycle:140,optimal:90,status:'critico',lat:-12.0464,lng:-77.0297},
+  {id:'SEM-009',routeId:'A07',routePos:.30,name:'Javier Prado & Aviación',phase:'green',cycle:70,optimal:70,status:'ok',lat:-12.0464,lng:-77.0297},
+  {id:'SEM-010',routeId:'A07',routePos:.60,name:'Javier Prado & La Molina',phase:'red',cycle:100,optimal:85,status:'suboptimo',lat:-12.0464,lng:-77.0297},
+  {id:'SEM-011',routeId:'MET',routePos:.22,name:'Vía Expresa & Aramburú',phase:'green',cycle:80,optimal:75,status:'ok',lat:-12.0464,lng:-77.0297},
+  {id:'SEM-012',routeId:'B12',routePos:.05,name:'Arequipa & Angamos',phase:'yellow',cycle:65,optimal:60,status:'ok',lat:-12.0464,lng:-77.0297},
 ];
 
-const INCIDENTS = [
-  {id:'INC-087',type:'Accidente',desc:'Colisión múltiple, 2 vehículos involucrados, carril derecho bloqueado',loc:'Javier Prado Km 8.2',time:'14:23',severity:'red',lat:-12.0876,lng:-77.0283},
-  {id:'INC-086',type:'Congestión Severa',desc:'Cola de más de 2 km, velocidad promedio 8 km/h',loc:'Av. Arequipa cdra. 42-50',time:'14:18',severity:'red',lat:-12.0876,lng:-77.0365},
-  {id:'INC-085',type:'Bus Averiado',desc:'Bus MT-2234 fuera de servicio, pasajeros derivados a MT-2356',loc:'Paradero San Isidro 7',time:'14:10',severity:'yellow',lat:-12.0983,lng:-77.0366},
-  {id:'INC-084',type:'Paradero Saturado',desc:'Más de 80 pasajeros esperando, frecuencia reducida',loc:'Paradero Naranjal - Metropolitano',time:'13:55',severity:'yellow',lat:-11.9798,lng:-77.0423},
-  {id:'INC-083',type:'Semáforo Averiado',desc:'Semáforo sin señal, genera retraso en flujo',loc:'La Marina & Brasil',time:'13:40',severity:'red',lat:-12.0634,lng:-77.0856},
+const INCIDENTS=[
+  {id:'INC-087',routeId:'C45',routePos:.55,type:'Accidente',desc:'Colisión múltiple — 2 vehículos, carril derecho bloqueado',loc:'Av. La Marina Km 8.2',time:'14:23',sev:'red',lat:-12.0464,lng:-77.0297,status:'Activo'},
+  {id:'INC-086',routeId:'B12',routePos:.40,type:'Congestión Severa',desc:'Cola de más de 2 km. Velocidad promedio 8 km/h',loc:'Av. Arequipa cdra. 42–50',time:'14:18',sev:'red',lat:-12.0464,lng:-77.0297,status:'Activo'},
+  {id:'INC-085',routeId:'B12',routePos:.20,type:'Bus Averiado',desc:'Bus MT-2234 fuera de servicio. Pasajeros derivados a MT-2356',loc:'Av. Arequipa cdra. 20',time:'14:10',sev:'yellow',lat:-12.0464,lng:-77.0297,status:'En atención'},
+  {id:'INC-084',routeId:'MET',routePos:.08,type:'Paradero Saturado',desc:'Más de 80 pasajeros esperando. Frecuencia reducida',loc:'Est. Naranjal — Metropolitano',time:'13:55',sev:'yellow',lat:-12.0464,lng:-77.0297,status:'En atención'},
+  {id:'INC-083',routeId:'C45',routePos:.75,type:'Semáforo Averiado',desc:'Semáforo sin señal, genera retraso en flujo',loc:'La Marina & Salaverry',time:'13:40',sev:'red',lat:-12.0464,lng:-77.0297,status:'Activo'},
 ];
 
-const FLOTA = [
+const FLOTA=[
   {id:'MT-1023',route:'Ruta B12',driver:'C. Mendoza',speed:34,status:'green',loc:'Av. Arequipa cdra 28',next:'Paradero Larcomar 3 min',lat:-12.0983,lng:-77.0365},
   {id:'MT-2347',route:'Ruta C45',driver:'A. Torres',speed:12,status:'yellow',loc:'Javier Prado Este Km 6',next:'Paradero La Cultura 6 min',lat:-12.0876,lng:-77.0283},
   {id:'MT-0891',route:'Ruta A07',driver:'M. Quispe',speed:41,status:'green',loc:'Av. La Marina 520',next:'Paradero Brasil 2 min',lat:-12.0634,lng:-77.0856},
-  {id:'MT-3412',route:'Ruta D23',driver:'R. Flores',speed:0,status:'red',loc:'Paradero Grau',next:'Averiado — sin ETA',lat:-12.0521,lng:-77.0298},
   {id:'MT-0456',route:'Ruta E09',driver:'J. Huanca',speed:28,status:'green',loc:'Av. Universitaria cdra 14',next:'Paradero UNI 4 min',lat:-12.0087,lng:-77.0634},
   {id:'MT-1789',route:'Ruta F15',driver:'S. Ramos',speed:22,status:'green',loc:'Av. Angamos 840',next:'Paradero Miraflores 5 min',lat:-12.1176,lng:-77.0365},
   {id:'MT-2100',route:'Ruta B12',driver:'P. Vargas',speed:0,status:'green',loc:'Terminal Sur',next:'Sale en 8 min',lat:-12.1234,lng:-77.0312},
   {id:'MT-0034',route:'Ruta G02',driver:'L. Castro',speed:19,status:'yellow',loc:'Jr. Lampa cdra 3',next:'Paradero Lima Centro 7 min',lat:-12.0464,lng:-77.0297},
 ];
 
-// ===== CLOCK =====
-function updateClock(){
-  const now = new Date();
-  document.getElementById('clockDisplay').textContent = now.toLocaleTimeString('es-PE',{hour12:false});
+// Get a coordinate point along a route at fractional position (0=start, 1=end)
+function getRoutePt(routeId,pos){
+  const r=EDIT_ROUTES.find(x=>x.id===routeId);
+  if(!r||!r.coords||r.coords.length===0)return[-12.0464,-77.0297];
+  const idx=Math.max(0,Math.min(r.coords.length-1,Math.floor(pos*(r.coords.length-1))));
+  return r.coords[idx];
 }
-setInterval(updateClock,1000); updateClock();
+
+// After routes are road-snapped, update lat/lng for semaphores, incidents, alerts
+function calibrateGeoPositions(){
+  SEMAFOROS.forEach(s=>{const p=getRoutePt(s.routeId,s.routePos);s.lat=p[0];s.lng=p[1];});
+  INCIDENTS.forEach(i=>{const p=getRoutePt(i.routeId,i.routePos);i.lat=p[0];i.lng=p[1];});
+  ALERTS.forEach(a=>{if(a.routeId&&a.inc&&a.incPos!=null){const p=getRoutePt(a.routeId,a.incPos);a.inc.lat=p[0];a.inc.lng=p[1];}});
+}
+
+// Create a live traffic-light Leaflet icon for a semaphore
+function createSemafIcon(s){
+  const ph=s.phase,st=s.status;
+  const border=st==='critico'?'#E63946':st==='suboptimo'?'#F5A623':'#3a4a5a';
+  const rOn=ph==='red',yOn=ph==='yellow',gOn=ph==='green';
+  return L.divIcon({className:'',html:`<div style="display:flex;flex-direction:column;align-items:center;background:rgba(5,10,25,.95);border:1px solid ${border};border-radius:4px;padding:2px 1px;gap:1px;pointer-events:none"><div style="width:8px;height:8px;border-radius:50%;background:${rOn?'#E63946':'#1a0000'};box-shadow:${rOn?'0 0 5px #E63946':'none'}"></div><div style="width:8px;height:8px;border-radius:50%;background:${yOn?'#F5A623':'#1a1000'};box-shadow:${yOn?'0 0 5px #F5A623':'none'}"></div><div style="width:8px;height:8px;border-radius:50%;background:${gOn?'#2BB673':'#001a08'};box-shadow:${gOn?'0 0 5px #2BB673':'none'}"></div></div>`,iconSize:[10,34],iconAnchor:[5,17]});
+}
+
+const ALERTS=[
+  {id:'ALT-001',color:'red',routeId:'B12',routeColor:'#1A4E8C',incPos:.40,
+   text:'<b>Accidente severo</b> — Av. Arequipa cdra 42. Ruta B12 afectada, cola de 2 km.',
+   meta:'Hace 2 min · CAM-001 · IA detectado',
+   inc:{lat:-12.0464,lng:-77.0297,type:'Accidente',desc:'Colisión múltiple, carril derecho bloqueado. Velocidad media: 8 km/h en zona afectada.'}},
+  {id:'ALT-002',color:'red',routeId:'C45',routeColor:'#2BB673',incPos:.55,
+   text:'<b>Bus MT-2347 averiado</b> — Javier Prado Este Km 6. Ruta C45 con 15 min de retraso.',
+   meta:'Hace 5 min · GPS MT-2347',
+   inc:{lat:-12.0464,lng:-77.0297,type:'Bus Averiado',desc:'Unidad MT-2347 inmovilizada, bloqueando carril. Pasajeros derivados a unidades de apoyo.'}},
+  {id:'ALT-003',color:'red',routeId:null,routeColor:null,
+   text:'<b>Semáforo SEM-008</b> averiado — La Marina &amp; Brasil. Sin señal activa.',
+   meta:'Hace 18 min · Reporte ciudadano',inc:null},
+  {id:'ALT-004',color:'yellow',routeId:'C45',routeColor:'#2BB673',
+   text:'Paradero Naranjal saturado (+80 pasajeros). Mayor frecuencia en C45 requerida.',
+   meta:'Hace 31 min · Validaciones TIT',inc:null},
+  {id:'ALT-005',color:'green',routeId:null,routeColor:null,
+   text:'Ruta A07 normalizada. Incidente resuelto en Av. Universitaria.',
+   meta:'Hace 45 min · Equipo de campo',inc:null},
+];
+
+const RECLAMOS=[
+  {id:'REC-312',fecha:'31/05 14:21',usuario:'J. García',tipo:'Congestión',loc:'Av. Arequipa',estado:'Pendiente',sev:'red'},
+  {id:'REC-311',fecha:'31/05 14:05',usuario:'M. López',tipo:'Semáforo',loc:'Javier Prado',estado:'En revisión',sev:'yellow'},
+  {id:'REC-310',fecha:'31/05 13:48',usuario:'A. Pérez',tipo:'Bus averiado',loc:'San Isidro',estado:'Pendiente',sev:'red'},
+  {id:'REC-309',fecha:'31/05 13:20',usuario:'C. Torres',tipo:'Congestión',loc:'La Marina',estado:'En revisión',sev:'yellow'},
+  {id:'REC-308',fecha:'31/05 12:55',usuario:'R. Quispe',tipo:'Paradero bloqueado',loc:'Angamos',estado:'Resuelto',sev:'green'},
+  {id:'REC-307',fecha:'31/05 12:30',usuario:'L. Huanca',tipo:'Bus averiado',loc:'Callao',estado:'Resuelto',sev:'green'},
+  {id:'REC-306',fecha:'31/05 11:45',usuario:'P. Vargas',tipo:'Accidente',loc:'Universitaria',estado:'En revisión',sev:'yellow'},
+  {id:'REC-305',fecha:'31/05 11:10',usuario:'F. Castro',tipo:'Congestión',loc:'28 de Julio',estado:'Pendiente',sev:'red'},
+];
+
+const NOTIFS=[
+  {text:'🚨 Accidente detectado — Javier Prado Km 8.2',time:'14:23',unread:true},
+  {text:'⚠️ Bus MT-2347 reporta retraso de 12 minutos',time:'14:18',unread:true},
+  {text:'🚦 SEM-008 sin señal — La Marina & Brasil',time:'14:10',unread:true},
+  {text:'📍 Paradero Naranjal saturado (80+ pasajeros)',time:'13:55',unread:false},
+  {text:'✅ Ruta A07 normalizada tras incidente resuelto',time:'13:40',unread:false},
+];
+
+// ===== CLOCK =====
+function updateClock(){document.getElementById('clk').textContent=new Date().toLocaleTimeString('es-PE',{hour12:false});}
+setInterval(updateClock,1000);updateClock();
+
+// ===== TICKER =====
+const TICKER_MSGS=['⚠️ Congestión moderada en Av. Arequipa cdra 28–35','🚌 Bus MT-2347 con retraso de 12 min en Ruta C45','✅ Ruta A07 normalizada','🚦 SEM-002 ciclo subóptimo detectado','📍 Paradero Naranjal: alta demanda'];
+let tickerIdx=0;
+function nextTicker(){
+  document.getElementById('tbTicker').textContent=TICKER_MSGS[tickerIdx%TICKER_MSGS.length];
+  tickerIdx++;
+}
+nextTicker();setInterval(nextTicker,5000);
+
+// ===== MAP AGE =====
+let mapAgeSec=30;
+setInterval(()=>{
+  mapAgeSec+=5;
+  if(mapAgeSec>120){mapAgeSec=0;}
+  const el=document.getElementById('mapAge');
+  if(el) el.textContent=`Actualizado hace ${mapAgeSec}s`;
+},5000);
 
 // ===== NAVIGATION =====
-document.querySelectorAll('.nav-item').forEach(item=>{
-  item.addEventListener('click',()=>{
-    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-    item.classList.add('active');
-    const sec = item.dataset.section;
-    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-    document.getElementById('section-'+sec).classList.add('active');
-    document.getElementById('topbarTitle').textContent = item.textContent.trim().replace(/\d+/g,'').trim();
-    onSectionOpen(sec);
-  });
+function goSection(sec){
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  const ni=document.querySelector(`.ni[data-sec="${sec}"]`);
+  if(ni) ni.classList.add('active');
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+sec).classList.add('active');
+  const titles={overview:'Resumen General',monitoreo:'Monitoreo de Tráfico',camaras:'Cámaras en Vivo',flota:'Flota GPS',rutas:'Crear / Editar Rutas',semaforos:'Control Semafórico',alertas:'Alertas del Sistema',reclamos:'Gestión de Reclamos',reporteria:'Sistema de Reportería'};
+  document.getElementById('tbTitle').textContent=titles[sec]||sec;
+  onSecOpen(sec);
+}
+document.querySelectorAll('.ni[data-sec]').forEach(n=>{
+  n.addEventListener('click',()=>goSection(n.dataset.sec));
 });
-
-function onSectionOpen(sec){
-  if(sec==='monitoreo' && !window._mapSemafInit) initMapSemaf();
-  if(sec==='flota' && !window._mapFlotaInit) initMapFlota();
-  if(sec==='rutas' && !window._mapRoutesInit) initMapRoutes();
-  if(sec==='camaras') initCameras();
-  if(sec==='semaforos') renderSemaforos();
-  if(sec==='alertas') renderAlertasFull();
-  if(sec==='reclamos') renderReclamos();
-  if(sec==='reporteria') initReportCharts();
+function onSecOpen(sec){
+  if(sec==='monitoreo'&&!window._smInit)initMapSemaf();
+  if(sec==='flota'&&!window._fmInit)initMapFlota();
+  if(sec==='rutas'){
+    if(!window._rmInit){
+      initMapRoutes().then(()=>renderRoutesList());
+    } else {
+      renderRoutesList();
+    }
+  }
+  if(sec==='camaras')initCams();
+  if(sec==='semaforos'){if(!window._sfmInit)initMapSemaforos();renderSemafs();}
+  if(sec==='alertas')renderAlertasFull();
+  if(sec==='reclamos')renderReclamos();
+  if(sec==='reporteria')initRepCharts();
 }
 
-// ===== MAIN MAP (OVERVIEW) =====
+// ===== OVERVIEW MAP =====
 let mainMap;
 function initMainMap(){
-  mainMap = L.map('map-main',{zoomControl:true,attributionControl:false}).setView(LIMA,12);
+  mainMap=L.map('map-main',{zoomControl:true,attributionControl:false}).setView(LIMA,12);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(mainMap);
-
-  // Heatmap circles (simulated)
-  const hotspots = [
-    {lat:-12.0876,lng:-77.0365,r:400,color:'#E63946',opacity:.35},
-    {lat:-12.0876,lng:-77.0283,r:350,color:'#E63946',opacity:.3},
-    {lat:-12.1176,lng:-77.0365,r:300,color:'#F5A623',opacity:.25},
-    {lat:-12.0636,lng:-77.0856,r:250,color:'#F5A623',opacity:.22},
-    {lat:-12.0087,lng:-77.0634,r:200,color:'#2BB673',opacity:.18},
-    {lat:-12.0983,lng:-77.0366,r:280,color:'#2BB673',opacity:.15},
-    {lat:-12.0464,lng:-77.0297,r:180,color:'#F5A623',opacity:.2},
+  const hs=[
+    {lat:-12.0876,lng:-77.0365,r:400,c:'#E63946',o:.35},{lat:-12.0876,lng:-77.0283,r:350,c:'#E63946',o:.3},
+    {lat:-12.1176,lng:-77.0365,r:300,c:'#F5A623',o:.25},{lat:-12.0636,lng:-77.0856,r:250,c:'#F5A623',o:.22},
+    {lat:-12.0087,lng:-77.0634,r:200,c:'#2BB673',o:.18},{lat:-12.0983,lng:-77.0366,r:280,c:'#2BB673',o:.15},
+    {lat:-12.0464,lng:-77.0297,r:180,c:'#F5A623',o:.2},
   ];
-  hotspots.forEach(h=>{
-    L.circle([h.lat,h.lng],{radius:h.r,color:'transparent',fillColor:h.color,fillOpacity:h.opacity}).addTo(mainMap);
-  });
-
-  // Camera markers
+  hs.forEach(h=>L.circle([h.lat,h.lng],{radius:h.r,color:'transparent',fillColor:h.c,fillOpacity:h.o}).addTo(mainMap));
   CAMERAS.forEach(cam=>{
-    const icon = L.divIcon({className:'',html:`<div style="background:rgba(0,170,255,.25);border:1.5px solid #0af;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:#0af">📷</div>`,iconSize:[18,18],iconAnchor:[9,9]});
-    L.marker([cam.lat,cam.lng],{icon}).bindPopup(`<b>${cam.id}</b><br>${cam.name}<br>🚗 ${cam.vehicles} veh/min`).addTo(mainMap);
+    const ic=L.divIcon({className:'',html:`<div style="background:rgba(0,170,255,.25);border:1.5px solid #0af;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px">📷</div>`,iconSize:[16,16],iconAnchor:[8,8]});
+    L.marker([cam.lat,cam.lng],{icon:ic}).bindPopup(`<b>${cam.id}</b><br>${cam.name}<br>🚗 ${cam.v} veh/min`).addTo(mainMap);
   });
-
-  // Incident markers
-  INCIDENTS.forEach(inc=>{
-    const color = inc.severity==='red'?'#E63946':'#F5A623';
-    const icon = L.divIcon({className:'',html:`<div style="background:${color}22;border:2px solid ${color};width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px">⚠️</div>`,iconSize:[22,22],iconAnchor:[11,11]});
-    L.marker([inc.lat,inc.lng],{icon}).bindPopup(`<b>${inc.type}</b><br>${inc.loc}<br>${inc.desc}`).addTo(mainMap);
+  // Draw placeholder routes now, replace with road-snapped after async snap
+  const mainRouteLayers=[];
+  EDIT_ROUTES.filter(r=>r.estado==='Activa').forEach(r=>{
+    mainRouteLayers.push(L.polyline(r.coords,{color:r.color,weight:3,opacity:.5,interactive:false}).addTo(mainMap));
   });
-
-  // Bus route lines
-  const routeCoords = [
-    [[-12.1185,-77.0283],[-12.1067,-77.0323],[-12.0983,-77.0356],[-12.0876,-77.0388],[-12.0731,-77.0406],[-12.0521,-77.0352],[-12.0464,-77.0297]],
-    [[-12.0564,-77.1197],[-12.0521,-77.0985],[-12.0487,-77.0756],[-12.0464,-77.0428],[-12.0634,-77.0380],[-12.0983,-77.0366]],
-    [[-11.9298,-77.0456],[-11.9756,-77.0423],[-12.0156,-77.0389],[-12.0464,-77.0428],[-12.0678,-77.0134],[-12.0834,-76.9892]],
-  ];
-  const colors = ['#2BB673','#1A4E8C','#F5A623'];
-  routeCoords.forEach((coords,i)=>{
-    L.polyline(coords,{color:colors[i],weight:3,opacity:.7,dashArray:i===2?'6,4':null}).addTo(mainMap);
+  ensureRoutesSnapped().then(()=>{
+    mainRouteLayers.forEach(l=>{try{mainMap.removeLayer(l);}catch(e){}});
+    EDIT_ROUTES.filter(r=>r.estado==='Activa').forEach(r=>{
+      L.polyline(r.coords,{color:r.color,weight:3,opacity:.5,interactive:false}).addTo(mainMap);
+    });
+    INCIDENTS.forEach(inc=>{
+      const col=inc.sev==='red'?'#E63946':'#F5A623';
+      const ic=L.divIcon({className:'',html:`<div style="background:${col}22;border:2px solid ${col};width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px">⚠️</div>`,iconSize:[20,20],iconAnchor:[10,10]});
+      L.marker([inc.lat,inc.lng],{icon:ic}).bindPopup(`<b>${inc.type}</b><br>${inc.loc}<br>${inc.desc}`).addTo(mainMap);
+    });
   });
 }
 
-// ===== SEMAF MAP =====
+// ===== SEMAF MAP (Monitoreo Tráfico — left panel) =====
 let semafMap;
-function initMapSemaf(){
-  window._mapSemafInit=true;
-  semafMap = L.map('map-semaf',{zoomControl:true,attributionControl:false}).setView(LIMA,12);
+async function initMapSemaf(){
+  window._smInit=true;
+  await ensureRoutesSnapped();
+  semafMap=L.map('map-semaf',{zoomControl:true,attributionControl:false}).setView(LIMA,12);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(semafMap);
-
-  SEMAFOROS.forEach(sem=>{
-    const color = sem.status==='critico'?'#E63946':sem.status==='suboptimo'?'#F5A623':'#2BB673';
-    const icon = L.divIcon({className:'',html:`<div style="background:${color}33;border:2px solid ${color};width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px">🚦</div>`,iconSize:[20,20],iconAnchor:[10,10]});
-    L.marker([sem.lat,sem.lng],{icon}).bindPopup(`
-      <b>${sem.id}</b><br>${sem.name}<br>
-      Ciclo actual: ${sem.cycle}s | Óptimo: ${sem.optimal}s<br>
-      Estado: <b style="color:${color}">${sem.status.toUpperCase()}</b>
-    `).addTo(semafMap);
+  // Routes with traffic-level highlight
+  EDIT_ROUTES.filter(r=>r.estado==='Activa').forEach(r=>{
+    L.polyline(r.coords,{color:r.color,weight:4,opacity:.5,interactive:false}).addTo(semafMap);
+    const n=r.coords.length,h1=Math.floor(n*.25),h2=Math.floor(n*.75);
+    if(h2>h1)L.polyline(r.coords.slice(h1,h2+1),{color:'#F5A623',weight:5,opacity:.35,interactive:false}).addTo(semafMap);
   });
-
+  // Incidents only — no semaphore markers here
   INCIDENTS.forEach(inc=>{
-    const color = inc.severity==='red'?'#E63946':'#F5A623';
-    const icon = L.divIcon({className:'',html:`<div style="background:${color}22;border:2px solid ${color};width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px">⚠️</div>`,iconSize:[22,22],iconAnchor:[11,11]});
-    L.marker([inc.lat,inc.lng],{icon}).on('click',()=>openIncident(inc)).addTo(semafMap);
+    const col=inc.sev==='red'?'#E63946':'#F5A623';
+    const ic=L.divIcon({className:'',html:`<div style="background:${col}22;border:2px solid ${col};width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px">⚠️</div>`,iconSize:[20,20],iconAnchor:[10,10]});
+    L.marker([inc.lat,inc.lng],{icon:ic}).on('click',()=>openInc(inc)).addTo(semafMap);
   });
+  renderIncList();
+}
 
-  renderIncidentsList();
+// ===== SEMÁFOROS MAP (Semáforos section — routes + live lights only) =====
+let semfMap;
+async function initMapSemaforos(){
+  window._sfmInit=true;
+  await ensureRoutesSnapped();
+  semfMap=L.map('map-semaforos',{zoomControl:true,attributionControl:false}).setView(LIMA,12);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(semfMap);
+  // Routes
+  EDIT_ROUTES.filter(r=>r.estado==='Activa').forEach(r=>{
+    L.polyline(r.coords,{color:r.color,weight:4.5,opacity:.55,interactive:false}).addTo(semfMap);
+  });
+  // Live semaphore markers — small, on routes, cycling in real time
+  SEMAFOROS.forEach(s=>{
+    const marker=L.marker([s.lat,s.lng],{icon:createSemafIcon(s),zIndexOffset:600,interactive:true})
+      .bindTooltip(`${s.id} — ${s.name}<br>Ciclo: ${s.cycle}s`,{permanent:false,direction:'top',offset:[0,-26]})
+      .on('click',()=>openSemaf(s.id))
+      .addTo(semfMap);
+    _semMapMkrs.push({id:s.id,marker});
+  });
 }
 
 // ===== FLOTA MAP =====
-let flotaMap, busMarkers=[];
-function initMapFlota(){
-  window._mapFlotaInit=true;
-  flotaMap = L.map('map-flota',{zoomControl:true,attributionControl:false}).setView(LIMA,12);
+let flotaMap,busMs=[];
+async function initMapFlota(){
+  window._fmInit=true;
+  await ensureRoutesSnapped();
+  flotaMap=L.map('map-flota',{zoomControl:true,attributionControl:false}).setView(LIMA,12);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(flotaMap);
-
-  busMarkers = FLOTA.map(bus=>{
-    const color = bus.status==='green'?'#2BB673':bus.status==='yellow'?'#F5A623':'#E63946';
-    const icon = L.divIcon({className:'',html:`<div style="background:${color};color:#fff;border-radius:5px;padding:2px 5px;font-size:10px;font-weight:700;white-space:nowrap;border:1px solid rgba(255,255,255,.3)">${bus.id}</div>`,iconSize:[60,18],iconAnchor:[30,9]});
-    return {marker:L.marker([bus.lat,bus.lng],{icon}).bindPopup(`<b>${bus.id}</b> — ${bus.route}<br>Chofer: ${bus.driver}<br>Velocidad: ${bus.speed} km/h<br>Próximo: ${bus.next}`).addTo(flotaMap), data:bus, lat:bus.lat, lng:bus.lng};
+  EDIT_ROUTES.filter(r=>r.estado==='Activa').forEach(r=>{
+    L.polyline(r.coords,{color:r.color,weight:3.5,opacity:.35,interactive:false}).addTo(flotaMap);
   });
-
-  renderFlotaList();
-  // Animate buses
-  setInterval(animateBuses, 3000);
+  // Match each bus to its route coordinates
+  function resolveRoute(routeName){
+    return EDIT_ROUTES.find(r=>routeName.includes(r.id))||EDIT_ROUTES[0];
+  }
+  busMs=FLOTA.map((b,i)=>{
+    const rData=resolveRoute(b.route);
+    const coords=rData.coords;
+    // Spread buses across the route so they don't all start at the same point
+    const startIdx=Math.min(Math.floor((i/FLOTA.length)*(coords.length-1)),coords.length-1);
+    const pos=coords[startIdx];
+    const col=b.status==='green'?'#2BB673':b.status==='yellow'?'#F5A623':'#E63946';
+    const ic=L.divIcon({className:'',html:`<div class="bm" style="background:${col}">${b.id}</div>`,iconSize:[60,18],iconAnchor:[30,9]});
+    return{
+      marker:L.marker(pos,{icon:ic}).bindPopup(`<b>${b.id}</b> — ${b.route}<br>Chofer: ${b.driver}<br>Vel: ${b.speed} km/h<br>${b.next}`).addTo(flotaMap),
+      data:b,
+      coords,
+      ptIdx:startIdx,
+      dir:i%2===0?1:-1,
+      lat:pos[0],lng:pos[1]
+    };
+  });
+  renderFlota(FLOTA);
+  setInterval(()=>{
+    busMs.forEach(b=>{
+      if(b.data.status==='red')return; // averiado — no se mueve
+      b.ptIdx+=b.dir;
+      if(b.ptIdx>=b.coords.length-1){b.ptIdx=b.coords.length-1;b.dir=-1;}
+      if(b.ptIdx<=0){b.ptIdx=0;b.dir=1;}
+      const pos=b.coords[b.ptIdx];
+      b.lat=pos[0];b.lng=pos[1];
+      b.marker.setLatLng(pos);
+    });
+  },4000);
 }
 
-function animateBuses(){
-  busMarkers.forEach(b=>{
-    if(b.data.speed>0){
-      b.lat += (Math.random()-.5)*0.0015;
-      b.lng += (Math.random()-.5)*0.0015;
-      b.marker.setLatLng([b.lat,b.lng]);
+function filterFlota(q){
+  q=q.toLowerCase();
+  const filtered=FLOTA.filter(b=>b.id.toLowerCase().includes(q)||b.route.toLowerCase().includes(q)||b.driver.toLowerCase().includes(q)||b.loc.toLowerCase().includes(q));
+  renderFlota(filtered);
+}
+
+function renderFlota(list){
+  document.getElementById('flotaList').innerHTML=list.map(b=>`
+    <div class="fl-item" onclick="focusBus('${b.id}')">
+      <div class="fl-ico ${b.status}">🚌</div>
+      <div style="flex:1;min-width:0">
+        <div class="fl-name">${b.id} · ${b.route}</div>
+        <div class="fl-meta">${b.driver}</div>
+        <div class="fl-meta" style="color:${b.status==='red'?'var(--r)':b.status==='yellow'?'var(--y)':'var(--mu)'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">→ ${b.next}</div>
+      </div>
+      <div class="fl-spd">${b.speed}<br><span style="font-size:9px;color:var(--mu)">km/h</span></div>
+    </div>
+  `).join('')||`<div style="color:var(--mu);font-size:12px;padding:20px;text-align:center">Sin resultados</div>`;
+}
+
+function focusBus(id){
+  const bm=busMs.find(b=>b.data.id===id);
+  if(bm&&flotaMap){flotaMap.setView([bm.lat,bm.lng],15);bm.marker.openPopup();}
+  showToast(`Unidad ${id} localizada en el mapa`,'yellow');
+}
+
+// ===== EXISTING ROUTES DATA =====
+const EDIT_ROUTES=[
+  {id:'B12',name:'Ruta B12 — Miraflores ↔ Centro Lima',tipo:'Regular',estado:'Activa',origen:'Paradero Larco — Av. Larco 1200',destino:'Paradero Plaza Mayor — Jr. Unión',desde:'05:00',hasta:'23:30',frec:8,flota:14,notas:'Ruta principal corredor Arequipa. Alta demanda horas punta.',color:'#1A4E8C',coords:[[-12.1185,-77.0283],[-12.0983,-77.0356],[-12.0876,-77.0388],[-12.0521,-77.0352],[-12.0464,-77.0297]]},
+  {id:'C45',name:'Ruta C45 — Callao ↔ San Isidro',tipo:'Regular',estado:'Activa',origen:'Terminal Callao — Av. Elmer Faucett s/n',destino:'Paradero San Isidro — Av. Rivera Navarrete',desde:'05:30',hasta:'22:00',frec:10,flota:10,notas:'Conecta Callao con San Isidro vía La Marina.',color:'#2BB673',coords:[[-12.0564,-77.1197],[-12.0487,-77.0756],[-12.0464,-77.0428],[-12.0983,-77.0366]]},
+  {id:'A07',name:'Ruta A07 — SJL ↔ Ate Vitarte',tipo:'Regular',estado:'Activa',origen:'Terminal SJL — Av. Próceres cdra. 1',destino:'Terminal Ate — Carretera Central Km 12',desde:'05:00',hasta:'22:30',frec:12,flota:8,notas:'Corredor Este — alta demanda en hora punta mañana.',color:'#F5A623',coords:[[-12.0089,-77.0023],[-12.0464,-77.0297],[-12.0834,-76.9756]]},
+  {id:'MET',name:'Metropolitano — Naranjal ↔ Benavides',tipo:'Expreso',estado:'Activa',origen:'Est. Naranjal — Av. Universitaria',destino:'Est. Benavides — Av. Benavides s/n',desde:'05:00',hasta:'22:30',frec:5,flota:32,notas:'Servicio BRT. Sin paradas intermedias entre Est. España y Est. Javier Prado (expreso).',color:'#9333ea',coords:[[-11.9798,-77.0423],[-12.0364,-77.0356],[-12.0712,-77.0298],[-12.1267,-77.0298]]},
+];
+
+let currentEditRoute=null,currentRouteData=null;
+let routeLayerRefs={};
+// Edit mode state
+let editMode=false,editCoords=[],editVertexMarkers=[];
+let originalRouteLayer=null,detourLayer=null,incidentMarker=null;
+
+function renderRoutesList(){
+  document.getElementById('routesList').innerHTML=EDIT_ROUTES.map(r=>`
+    <div onclick="loadRoute('${r.id}')" id="rl-${r.id}" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;border:1px solid ${currentEditRoute===r.id?'rgba(26,78,140,.5)':'var(--bd)'};cursor:pointer;transition:all .12s;background:${currentEditRoute===r.id?'rgba(26,78,140,.2)':'transparent'}">
+      <div style="width:4px;height:32px;border-radius:2px;background:${r.color};flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.id} — ${r.name.split('—')[1]?.trim()||r.name}</div>
+        <div style="font-size:9.5px;color:var(--mu);margin-top:1px">${r.tipo} · cada ${r.frec} min</div>
+      </div>
+      <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;background:${r.estado==='Activa'?'rgba(43,182,115,.15)':r.estado==='Suspendida'?'rgba(230,57,70,.15)':'rgba(245,166,35,.15)'};color:${r.estado==='Activa'?'var(--g)':r.estado==='Suspendida'?'var(--r)':'var(--y)'};flex-shrink:0">${r.estado}</span>
+    </div>
+  `).join('');
+}
+
+function loadRoute(id, fromAlert=null){
+  const r=EDIT_ROUTES.find(x=>x.id===id);
+  if(!r)return;
+  currentEditRoute=id; currentRouteData=r;
+  document.getElementById('reTitle').textContent='Editando: '+r.id;
+  document.getElementById('rNombre').value=r.name;
+  document.getElementById('rTipo').value=r.tipo;
+  document.getElementById('rOrigen').value=r.origen;
+  document.getElementById('rDest').value=r.destino;
+  const times=document.querySelectorAll('.re-body input[type="time"]');
+  if(times[0])times[0].value=r.desde; if(times[1])times[1].value=r.hasta;
+  const nums=document.querySelectorAll('.re-body input[type="number"]');
+  if(nums[0])nums[0].value=r.frec; if(nums[1])nums[1].value=r.flota;
+  const fta=document.querySelector('.re-body .fta'); if(fta)fta.value=r.notas;
+  const sels=document.querySelectorAll('.re-body .fsel');
+  if(sels[0])sels[0].value=r.tipo; if(sels[1])sels[1].value=r.estado;
+  renderRoutesList();
+  // Incident info bar
+  const incBar=document.getElementById('incAlertBar');
+  if(fromAlert&&fromAlert.inc){
+    document.getElementById('incAlertText').textContent=fromAlert.inc.type+' — '+fromAlert.inc.desc;
+    document.getElementById('incAlertMeta').textContent=fromAlert.meta||'';
+    incBar.style.display='block';
+  } else { incBar.style.display='none'; }
+  if(routesMap){
+    clearEditLayers();
+    editCoords=r.coords.map(c=>[...c]);
+    // Draw original route faded
+    originalRouteLayer=L.polyline(editCoords,{color:r.color,weight:4,opacity:.25,dashArray:'8,5',interactive:false}).addTo(routesMap);
+    // Draw editable route
+    drawDetourLine();
+    // Incident marker
+    if(fromAlert&&fromAlert.inc){
+      const inc=fromAlert.inc;
+      const ic=L.divIcon({className:'',html:`<div style="background:rgba(230,57,70,.2);border:2.5px solid var(--r);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 0 12px rgba(230,57,70,.5)">⚠️</div>`,iconSize:[28,28],iconAnchor:[14,14]});
+      incidentMarker=L.marker([inc.lat,inc.lng],{icon:ic,zIndexOffset:2000})
+        .bindPopup(`<b style="color:#ff6b75">⚠️ ${inc.type}</b><br>${inc.desc}`,{maxWidth:260})
+        .addTo(routesMap);
+      incidentMarker.openPopup();
     }
+    routesMap.fitBounds(originalRouteLayer.getBounds(),{padding:[50,50]});
+    // Auto-enter edit mode when loaded from alert
+    if(fromAlert){
+      setTimeout(()=>enableEditMode(),400);
+    } else {
+      exitEditMode();
+    }
+  }
+  updatePtCount();
+  showToast(`Ruta ${r.id} cargada${fromAlert?' — crea el desvío arrastrando los puntos':''}`,fromAlert?'yellow':'green');
+}
+
+function clearEditLayers(){
+  editVertexMarkers.forEach(m=>{try{routesMap.removeLayer(m);}catch(e){}});
+  editVertexMarkers=[];
+  if(originalRouteLayer){try{routesMap.removeLayer(originalRouteLayer);}catch(e){}}
+  if(detourLayer){try{routesMap.removeLayer(detourLayer);}catch(e){}}
+  if(incidentMarker){try{routesMap.removeLayer(incidentMarker);}catch(e){}}
+  originalRouteLayer=null; detourLayer=null; incidentMarker=null;
+}
+
+function drawDetourLine(){
+  if(detourLayer){try{routesMap.removeLayer(detourLayer);}catch(e){}}
+  if(!currentRouteData||editCoords.length<2)return;
+  detourLayer=L.polyline(editCoords,{color:currentRouteData.color,weight:5,opacity:.9}).addTo(routesMap);
+}
+
+function rebuildVertexMarkers(){
+  editVertexMarkers.forEach(m=>{try{routesMap.removeLayer(m);}catch(e){}});
+  editVertexMarkers=[];
+  if(!editMode||!currentRouteData)return;
+  editCoords.forEach((coord,idx)=>{
+    const m=L.marker(coord,{
+      icon:L.divIcon({className:'',html:`<div style="width:14px;height:14px;background:${currentRouteData.color};border:2.5px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.5);cursor:grab"></div>`,iconSize:[14,14],iconAnchor:[7,7]}),
+      draggable:true,zIndexOffset:1000
+    });
+    m.on('drag',()=>{
+      editCoords[idx]=[m.getLatLng().lat,m.getLatLng().lng];
+      drawDetourLine();
+    });
+    m.on('contextmenu',(e)=>{
+      L.DomEvent.stopPropagation(e);
+      if(editCoords.length>2){editCoords.splice(idx,1);rebuildVertexMarkers();drawDetourLine();updatePtCount();}
+    });
+    m.addTo(routesMap);
+    editVertexMarkers.push(m);
   });
+  updatePtCount();
+}
+
+function ptSegDist([px,py],[ax,ay],[bx,by]){
+  const dx=bx-ax,dy=by-ay;
+  if(dx===0&&dy===0)return Math.hypot(px-ax,py-ay);
+  const t=Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/(dx*dx+dy*dy)));
+  return Math.hypot(px-ax-t*dx,py-ay-t*dy);
+}
+
+function nearestSegIdx(pt,coords){
+  let best=0,bestD=Infinity;
+  for(let i=0;i<coords.length-1;i++){const d=ptSegDist(pt,coords[i],coords[i+1]);if(d<bestD){bestD=d;best=i;}}
+  return best;
+}
+
+function enableEditMode(){
+  editMode=true;
+  document.getElementById('editModeBar').style.display='block';
+  document.getElementById('toggleEditBtn').textContent='✓ Salir de edición';
+  document.getElementById('toggleEditBtn').style.background='rgba(245,166,35,.2)';
+  document.getElementById('toggleEditBtn').style.color='var(--y)';
+  document.getElementById('publishDetourBtn').style.display='block';
+  rebuildVertexMarkers();
+  if(routesMap){
+    routesMap.off('click');
+    routesMap.on('click',(e)=>{
+      if(!editMode)return;
+      const pt=[e.latlng.lat,e.latlng.lng];
+      const idx=nearestSegIdx(pt,editCoords);
+      editCoords.splice(idx+1,0,pt);
+      rebuildVertexMarkers();
+      drawDetourLine();
+    });
+  }
+}
+
+function exitEditMode(){
+  editMode=false;
+  // Stop free draw if active
+  if(freeDrawMode){
+    freeDrawMode=false;
+    const btn=document.getElementById('freeDrawBtn');
+    const hint=document.getElementById('freeDrawHint');
+    if(btn){btn.textContent='✏️ Trazar libre';btn.style.cssText='';}
+    if(hint)hint.style.display='none';
+    freeDrawMarkers.forEach(m=>{try{routesMap.removeLayer(m);}catch(e){}});
+    freeDrawWaypoints=[];freeDrawMarkers=[];freeDrawSegCoords=[];
+  }
+  document.getElementById('editModeBar').style.display='none';
+  document.getElementById('toggleEditBtn').textContent='✏️ Editar puntos';
+  document.getElementById('toggleEditBtn').style.background='';
+  document.getElementById('toggleEditBtn').style.color='';
+  document.getElementById('publishDetourBtn').style.display='none';
+  clearAltPanel();
+  rebuildVertexMarkers();
+  if(routesMap){routesMap.off('click');routesMap.off('contextmenu');}
+}
+
+function toggleEditMode(){
+  if(!currentRouteData){showToast('Selecciona una ruta primero','yellow');return;}
+  if(editMode)exitEditMode(); else enableEditMode();
+}
+
+function clearRouteEdit(){
+  if(!currentRouteData)return;
+  editCoords=currentRouteData.coords.map(c=>[...c]);
+  rebuildVertexMarkers();
+  drawDetourLine();
+  updatePtCount();
+  showToast('Puntos restaurados a la ruta original','yellow');
+}
+
+function updatePtCount(){
+  const el=document.getElementById('routePtCount');
+  if(el)el.textContent=editCoords.length;
+}
+
+function publishDetour(){
+  if(!currentRouteData){showToast('Selecciona una ruta primero','yellow');return;}
+  if(editCoords.length<2){showToast('Traza al menos 2 puntos','red');return;}
+  // Style the detour line differently
+  if(detourLayer)detourLayer.setStyle({color:'#F5A623',dashArray:'12,4',weight:5,opacity:.95});
+  if(originalRouteLayer)originalRouteLayer.setStyle({opacity:.2});
+  // Add a label
+  const mid=editCoords[Math.floor(editCoords.length/2)];
+  const lbl=L.divIcon({className:'',html:`<div style="background:rgba(245,166,35,.9);color:#000;border-radius:5px;padding:3px 7px;font-size:9px;font-weight:800;white-space:nowrap">DESVÍO ACTIVO — ${currentRouteData.id}</div>`,iconSize:[0,0],iconAnchor:[0,0]});
+  L.marker(mid,{icon:lbl,interactive:false}).addTo(routesMap);
+  exitEditMode();
+  showToast(`✓ Desvío temporal publicado — Ruta ${currentRouteData.id}. Conductores notificados en tiempo real.`,'green');
+  document.getElementById('incAlertBar').style.display='none';
+}
+
+function resetRouteForm(){
+  currentEditRoute=null; currentRouteData=null;
+  document.getElementById('reTitle').textContent='Nueva Ruta';
+  document.getElementById('rNombre').value='';
+  document.getElementById('rTipo').value='Regular';
+  document.getElementById('rOrigen').value=''; document.getElementById('rDest').value='';
+  const fta=document.querySelector('.re-body .fta'); if(fta)fta.value='';
+  document.getElementById('incAlertBar').style.display='none';
+  exitEditMode();
+  clearEditLayers();
+  editCoords=[];
+  updatePtCount();
+  renderRoutesList();
 }
 
 // ===== ROUTES MAP =====
-let routesMap, routePoints=[], routeLine;
-function initMapRoutes(){
-  window._mapRoutesInit=true;
-  routesMap = L.map('map-routes',{zoomControl:true,attributionControl:false}).setView(LIMA,12);
+let routesMap,rPts=[],rLine,rMarkers=[];
+async function initMapRoutes(){
+  window._rmInit=true;
+  await ensureRoutesSnapped();
+  routesMap=L.map('map-routes',{zoomControl:true,attributionControl:false}).setView(LIMA,12);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(routesMap);
-
-  // Existing routes
-  const routeCoords = [
-    [[-12.1185,-77.0283],[-12.0983,-77.0356],[-12.0876,-77.0388],[-12.0521,-77.0352],[-12.0464,-77.0297]],
-    [[-12.0564,-77.1197],[-12.0487,-77.0756],[-12.0464,-77.0428],[-12.0983,-77.0366]],
-  ];
-  routeCoords.forEach(c=>L.polyline(c,{color:'#2563eb',weight:3,opacity:.5}).addTo(routesMap));
-
-  routesMap.on('click',e=>{
-    routePoints.push([e.latlng.lat,e.latlng.lng]);
-    L.circleMarker([e.latlng.lat,e.latlng.lng],{radius:6,color:'#F5A623',fillColor:'#F5A623',fillOpacity:1}).addTo(routesMap);
-    if(routeLine) routesMap.removeLayer(routeLine);
-    if(routePoints.length>1){
-      routeLine = L.polyline(routePoints,{color:'#F5A623',weight:4,dashArray:'8,4'}).addTo(routesMap);
-    }
-    showToast(`Punto agregado: ${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`,'yellow');
+  // Show all existing routes
+  EDIT_ROUTES.forEach(r=>{
+    L.polyline(r.coords,{color:r.color,weight:3.5,opacity:r.estado==='Activa'?.45:.2,dashArray:r.estado==='Suspendida'?'6,4':null,interactive:false}).addTo(routesMap);
   });
 }
+
+function clearRoute(){
+  exitEditMode();
+  clearEditLayers();
+  editCoords=[];
+  updatePtCount();
+  if(currentRouteData){
+    // Redraw original
+    editCoords=currentRouteData.coords.map(c=>[...c]);
+    originalRouteLayer=L.polyline(editCoords,{color:currentRouteData.color,weight:4,opacity:.25,dashArray:'8,5',interactive:false}).addTo(routesMap);
+    drawDetourLine();
+  }
+  showToast('Edición cancelada — ruta original restaurada','yellow');
+}
+
+function saveRouteDraft(){
+  const n=document.getElementById('rNombre').value.trim();
+  if(!n){showToast('Ingresa un nombre de ruta','red');return;}
+  showToast(`"${n}" guardado como borrador`,'green');
+}
+
+function publishRoute(){
+  const n=document.getElementById('rNombre').value.trim();
+  if(!n){showToast('Ingresa un nombre de ruta','red');return;}
+  if(editCoords.length<2){showToast('Traza al menos 2 puntos en el mapa','yellow');return;}
+  showToast(`✓ Ruta "${n}" publicada. Conductores la reciben ahora.`,'green');
+}
+
+function simRoute(){
+  const n=document.getElementById('rNombre').value.trim()||'esta ruta';
+  showToast(`Simulando impacto de "${n}"…`,'yellow');
+  setTimeout(()=>showToast('Impacto estimado: −12% congestión en corredor · +8% pasajeros atendidos','green'),2500);
+}
+
+// ===== OSRM ROAD ROUTING =====
+// Snap all EDIT_ROUTES to real streets once on load (cached)
+let _snapDone=false,_snapProm=null;
+async function ensureRoutesSnapped(){
+  if(_snapDone)return;
+  if(_snapProm)return _snapProm;
+  _snapProm=(async()=>{
+    for(const r of EDIT_ROUTES){
+      try{
+        const res=await osrmRoute(r.coords,false);
+        if(res&&res[0]&&res[0].coords.length>1)r.coords=res[0].coords;
+      }catch(e){console.warn('snap failed for '+r.id,e);}
+    }
+    calibrateGeoPositions();
+    _snapDone=true;
+  })();
+  return _snapProm;
+}
+
+async function osrmRoute(waypoints, alternatives=false){
+  try{
+    const coords=waypoints.map(([la,lo])=>`${lo},${la}`).join(';');
+    const url=`https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson&alternatives=${alternatives}&steps=false`;
+    const res=await fetch(url);
+    const data=await res.json();
+    if(!data||data.code!=='Ok')return null;
+    return data.routes.map(r=>({
+      coords:r.geometry.coordinates.map(([lo,la])=>[la,lo]),
+      duration:r.duration,
+      distance:r.distance
+    }));
+  }catch(e){console.warn('OSRM error',e);return null;}
+}
+
+let altRoutes=[];
+const ALT_COLORS=['#F5A623','#2BB673','#7ab3f7'];
+const ALT_LABELS=['⚡ Más rápida','🔀 Alternativa 1','🔵 Alternativa 2'];
+
+function clearAltLayers(){
+  altRoutes.forEach(a=>{if(a.layer)try{routesMap.removeLayer(a.layer);}catch(e){}});
+  altRoutes=[];
+}
+
+async function snapToRoads(){
+  if(!currentRouteData){showToast('Selecciona una ruta primero','yellow');return;}
+  if(!editCoords||editCoords.length<2){showToast('La ruta necesita al menos 2 puntos','yellow');return;}
+  const panel=document.getElementById('altPanel');
+  panel.style.display='flex';
+  panel.innerHTML='<div style="color:var(--mu);font-size:11px;padding:4px 0">📡 Calculando ruta exacta por calles…</div>';
+  // Use up to 8 waypoints to avoid OSRM limits
+  const step=Math.max(1,Math.floor((editCoords.length-2)/6));
+  const middle=editCoords.slice(1,-1).filter((_,i)=>i%step===0);
+  const wps=[editCoords[0],...middle,editCoords[editCoords.length-1]];
+  const routes=await osrmRoute(wps,true);
+  if(!routes||routes.length===0){
+    panel.style.display='none';
+    showToast('No se pudo calcular la ruta. Verifica la conexión e intenta de nuevo.','red');
+    return;
+  }
+  showAltRoutes(routes);
+}
+
+function showAltRoutes(routes){
+  clearAltLayers();
+  if(!editMode)enableEditMode();
+  // Remove current detour line temporarily
+  if(detourLayer)try{routesMap.removeLayer(detourLayer);}catch(e){}
+  // Draw all alternatives
+  routes.forEach((r,i)=>{
+    const layer=L.polyline(r.coords,{
+      color:ALT_COLORS[i],weight:i===0?5.5:4,opacity:i===0?.9:.45,
+      dashArray:i===0?null:'10,5',interactive:true
+    }).on('click',()=>selectAlt(i)).addTo(routesMap);
+    altRoutes.push({...r,layer});
+  });
+  if(altRoutes[0])routesMap.fitBounds(altRoutes[0].layer.getBounds(),{padding:[50,50]});
+  const panel=document.getElementById('altPanel');
+  panel.style.display='flex';
+  panel.innerHTML=`
+    <div style="font-size:10px;font-weight:700;color:var(--y);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px">Selecciona una ruta alternativa</div>
+    ${routes.map((r,i)=>`
+      <div class="alt-card${i===0?' active':''}" id="altCard-${i}" onclick="selectAlt(${i})">
+        <div style="width:10px;height:10px;border-radius:50%;background:${ALT_COLORS[i]};flex-shrink:0"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;font-weight:700;color:#fff">${ALT_LABELS[i]||'Alternativa '+i}</div>
+          <div style="font-size:10px;color:var(--mu)">${Math.round(r.duration/60)} min · ${(r.distance/1000).toFixed(1)} km</div>
+        </div>
+        <button class="btn btn-p btn-sm" style="font-size:10px;flex-shrink:0" onclick="event.stopPropagation();applyAlt(${i})">✓ Aplicar</button>
+      </div>
+    `).join('')}
+    <button class="btn btn-gh btn-sm" style="margin-top:3px" onclick="clearAltPanel()">✕ Cancelar</button>
+  `;
+}
+
+function selectAlt(idx){
+  altRoutes.forEach((a,i)=>{
+    a.layer.setStyle({opacity:i===idx?.9:.35,weight:i===idx?5.5:3.5,dashArray:i===idx?null:'10,5'});
+  });
+  document.querySelectorAll('.alt-card').forEach((c,i)=>c.classList.toggle('active',i===idx));
+}
+
+function applyAlt(idx){
+  const alt=altRoutes[idx];
+  if(!alt)return;
+  editCoords=[...alt.coords];
+  clearAltPanel();
+  drawDetourLine();
+  if(editMode)rebuildVertexMarkers();
+  updatePtCount();
+  showToast('Ruta aplicada — arrastra los puntos para ajustar si lo necesitas','green');
+}
+
+function clearAltPanel(){
+  clearAltLayers();
+  const panel=document.getElementById('altPanel');
+  panel.style.display='none';
+  panel.innerHTML='';
+  // Redraw current detour line
+  drawDetourLine();
+}
+
+// ===== FREE DRAW MODE =====
+let freeDrawMode=false,freeDrawWaypoints=[],freeDrawMarkers=[],freeDrawSegCoords=[];
+
+function toggleFreeDrawMode(){
+  freeDrawMode=!freeDrawMode;
+  const btn=document.getElementById('freeDrawBtn');
+  const hint=document.getElementById('freeDrawHint');
+  if(freeDrawMode){
+    btn.textContent='⏹ Detener trazado';
+    btn.style.cssText='background:rgba(230,57,70,.15);color:var(--r);border-color:rgba(230,57,70,.3)';
+    hint.style.display='block';
+    freeDrawWaypoints=[];freeDrawMarkers=[];freeDrawSegCoords=[];
+    if(!editMode)enableEditMode();
+    if(routesMap){
+      routesMap.off('click');
+      routesMap.on('click',(e)=>freeDrawClick(e));
+      routesMap.on('contextmenu',(e)=>{L.DomEvent.preventDefault(e);undoLastFreePoint();});
+    }
+    showToast('Trazar libre activo — haz click en el mapa para ir añadiendo puntos','yellow');
+  } else {
+    btn.textContent='✏️ Trazar libre';
+    btn.style.cssText='';
+    hint.style.display='none';
+    // Assemble final route from drawn segments
+    if(freeDrawSegCoords.length>0){
+      const assembled=[];
+      freeDrawSegCoords.forEach(seg=>seg.forEach((c,i)=>{if(i===0&&assembled.length>0)return;assembled.push(c);}));
+      if(assembled.length>1){
+        editCoords=assembled;
+        drawDetourLine();
+        if(editMode)rebuildVertexMarkers();
+        updatePtCount();
+        showToast(`Ruta trazada con ${editCoords.length} puntos — puedes editarla arrastrando los nodos`,'green');
+      }
+    }
+    // Clean up temp markers
+    freeDrawMarkers.forEach(m=>{try{routesMap.removeLayer(m);}catch(e){}});
+    freeDrawWaypoints=[];freeDrawMarkers=[];freeDrawSegCoords=[];
+    // Restore normal edit click handler
+    if(routesMap&&editMode){
+      routesMap.off('click');routesMap.off('contextmenu');
+      routesMap.on('click',(e)=>{
+        if(!editMode)return;
+        const pt=[e.latlng.lat,e.latlng.lng];
+        const idx=nearestSegIdx(pt,editCoords);
+        editCoords.splice(idx+1,0,pt);
+        rebuildVertexMarkers();drawDetourLine();
+      });
+    }
+  }
+}
+
+async function freeDrawClick(e){
+  if(!freeDrawMode)return;
+  const pt=[e.latlng.lat,e.latlng.lng];
+  freeDrawWaypoints.push(pt);
+  // Waypoint marker
+  const wm=L.circleMarker(pt,{radius:6,color:'#F5A623',fillColor:'#fff',fillOpacity:1,weight:2.5,interactive:false}).addTo(routesMap);
+  freeDrawMarkers.push(wm);
+  if(freeDrawWaypoints.length>=2){
+    // Show temporary line while snapping
+    const prev=freeDrawWaypoints[freeDrawWaypoints.length-2];
+    const tmpLine=L.polyline([prev,pt],{color:'#F5A623',weight:2,opacity:.4,dashArray:'6,4',interactive:false}).addTo(routesMap);
+    freeDrawMarkers.push(tmpLine);
+    // Snap segment to road
+    const routes=await osrmRoute([prev,pt],false);
+    if(routes&&routes[0]){
+      // Remove the temporary dashed line
+      try{routesMap.removeLayer(tmpLine);}catch(ex){}
+      const segIdx=freeDrawMarkers.indexOf(tmpLine);
+      if(segIdx>-1)freeDrawMarkers.splice(segIdx,1);
+      // Draw snapped segment
+      const snapLine=L.polyline(routes[0].coords,{color:'#F5A623',weight:4.5,opacity:.88,interactive:false}).addTo(routesMap);
+      freeDrawMarkers.push(snapLine);
+      freeDrawSegCoords.push(routes[0].coords);
+    } else {
+      // Fallback: keep the straight line
+      freeDrawSegCoords.push([prev,pt]);
+    }
+  }
+}
+
+function undoLastFreePoint(){
+  if(!freeDrawMode||freeDrawWaypoints.length===0)return;
+  freeDrawWaypoints.pop();
+  // Remove last segment line + waypoint marker (last 2 layers added)
+  const toRemove=freeDrawSegCoords.length>0?2:1;
+  for(let i=0;i<toRemove&&freeDrawMarkers.length>0;i++){
+    const m=freeDrawMarkers.pop();
+    try{routesMap.removeLayer(m);}catch(e){}
+  }
+  if(freeDrawSegCoords.length>0)freeDrawSegCoords.pop();
+  showToast('Último punto eliminado','yellow');
+}
+
+// Opens route editor from an alert (creates detour flow)
+function openAlertDetour(alertId){
+  const a=ALERTS.find(x=>x.id===alertId);
+  if(!a||!a.routeId){showToast('Esta alerta no está asociada a una ruta específica','yellow');return;}
+  goSection('rutas');
+  const doLoad=()=>loadRoute(a.routeId,a);
+  if(!window._rmInit){
+    initMapRoutes().then(()=>{renderRoutesList();setTimeout(doLoad,200);});
+  } else {
+    setTimeout(doLoad,150);
+  }
+}
+
+// ===== GLOBAL SEMAPHORE TICK =====
+const _semSt={};
+let _semMapMkrs=[]; // [{id,marker}] — live map markers for all semaphore maps
+
+function initSemafState(){
+  SEMAFOROS.forEach(s=>{
+    const ph=['red','yellow','green'];
+    _semSt[s.id]={
+      pi:Math.max(0,ph.indexOf(s.phase)),
+      cd:s.phase==='red'?s.cycle*.5:s.phase==='yellow'?5:s.cycle*.45,
+      dur:{red:s.cycle*.5,yellow:5,green:s.cycle*.45}
+    };
+  });
+}
+// Called after DOM ready so SEMAFOROS is populated
+document.addEventListener('DOMContentLoaded',initSemafState);
+
+setInterval(()=>{
+  const ph=['red','yellow','green'];
+  SEMAFOROS.forEach(s=>{
+    const st=_semSt[s.id];if(!st)return;
+    st.cd=Math.max(0,st.cd-1);
+    if(st.cd===0){
+      st.pi=(st.pi+1)%3;
+      s.phase=ph[st.pi];
+      st.cd=st.dur[s.phase];
+    }
+    // Update semaphores grid DOM (if panel open)
+    const rEl=document.getElementById('sR-'+s.id);
+    if(rEl){
+      const cdEl=document.getElementById('sC-'+s.id);
+      if(cdEl)cdEl.textContent=Math.round(st.cd)+'s';
+      rEl.className='sl '+(s.phase==='red'?'on-r':'');
+      const yEl=document.getElementById('sY-'+s.id);const gEl=document.getElementById('sG-'+s.id);
+      if(yEl)yEl.className='sl '+(s.phase==='yellow'?'on-y':'');
+      if(gEl)gEl.className='sl '+(s.phase==='green'?'on-g':'');
+    }
+    // Update all live map markers
+    _semMapMkrs.forEach(sm=>{if(sm.id===s.id)sm.marker.setIcon(createSemafIcon(s));});
+  });
+},1000);
 
 // ===== CAMERAS =====
-const camContexts = {};
-function initCameras(){
-  const container = document.getElementById('camGridContainer');
-  const layout = document.getElementById('camLayout').value;
-  const cols = layout==='9'?3:2;
-  const rows = layout==='9'?3:2;
-  const cams = CAMERAS.slice(0,cols*rows);
-
-  container.style.gridTemplateColumns = `repeat(${cols},1fr)`;
-  container.style.gridTemplateRows = `repeat(${rows},1fr)`;
-  container.innerHTML='';
-
+const camCtx={};
+let expandedCamIdx=null;
+function initCams(){
+  const layout=document.getElementById('camLayout').value;
+  const cols=layout==='9'?3:2,rows=layout==='9'?3:2,count=cols*rows;
+  const cams=CAMERAS.slice(0,count);
+  const grid=document.getElementById('camGrid');
+  grid.style.gridTemplateColumns=`repeat(${cols},1fr)`;
+  grid.style.gridTemplateRows=`repeat(${rows},1fr)`;
+  grid.innerHTML='';
+  Object.keys(camCtx).forEach(k=>{if(camCtx[k].raf)cancelAnimationFrame(camCtx[k].raf);delete camCtx[k];});
   cams.forEach((cam,i)=>{
-    const cell = document.createElement('div');
-    cell.style.cssText='position:relative;background:#000;overflow:hidden;border-radius:6px;cursor:pointer';
-    cell.innerHTML=`
-      <canvas id="cam-canvas-${i}" style="width:100%;height:100%;display:block"></canvas>
-      <div style="position:absolute;top:6px;left:8px;font-family:JetBrains Mono,monospace;font-size:10px;color:#0af;opacity:.9" id="cam-time-${i}">00:00:00</div>
-      <div style="position:absolute;top:22px;left:8px;font-family:JetBrains Mono,monospace;font-size:9px;color:#0f8;opacity:.85" id="cam-ai-${i}">🚗 ${cam.vehicles} veh/min  🚶 ${cam.pedestrians}</div>
-      <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.85));padding:8px;font-size:11px;font-family:JetBrains Mono,monospace;color:#0af">${cam.id} — ${cam.name}</div>
-      <div style="position:absolute;top:6px;right:8px;width:7px;height:7px;border-radius:50%;background:${cam.status==='active'?'#2BB673':cam.status==='warning'?'#F5A623':'#E63946'};box-shadow:0 0 6px ${cam.status==='active'?'#2BB673':cam.status==='warning'?'#F5A623':'#E63946'}"></div>
-    `;
-    container.appendChild(cell);
-
+    const col=cam.status==='active'?'#2BB673':cam.status==='warning'?'#F5A623':'#E63946';
+    const cell=document.createElement('div');
+    cell.className='cam-cell';cell.id='cc'+i;
+    cell.innerHTML=`<canvas id="cv${i}" style="width:100%;height:100%;display:block"></canvas>
+      <div style="position:absolute;top:6px;left:8px;font-family:JetBrains Mono,monospace;font-size:10px;color:#0af;opacity:.9" id="ct${i}">--:--:--</div>
+      <div style="position:absolute;top:22px;left:8px;font-family:JetBrains Mono,monospace;font-size:9px;color:#0f8;opacity:.9" id="cai${i}">🚗${cam.v} 🚶${cam.p}</div>
+      <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.9));padding:7px 8px;font-size:10.5px;font-family:JetBrains Mono,monospace;color:#0af">${cam.id} — ${cam.name}</div>
+      <div style="position:absolute;top:6px;right:8px;width:7px;height:7px;border-radius:50%;background:${col};box-shadow:0 0 5px ${col}"></div>
+      <div style="position:absolute;top:6px;right:22px;font-size:10px;cursor:pointer;color:#fff;opacity:.7" onclick="event.stopPropagation();expandCam(${i})" title="Expandir">⛶</div>`;
+    cell.addEventListener('click',()=>expandCam(i));
+    grid.appendChild(cell);
     setTimeout(()=>{
-      const canvas = document.getElementById(`cam-canvas-${i}`);
-      if(!canvas) return;
-      canvas.width = canvas.offsetWidth||320;
-      canvas.height = canvas.offsetHeight||200;
-      const ctx = canvas.getContext('2d');
-      camContexts[i] = {ctx, canvas, cam, vehicles:[], frame:0};
-      // init vehicles
-      for(let v=0;v<6;v++){
-        camContexts[i].vehicles.push({x:Math.random()*canvas.width,y:canvas.height*(0.35+Math.random()*.3),speed:(Math.random()+.5)*(cam.status==='active'?1:.2),w:22+Math.random()*14,h:10+Math.random()*6,color:['#e74c3c','#3498db','#f39c12','#2ecc71','#9b59b6','#e67e22','#1abc9c'][Math.floor(Math.random()*7)]});
-      }
-      if(cam.status!=='inactive') animateCam(i);
-    },100);
+      const cv=document.getElementById('cv'+i);if(!cv)return;
+      cv.width=cv.offsetWidth||320;cv.height=cv.offsetHeight||200;
+      const ctx=cv.getContext('2d');
+      const vehs=[];
+      for(let v=0;v<7;v++) vehs.push({x:Math.random()*cv.width,y:cv.height*(.38+Math.random()*.24),spd:(Math.random()+.4)*(cam.status==='active'?1.2:.15),w:20+Math.random()*14,h:9+Math.random()*5,c:['#e74c3c','#3498db','#f39c12','#2ecc71','#9b59b6','#e67e22','#1abc9c','#fff'][Math.floor(Math.random()*8)]});
+      camCtx[i]={ctx,cv,cam,vehs,frame:0};
+      if(cam.status!=='inactive') drawCam(i);
+    },80);
   });
 }
 
-function animateCam(i){
-  const c = camContexts[i];
-  if(!c) return;
-  const {ctx,canvas,cam,vehicles} = c;
-  ctx.fillStyle = cam.status==='warning'?'#1a1a0a':'#0a0a0a';
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  // Roads
-  const midY = canvas.height*.5;
-  ctx.fillStyle='#1c1c1c';
-  ctx.fillRect(0,midY-40,canvas.width,80);
-  // Road lines
-  ctx.strokeStyle='#333';
-  ctx.lineWidth=1;
-  ctx.setLineDash([15,10]);
-  ctx.beginPath();ctx.moveTo(0,midY);ctx.lineTo(canvas.width,midY);ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Lane markings
-  ctx.strokeStyle='#fff3';
-  ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.moveTo(0,midY-40);ctx.lineTo(canvas.width,midY-40);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(0,midY+40);ctx.lineTo(canvas.width,midY+40);ctx.stroke();
-
-  // Buildings (background)
-  for(let b=0;b<8;b++){
-    const bx = b*(canvas.width/7);
-    const bh = 30+Math.sin(b*1.3)*20;
-    ctx.fillStyle=`rgba(30,30,50,${.5+b%3*.1})`;
-    ctx.fillRect(bx,midY-40-bh,canvas.width/8-2,bh);
+function drawCam(i){
+  const c=camCtx[i];if(!c)return;
+  const{ctx,cv,cam,vehs}=c;
+  ctx.fillStyle=cam.status==='warning'?'#12120a':'#0a0c12';
+  ctx.fillRect(0,0,cv.width,cv.height);
+  const my=cv.height*.5;
+  ctx.fillStyle='#181818';ctx.fillRect(0,my-38,cv.width,76);
+  ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,my-38);ctx.lineTo(cv.width,my-38);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,my+38);ctx.lineTo(cv.width,my+38);ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,.04)';ctx.setLineDash([14,10]);
+  ctx.beginPath();ctx.moveTo(0,my);ctx.lineTo(cv.width,my);ctx.stroke();ctx.setLineDash([]);
+  for(let b=0;b<9;b++){
+    const bx=(b/8)*cv.width;const bh=28+Math.sin(b*1.7)*16;
+    ctx.fillStyle=`rgba(20,25,45,${.4+b%2*.1})`;
+    ctx.fillRect(bx,my-38-bh,cv.width/10,bh);
   }
-
-  // Vehicles
-  vehicles.forEach(v=>{
-    v.x += v.speed;
-    if(v.x>canvas.width+30) v.x=-30;
-    ctx.save();
-    ctx.shadowColor=v.color;ctx.shadowBlur=4;
-    ctx.fillStyle=v.color;
-    ctx.fillRect(v.x,v.y-v.h/2,v.w,v.h);
-    // Headlights
-    ctx.fillStyle='rgba(255,255,200,.8)';
-    ctx.fillRect(v.x+v.w-2,v.y-2,2,4);
+  vehs.forEach(v=>{
+    v.x+=v.spd;if(v.x>cv.width+30)v.x=-30;
+    ctx.save();ctx.shadowColor=v.c;ctx.shadowBlur=3;
+    ctx.fillStyle=v.c;ctx.fillRect(v.x,v.y-v.h/2,v.w,v.h);
+    ctx.fillStyle='rgba(255,255,200,.85)';ctx.fillRect(v.x+v.w-2,v.y-1.5,2,3);
     ctx.restore();
   });
-
-  // AI overlay boxes
-  if(c.frame%30<20){
-    ctx.strokeStyle='#0f8';
-    ctx.lineWidth=1;
-    vehicles.slice(0,3).forEach(v=>{
-      ctx.strokeRect(v.x-2,v.y-v.h/2-2,v.w+4,v.h+4);
-      ctx.fillStyle='#0f8';
-      ctx.font='7px monospace';
-      ctx.fillText(Math.floor(v.speed*20)+'km/h',v.x,v.y-v.h/2-4);
+  if(c.frame%25<18){
+    ctx.strokeStyle='#0f8';ctx.lineWidth=.8;
+    vehs.slice(0,3).forEach(v=>{
+      ctx.strokeRect(v.x-1,v.y-v.h/2-1,v.w+2,v.h+2);
+      ctx.fillStyle='#0f8';ctx.font='7px monospace';
+      ctx.fillText(Math.floor(v.spd*22)+'km/h',v.x,v.y-v.h/2-3);
     });
   }
-
-  // Timestamp
-  const now = new Date();
-  const el = document.getElementById(`cam-time-${i}`);
-  if(el) el.textContent = now.toLocaleTimeString('es-PE',{hour12:false});
-
-  // Update AI counts randomly
-  if(c.frame%90===0){
-    const ai = document.getElementById(`cam-ai-${i}`);
-    if(ai) ai.textContent = `🚗 ${Math.floor(cam.vehicles+Math.random()*10-5)} veh/min  🚶 ${Math.floor(cam.pedestrians+Math.random()*6-3)}`;
-  }
-
-  c.frame++;
-  requestAnimationFrame(()=>animateCam(i));
+  const now=new Date();
+  const ct=document.getElementById('ct'+i);if(ct)ct.textContent=now.toLocaleTimeString('es-PE',{hour12:false});
+  if(c.frame%80===0){const ca=document.getElementById('cai'+i);if(ca)ca.textContent=`🚗${Math.floor(cam.v+Math.random()*8-4)} 🚶${Math.floor(cam.p+Math.random()*5-2)}`;}
+  c.frame++;c.raf=requestAnimationFrame(()=>drawCam(i));
 }
 
-function setCamLayout(v){ initCameras(); }
+function expandCam(i){
+  const c=camCtx[i];if(!c)return;
+  expandedCamIdx=i;
+  document.getElementById('camExpand').classList.add('open');
+  const ec=document.getElementById('camExpandCanvas');
+  ec.width=960;ec.height=540;
+  document.getElementById('camExpId').textContent=c.cam.id+' — '+c.cam.name;
+  drawExpandedCam();
+}
+function drawExpandedCam(){
+  if(expandedCamIdx===null)return;
+  const c=camCtx[expandedCamIdx];if(!c)return;
+  const ec=document.getElementById('camExpandCanvas');
+  if(!ec||!document.getElementById('camExpand').classList.contains('open'))return;
+  const ctx=ec.getContext('2d');
+  const cpy={ctx,cv:ec,cam:c.cam,vehs:c.vehs,frame:c.frame};
+  drawCamToCtx(cpy);
+  document.getElementById('camExpTime').textContent=new Date().toLocaleTimeString('es-PE',{hour12:false});
+  document.getElementById('camExpVeh').textContent=`🚗 ${c.cam.v} veh/min  🚶 ${c.cam.p}`;
+  requestAnimationFrame(drawExpandedCam);
+}
+function drawCamToCtx(c){
+  const{ctx,cv,cam,vehs}=c;
+  ctx.fillStyle=cam.status==='warning'?'#12120a':'#0a0c12';ctx.fillRect(0,0,cv.width,cv.height);
+  const my=cv.height*.5;ctx.fillStyle='#181818';ctx.fillRect(0,my-56,cv.width,112);
+  vehs.forEach(v=>{v.x+=v.spd*.5;if(v.x>cv.width+30)v.x=-30;ctx.fillStyle=v.c;ctx.fillRect(v.x*(cv.width/320),v.y*(cv.height/200)-v.h,v.w*1.5,v.h*1.5);});
+  ctx.strokeStyle='#0f8';ctx.lineWidth=1;
+  vehs.slice(0,4).forEach(v=>{ctx.strokeRect(v.x*(cv.width/320)-2,v.y*(cv.height/200)-v.h-2,v.w*1.5+4,v.h*1.5+4);});
+}
+function closeCamExpand(){
+  document.getElementById('camExpand').classList.remove('open');
+  expandedCamIdx=null;
+}
 
-// ===== ALERTS LIST =====
-const ALERTS_DATA = [
-  {color:'red',text:'Accidente en Javier Prado Km 8.2 — 2 vehículos. Carril derecho bloqueado.',meta:'Hace 2 min · Fuente: CAM-002 · IA',action:'Ver'},
-  {color:'red',text:'Congestión crítica Av. Arequipa cdra 42–50. Velocidad media: 8 km/h.',meta:'Hace 5 min · Fuente: GPS Flota',action:'Ver'},
-  {color:'red',text:'Semáforo SEM-008 averiado — La Marina & Brasil. Sin señal.',meta:'Hace 18 min · Fuente: Reporte ciudadano',action:'Ver'},
-  {color:'yellow',text:'Bus MT-2347 con retraso de 12 min. Ruta C45 afectada.',meta:'Hace 24 min · Fuente: GPS MT-2347',action:'Ver'},
-  {color:'yellow',text:'Paradero Naranjal saturado (+80 pasajeros). Solicitar frecuencia adicional.',meta:'Hace 31 min · Fuente: Validaciones',action:'Ver'},
-  {color:'green',text:'Ruta A07 normalizada. Incidente resuelto en Av. Universitaria.',meta:'Hace 45 min · Fuente: Equipo campo',action:''},
-];
-
-function renderAlerts(){
-  const el = document.getElementById('alertsList');
-  if(!el) return;
-  el.innerHTML = ALERTS_DATA.slice(0,4).map(a=>`
-    <div class="alert-item">
-      <div class="alert-dot ${a.color}"></div>
-      <div style="flex:1">
-        <div class="alert-text">${a.text}</div>
-        <div class="alert-meta">${a.meta}</div>
+// ===== INCIDENTS LIST =====
+function renderIncList(){
+  document.getElementById('incList').innerHTML=INCIDENTS.map(inc=>`
+    <div class="inc-card ${inc.sev}" onclick="openInc(${JSON.stringify(inc).replace(/"/g,'&quot;')})">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
+        <span class="badge ${inc.sev}">${inc.type}</span>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--mu)">${inc.id} · ${inc.time}</span>
+        <span class="badge blue" style="margin-left:auto;font-size:9px">${inc.status}</span>
       </div>
-      ${a.action?`<div class="alert-action"><button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="showToast('Abriendo detalle...','yellow')">${a.action}</button></div>`:''}
+      <div style="font-size:12px;color:var(--tx)">${inc.desc}</div>
+      <div style="font-size:10.5px;color:var(--mu);margin-top:4px">📍 ${inc.loc}</div>
+    </div>
+  `).join('');
+}
+
+function addRandInc(){
+  const types=['Congestión','Accidente','Bus Averiado','Semáforo Roto','Paradero Saturado'];
+  const locs=['Av. Javier Prado','Av. Arequipa','La Marina','Universitaria','28 de Julio'];
+  const t=types[Math.floor(Math.random()*types.length)];
+  const l=locs[Math.floor(Math.random()*locs.length)];
+  showToast(`Nueva alerta: ${t} en ${l}`,'red');
+  const badge=document.getElementById('incBadge');
+  const n=parseInt(badge.textContent)||0;badge.textContent=(n+1)+' Críticos';
+  const nb=document.getElementById('nb-mon');if(nb)nb.textContent=(parseInt(nb.textContent)||0)+1;
+}
+
+let curInc=null;
+function openInc(inc){
+  curInc=inc;
+  document.getElementById('moTitle').textContent=`${inc.type} — ${inc.id}`;
+  document.getElementById('moBody').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div class="mi-info"><div class="mi-lbl">Ubicación</div><div class="mi-val">📍 ${inc.loc}</div></div>
+      <div class="mi-info"><div class="mi-lbl">Hora</div><div class="mi-val fmono">${inc.time} hrs</div></div>
+    </div>
+    <div class="mi-info" style="margin-bottom:8px"><div class="mi-lbl">Descripción</div><div class="mi-val">${inc.desc}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="mi-info"><div class="mi-lbl">Severidad</div><span class="badge ${inc.sev}">${inc.sev==='red'?'CRÍTICO':'MEDIO'}</span></div>
+      <div class="mi-info"><div class="mi-lbl">Estado</div><span class="badge blue">${inc.status}</span></div>
+    </div>`;
+  document.getElementById('moAction').textContent='Asignar Equipo de Campo';
+  document.getElementById('incModal').classList.add('open');
+}
+function modalAction(){
+  if(curInc){showToast(`Equipo asignado a ${curInc.id} — ${curInc.type}`,'green');curInc.status='En atención';renderIncList();}
+  closeMo();
+}
+function closeMo(){document.getElementById('incModal').classList.remove('open');curInc=null;}
+
+// ===== SEMAPHORES =====
+function renderSemafs(){
+  const filter=document.getElementById('sfFilter').value;
+  const list=filter?SEMAFOROS.filter(s=>s.status===filter):SEMAFOROS;
+  document.getElementById('sfGrid').innerHTML=list.map(s=>{
+    const col=s.status==='critico'?'var(--r)':s.status==='suboptimo'?'var(--y)':'var(--g)';
+    return`<div class="sfc ${s.status}" id="sfc-${s.id}" onclick="openSemaf('${s.id}')">
+      <div class="sf-id">${s.id}</div>
+      <div class="sf-name">${s.name}</div>
+      <div class="sf-lights">
+        <div class="sl ${s.phase==='red'?'on-r':''}" id="sR-${s.id}"></div>
+        <div class="sl ${s.phase==='yellow'?'on-y':''}" id="sY-${s.id}"></div>
+        <div class="sl ${s.phase==='green'?'on-g':''}" id="sG-${s.id}"></div>
+        <span style="font-size:9px;color:var(--mu);margin-left:7px;font-family:var(--mono)" id="sC-${s.id}">${s.cycle}s</span>
+      </div>
+      <div class="sf-cycle">Ciclo: ${s.cycle}s | Óptimo IA: ${s.optimal}s</div>
+      <div class="sf-sts" style="color:${col}">${s.status==='critico'?'⚠️ Ineficiente':s.status==='suboptimo'?'⚡ Subóptimo':'✅ Normal'}</div>
+    </div>`;
+  }).join('');
+}
+
+function openSemaf(id){
+  const s=SEMAFOROS.find(x=>x.id===id);
+  document.getElementById('moTitle').textContent=`${s.id} — ${s.name}`;
+  document.getElementById('moBody').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+      <div class="mi-info" style="text-align:center"><div class="mi-lbl">Ciclo Actual</div><div style="font-size:22px;font-weight:700;color:#fff;font-family:var(--mono)">${s.cycle}s</div></div>
+      <div class="mi-info" style="text-align:center"><div class="mi-lbl">Óptimo IA</div><div style="font-size:22px;font-weight:700;color:var(--g);font-family:var(--mono)">${s.optimal}s</div></div>
+      <div class="mi-info" style="text-align:center"><div class="mi-lbl">Ahorro</div><div style="font-size:22px;font-weight:700;color:var(--y);font-family:var(--mono)">${s.cycle-s.optimal}s</div></div>
+    </div>
+    <div style="background:rgba(43,182,115,.08);border:1px solid rgba(43,182,115,.2);border-radius:8px;padding:11px">
+      <div style="font-size:10.5px;font-weight:700;color:var(--g);margin-bottom:5px">💡 Recomendación IA SmartFlow</div>
+      <div style="font-size:12px;color:var(--tx)">Reducir ciclo de ${s.cycle}s a ${s.optimal}s en hora punta. Incrementar fase verde Este–Oeste para reducir cola estimada en ${Math.round((s.cycle-s.optimal)/s.cycle*100)}%.</div>
+    </div>`;
+  document.getElementById('moAction').textContent=`✓ Aplicar ${s.optimal}s`;
+  document.getElementById('moAction').onclick=()=>{
+    s.cycle=s.optimal;s.status='ok';
+    showToast(`SEM ciclo actualizado a ${s.optimal}s`,'green');
+    renderSemafs();closeMo();
+    document.getElementById('moAction').onclick=modalAction;
+  };
+  document.getElementById('incModal').classList.add('open');
+}
+
+function aiOptimizeAll(){
+  showToast('IA optimizando todos los semáforos…','yellow');
+  setTimeout(()=>{
+    SEMAFOROS.forEach(s=>{if(s.status!=='ok'){s.cycle=s.optimal;s.status='ok';}});
+    renderSemafs();showToast('Todos los semáforos optimizados ✓','green');
+    document.querySelector('.sf-toolbar .badge.yellow').textContent='0 subóptimos';
+  },2800);
+}
+
+// ===== ALERTS =====
+function renderAlerts(){
+  document.getElementById('alertsList').innerHTML=ALERTS.slice(0,4).map(a=>`
+    <div class="ai">
+      <div class="adot ${a.color}"></div>
+      <div style="flex:1">
+        ${a.routeId?`<div style="font-size:9px;font-weight:800;color:${a.routeColor||'var(--mu)'};text-transform:uppercase;margin-bottom:2px">▬ Ruta ${a.routeId}</div>`:''}
+        <div class="a-text">${a.text}</div>
+        <div class="a-meta">${a.meta}</div>
+      </div>
+      ${a.color!=='green'&&a.routeId&&a.inc?`<button class="btn btn-r btn-sm" style="flex-shrink:0" onclick="openAlertDetour('${a.id}')">⤷ Desvío</button>`:
+        a.color!=='green'?`<button class="btn btn-gh btn-sm" onclick="goSection('alertas')">Ver</button>`:`<span class="badge green">Resuelto</span>`}
     </div>
   `).join('');
 }
 
 function renderAlertasFull(){
-  document.getElementById('alertasFull').innerHTML = ALERTS_DATA.map(a=>`
-    <div class="alert-item" style="padding:14px 0">
-      <div class="alert-dot ${a.color}" style="width:10px;height:10px;margin-top:5px"></div>
+  const filter=document.getElementById('alertFilter').value;
+  const list=filter?ALERTS.filter(a=>a.color===filter):ALERTS;
+  document.getElementById('alertasFull').innerHTML=list.map(a=>`
+    <div class="ai" style="padding:13px 0;gap:12px">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0">
+        <div class="adot ${a.color}" style="width:10px;height:10px;margin-top:0"></div>
+        <div style="font-size:8px;font-family:var(--mono);color:var(--mu)">${a.id}</div>
+      </div>
       <div style="flex:1">
-        <div class="alert-text" style="font-size:13px">${a.text}</div>
-        <div class="alert-meta">${a.meta}</div>
+        ${a.routeId?`<div style="display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:5px;background:${a.routeColor||'#333'}22;border:1px solid ${a.routeColor||'#333'}44;margin-bottom:5px"><div style="width:8px;height:8px;border-radius:50%;background:${a.routeColor||'#888'}"></div><span style="font-size:10px;font-weight:700;color:${a.routeColor||'var(--tx)'}">Ruta ${a.routeId}</span></div>`:''}
+        <div class="a-text" style="font-size:13px">${a.text}</div>
+        <div class="a-meta">${a.meta}</div>
       </div>
-      ${a.action?`<button class="btn btn-ghost" style="font-size:11px" onclick="showToast('Procesando alerta...','yellow')">Gestionar</button>`:'<span class="badge green">Resuelto</span>'}
-    </div>
-  `).join('');
-}
-
-function clearAlerts(){ showToast('Todas las alertas marcadas como leídas','green'); document.getElementById('alertsBadge').textContent='0'; }
-
-// ===== INCIDENTS LIST =====
-function renderIncidentsList(){
-  document.getElementById('incidentsList').innerHTML = INCIDENTS.map(inc=>`
-    <div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;cursor:pointer;transition:all .15s;border-left:3px solid ${inc.severity==='red'?'var(--red)':'var(--yellow)'}" onclick="openIncident(${JSON.stringify(inc).replace(/"/g,'&quot;')})">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-        <span class="badge ${inc.severity==='red'?'red':'yellow'}">${inc.type}</span>
-        <span style="font-family:var(--mono);font-size:10px;color:var(--muted)">${inc.id} · ${inc.time}</span>
-      </div>
-      <div style="font-size:12px;color:var(--text)">${inc.desc}</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">📍 ${inc.loc}</div>
-    </div>
-  `).join('');
-}
-
-function addRandomIncident(){
-  const types = ['Congestión','Accidente','Bus Averiado','Semáforo Roto'];
-  const locs = ['Av. Javier Prado','Av. Arequipa','La Marina','Universitaria'];
-  const t = types[Math.floor(Math.random()*types.length)];
-  const l = locs[Math.floor(Math.random()*locs.length)];
-  showToast(`Nueva alerta: ${t} en ${l}`, 'red');
-  const badge = document.getElementById('incidentCount');
-  const n = parseInt(badge.textContent)||0;
-  badge.textContent = (n+1)+' Críticos';
-}
-
-function openIncident(inc){
-  document.getElementById('modalTitle').textContent = inc.type+' — '+inc.id;
-  document.getElementById('modalBody').innerHTML = `
-    <div style="display:grid;gap:10px">
-      <div style="display:flex;gap:10px">
-        <div style="flex:1;background:var(--surface2);border-radius:8px;padding:12px">
-          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">UBICACIÓN</div>
-          <div style="font-size:13px;color:var(--text)">📍 ${inc.loc}</div>
-        </div>
-        <div style="flex:1;background:var(--surface2);border-radius:8px;padding:12px">
-          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">HORA REPORTE</div>
-          <div style="font-size:13px;color:var(--text);font-family:var(--mono)">${inc.time} hrs</div>
-        </div>
-      </div>
-      <div style="background:var(--surface2);border-radius:8px;padding:12px">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">DESCRIPCIÓN</div>
-        <div style="font-size:13px;color:var(--text)">${inc.desc}</div>
-      </div>
-      <div style="background:var(--surface2);border-radius:8px;padding:12px">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">SEVERIDAD</div>
-        <span class="badge ${inc.severity}">${inc.severity==='red'?'CRÍTICO':'MEDIO'}</span>
+      <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex-shrink:0">
+        ${a.color==='green'?`<span class="badge green">Resuelto</span>`:`<span class="badge ${a.color}">${a.color==='red'?'Crítico':'Medio'}</span>`}
+        ${a.color!=='green'&&a.routeId&&a.inc?`<button class="btn btn-r btn-sm" onclick="openAlertDetour('${a.id}')">⤷ Crear Desvío</button>`:
+          a.color!=='green'?`<button class="btn btn-gh btn-sm" onclick="showToast('Alerta marcada como revisada','green')">✓ Revisar</button>`:''}
       </div>
     </div>
-  `;
-  document.getElementById('incidentModal').classList.add('open');
-}
-function closeModal(){ document.getElementById('incidentModal').classList.remove('open'); }
-
-// ===== SEMAFOROS =====
-let semafPhases = {};
-function renderSemaforos(){
-  const grid = document.getElementById('semafGrid');
-  grid.innerHTML = `<div class="semaf-grid">` + SEMAFOROS.map(s=>{
-    const color = s.status==='critico'?'var(--red)':s.status==='suboptimo'?'var(--yellow)':'var(--green)';
-    return `
-    <div class="semaf-card" id="semaf-${s.id}" onclick="openSemaforo('${s.id}')">
-      <div class="semaf-id">${s.id}</div>
-      <div class="semaf-name">${s.name}</div>
-      <div class="semaf-lights">
-        <div class="s-light ${s.phase==='red'?'on-red':''}" id="sR-${s.id}"></div>
-        <div class="s-light ${s.phase==='yellow'?'on-yellow':''}" id="sY-${s.id}"></div>
-        <div class="s-light ${s.phase==='green'?'on-green':''}" id="sG-${s.id}"></div>
-        <span style="font-size:10px;color:var(--muted);margin-left:8px" id="sCount-${s.id}">${s.cycle}s</span>
-      </div>
-      <div class="semaf-cycle">Ciclo: ${s.cycle}s | Óptimo: ${s.optimal}s</div>
-      <div class="semaf-status" style="color:${color}">${s.status==='critico'?'⚠️ Ciclo Ineficiente':s.status==='suboptimo'?'⚡ Subóptimo':'✅ Normal'}</div>
-    </div>`;
-  }).join('') + `</div>`;
-
-  // Animate traffic lights
-  SEMAFOROS.forEach(s=>{
-    semafPhases[s.id] = {phase:s.phase, countdown:s.cycle};
-    animateSemaforo(s);
-  });
+  `).join('')||`<div style="color:var(--mu);font-size:12px;padding:24px;text-align:center">No hay alertas con este filtro</div>`;
 }
 
-function animateSemaforo(s){
-  const phases = ['red','yellow','green'];
-  const durations = {red:s.cycle*.5,yellow:5,green:s.cycle*.45};
-  let phaseIdx = phases.indexOf(s.phase);
-  let countdown = durations[s.phase]||s.cycle/3;
-
-  setInterval(()=>{
-    const rEl = document.getElementById(`sR-${s.id}`);
-    const yEl = document.getElementById(`sY-${s.id}`);
-    const gEl = document.getElementById(`sG-${s.id}`);
-    const cEl = document.getElementById(`sCount-${s.id}`);
-    if(!rEl) return;
-    countdown--;
-    if(cEl) cEl.textContent = Math.max(0,Math.round(countdown))+'s';
-    if(countdown<=0){
-      phaseIdx=(phaseIdx+1)%3;
-      const p = phases[phaseIdx];
-      countdown = durations[p];
-      rEl.className='s-light '+(p==='red'?'on-red':'');
-      yEl.className='s-light '+(p==='yellow'?'on-yellow':'');
-      gEl.className='s-light '+(p==='green'?'on-green':'');
-    }
-  },1000);
+function markAllRead(){
+  showToast('Todas las alertas marcadas como leídas','green');
+  document.getElementById('nb-alertas').textContent='0';
+  document.getElementById('alertCritBadge').textContent='0 Críticas';
 }
 
-function openSemaforo(id){
-  const s = SEMAFOROS.find(x=>x.id===id);
-  document.getElementById('modalTitle').textContent = `${s.id} — ${s.name}`;
-  document.getElementById('modalBody').innerHTML = `
-    <div style="display:grid;gap:10px">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-        <div style="background:var(--surface2);border-radius:8px;padding:12px;text-align:center">
-          <div style="font-size:10px;color:var(--muted)">CICLO ACTUAL</div>
-          <div style="font-size:22px;font-weight:700;color:#fff;font-family:var(--mono)">${s.cycle}s</div>
-        </div>
-        <div style="background:var(--surface2);border-radius:8px;padding:12px;text-align:center">
-          <div style="font-size:10px;color:var(--muted)">CICLO ÓPTIMO IA</div>
-          <div style="font-size:22px;font-weight:700;color:var(--green);font-family:var(--mono)">${s.optimal}s</div>
-        </div>
-        <div style="background:var(--surface2);border-radius:8px;padding:12px;text-align:center">
-          <div style="font-size:10px;color:var(--muted)">AHORRO</div>
-          <div style="font-size:22px;font-weight:700;color:var(--yellow);font-family:var(--mono)">${s.cycle-s.optimal}s</div>
-        </div>
-      </div>
-      <div style="background:rgba(43,182,115,.1);border:1px solid rgba(43,182,115,.3);border-radius:8px;padding:12px">
-        <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:6px">💡 Recomendación IA</div>
-        <div style="font-size:12px;color:var(--text)">Reducir ciclo verde de ${s.cycle}s a ${s.optimal}s en hora punta. Incrementar fase verde en dirección Este-Oeste para reducir cola en ${Math.round((s.cycle-s.optimal)/s.cycle*100)}%.</div>
-      </div>
-      <div style="display:flex;gap:8px;justify-content:flex-end">
-        <button class="btn btn-success" onclick="showToast('Ciclo actualizado a ${s.optimal}s ✓','green');closeModal()">Aplicar ${s.optimal}s</button>
-      </div>
-    </div>
-  `;
-  document.getElementById('incidentModal').classList.add('open');
+// ===== RECLAMOS =====
+function filterReclamos(){
+  const tipo=document.getElementById('rfTipo').value;
+  const estado=document.getElementById('rfEstado').value;
+  const list=RECLAMOS.filter(r=>(!tipo||r.tipo===tipo)&&(!estado||r.estado===estado));
+  renderRecTabla(list);
 }
-
-// ===== FLOTA LIST =====
-function renderFlotaList(){
-  document.getElementById('flotaList').innerHTML = FLOTA.map(b=>`
-    <div class="flota-item" onclick="showToast('Unidad ${b.id} — ${b.loc}','yellow')">
-      <div class="flota-icon ${b.status}">🚌</div>
-      <div>
-        <div class="flota-name">${b.id} · ${b.route}</div>
-        <div class="flota-meta">${b.driver} · ${b.loc}</div>
-        <div class="flota-meta" style="color:${b.status==='red'?'var(--red)':b.status==='yellow'?'var(--yellow)':'var(--muted)'}">→ ${b.next}</div>
-      </div>
-      <div class="flota-speed">${b.speed} km/h</div>
-    </div>
-  `).join('');
-}
-
-// ===== RECLAMOS TABLE =====
-const RECLAMOS = [
-  {id:'REC-312',fecha:'30/05 14:21',usuario:'J. García',tipo:'Congestión',loc:'Av. Arequipa',estado:'Pendiente',prioridad:'red'},
-  {id:'REC-311',fecha:'30/05 14:05',usuario:'M. López',tipo:'Semáforo',loc:'Javier Prado',estado:'En revisión',prioridad:'yellow'},
-  {id:'REC-310',fecha:'30/05 13:48',usuario:'A. Pérez',tipo:'Bus averiado',loc:'San Isidro',estado:'Pendiente',prioridad:'red'},
-  {id:'REC-309',fecha:'30/05 13:20',usuario:'C. Torres',tipo:'Congestión',loc:'La Marina',estado:'En revisión',prioridad:'yellow'},
-  {id:'REC-308',fecha:'30/05 12:55',usuario:'R. Quispe',tipo:'Paradero bloqueado',loc:'Angamos',estado:'Resuelto',prioridad:'green'},
-  {id:'REC-307',fecha:'30/05 12:30',usuario:'L. Huanca',tipo:'Bus averiado',loc:'Callao',estado:'Resuelto',prioridad:'green'},
-  {id:'REC-306',fecha:'30/05 11:45',usuario:'P. Vargas',tipo:'Accidente',loc:'Universitaria',estado:'En revisión',prioridad:'yellow'},
-  {id:'REC-305',fecha:'30/05 11:10',usuario:'F. Castro',tipo:'Congestión',loc:'28 de Julio',estado:'Pendiente',prioridad:'red'},
-];
 function renderReclamos(){
-  document.getElementById('reclamosTable').innerHTML = `
-    <thead><tr>
-      <th>ID</th><th>Fecha/Hora</th><th>Usuario</th><th>Tipo</th><th>Ubicación</th><th>Estado</th><th>Acción</th>
-    </tr></thead>
-    <tbody>
-    ${RECLAMOS.map(r=>`<tr>
-      <td style="font-family:var(--mono);font-size:11px">${r.id}</td>
-      <td style="font-family:var(--mono);font-size:11px;color:var(--muted)">${r.fecha}</td>
-      <td>${r.usuario}</td>
-      <td>${r.tipo}</td>
-      <td style="color:var(--muted)">📍 ${r.loc}</td>
-      <td><span class="badge ${r.prioridad}">${r.estado}</span></td>
-      <td><button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="showToast('Asignando equipo al ${r.id}...','yellow')">Asignar</button></td>
-    </tr>`).join('')}
-    </tbody>
-  `;
+  document.getElementById('recHead').innerHTML=`<tr><th>ID</th><th>Fecha/Hora</th><th>Usuario</th><th>Tipo</th><th>Ubicación</th><th>Estado</th><th>Acción</th></tr>`;
+  renderRecTabla(RECLAMOS);
+}
+function renderRecTabla(list){
+  document.getElementById('recBody').innerHTML=list.map(r=>`<tr>
+    <td style="font-family:var(--mono);font-size:11px">${r.id}</td>
+    <td style="font-family:var(--mono);font-size:11px;color:var(--mu)">${r.fecha}</td>
+    <td>${r.usuario}</td>
+    <td>${r.tipo}</td>
+    <td style="color:var(--mu)">📍 ${r.loc}</td>
+    <td><span class="badge ${r.sev}">${r.estado}</span></td>
+    <td><button class="btn btn-gh btn-sm" onclick="assignRec('${r.id}',this)">Asignar</button></td>
+  </tr>`).join('')||`<tr><td colspan="7" style="text-align:center;color:var(--mu);padding:20px">Sin resultados</td></tr>`;
+}
+function assignRec(id,btn){
+  showToast(`Equipo asignado al reclamo ${id}`,'green');
+  const r=RECLAMOS.find(x=>x.id===id);
+  if(r&&r.estado==='Pendiente'){r.estado='En revisión';r.sev='yellow';renderRecTabla(RECLAMOS);}
+  btn.textContent='Asignado';btn.disabled=true;btn.style.opacity='.5';
 }
 
-// ===== CHARTS (OVERVIEW) =====
-let chartsInit=false;
+// ===== REPORT CHARTS =====
+let repInit=false;
+function initRepCharts(){
+  if(repInit)return;repInit=true;
+  new Chart(document.getElementById('chartRBar'),{type:'bar',data:{labels:['Naranjal','Javier Prado','Angamos','Miraflores','La Cultura','Canadá'],datasets:[{data:[8420,7130,6890,5940,5210,4780],backgroundColor:['#1A4E8C','#2563eb','#1A4E8C','#2563eb','#1A4E8C','#2563eb'],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9},color:'#5a6b8a'}},y:{ticks:{font:{size:9},color:'#5a6b8a'}}}}});
+  new Chart(document.getElementById('chartRLine'),{type:'line',data:{labels:['Mar','Abr','May'],datasets:[{label:'Pasajeros',data:[245000,268000,281000],borderColor:'#2BB673',backgroundColor:'rgba(43,182,115,.12)',fill:true,tension:.4,pointBackgroundColor:'#2BB673',pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9},color:'#5a6b8a'}},y:{ticks:{font:{size:9},color:'#5a6b8a'}}}}});
+  document.getElementById('repTable').innerHTML=`<thead><tr><th>Corredor</th><th>Pasajeros/día</th><th>Cumplimiento</th><th>Incidentes</th><th>Tendencia</th></tr></thead><tbody>
+    <tr><td>Metropolitano</td><td class="fmono">89,200</td><td><span class="badge green">97%</span></td><td>3</td><td style="color:var(--g)">▲ +3%</td></tr>
+    <tr><td>Metro Línea 1</td><td class="fmono">112,400</td><td><span class="badge green">99%</span></td><td>1</td><td style="color:var(--g)">▲ +5%</td></tr>
+    <tr><td>Av. Arequipa</td><td class="fmono">31,540</td><td><span class="badge green">94%</span></td><td>7</td><td style="color:var(--g)">▲ +1%</td></tr>
+    <tr><td>Javier Prado</td><td class="fmono">24,180</td><td><span class="badge yellow">87%</span></td><td>12</td><td style="color:var(--y)">→ 0%</td></tr>
+    <tr><td>La Marina</td><td class="fmono">18,760</td><td><span class="badge red">72%</span></td><td>21</td><td style="color:var(--r)">▼ -4%</td></tr>
+  </tbody>`;
+}
+
+function genReport(){
+  const type=document.getElementById('repType').value;
+  showToast('Generando reporte…','yellow');
+  document.getElementById('repPreviewTitle').textContent='Generando…';
+  setTimeout(()=>{
+    showToast(`Reporte listo: ${type}`,'green');
+    document.getElementById('repPreviewTitle').textContent=`Vista Previa — ${type} (Últimos 3 meses)`;
+    document.getElementById('lastRepTime').textContent=new Date().toLocaleString('es-PE');
+  },2000);
+}
+
+// ===== OVERVIEW CHARTS =====
+let oInit=false;
 function initOverviewCharts(){
-  if(chartsInit) return; chartsInit=true;
-  const hours = Array.from({length:24},(_,i)=>i+':00');
-  const trafficData = [120,80,60,45,55,90,180,320,420,380,310,280,350,390,410,380,450,510,480,380,290,210,170,140];
-
-  Chart.defaults.color='#6b7fa0';
-  Chart.defaults.borderColor='rgba(42,58,82,.5)';
-
-  new Chart(document.getElementById('chartTraffic'),{
-    type:'line',
-    data:{labels:hours,datasets:[{label:'Vehículos/h',data:trafficData,borderColor:'#1A4E8C',backgroundColor:'rgba(26,78,140,.15)',fill:true,tension:.4,pointRadius:0}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:8,font:{size:9}}},y:{ticks:{font:{size:9}}}}}
-  });
-
-  new Chart(document.getElementById('chartIncidents'),{
-    type:'doughnut',
-    data:{labels:['Congestión','Accidente','Bus Averiado','Semáforo','Otro'],datasets:[{data:[42,18,14,16,10],backgroundColor:['#E63946','#F5A623','#1A4E8C','#2BB673','#6b7fa0'],borderWidth:0}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}}}
-  });
-
-  new Chart(document.getElementById('chartService'),{
-    type:'bar',
-    data:{labels:['Lu','Ma','Mi','Ju','Vi','Sá','Do'],datasets:[{label:'Nivel',data:[78,82,75,80,71,88,92],backgroundColor:(ctx)=>{const v=ctx.raw; return v>=80?'#2BB673':v>=70?'#F5A623':'#E63946'}}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{font:{size:9},callback:v=>v+'%'}}}}
-  });
+  if(oInit)return;oInit=true;
+  const hrs=Array.from({length:24},(_,i)=>i+':00');
+  const td=[120,80,60,45,55,90,180,320,420,380,310,280,350,390,410,380,450,510,480,380,290,210,170,140];
+  const peak=Math.max(...td),peakH=hrs[td.indexOf(peak)];
+  document.getElementById('trafficPeak').textContent=`Pico: ${peak} veh/h a las ${peakH}`;
+  Chart.defaults.color='#5a6b8a';Chart.defaults.borderColor='rgba(30,45,71,.5)';
+  new Chart(document.getElementById('chartTraffic'),{type:'line',data:{labels:hrs,datasets:[{data:td,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.12)',fill:true,tension:.4,pointRadius:0,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:8,font:{size:9}}},y:{ticks:{font:{size:9}}}}}});
 }
 
-function initReportCharts(){
-  if(document.getElementById('chartRepBar')._chartInit) return;
-  document.getElementById('chartRepBar')._chartInit=true;
-  new Chart(document.getElementById('chartRepBar'),{
-    type:'bar',
-    data:{labels:['Naranjal','Javier Prado','Angamos','Miraflores','La Cultura','Canadá'],datasets:[{label:'Pasajeros',data:[8420,7130,6890,5940,5210,4780],backgroundColor:'#1A4E8C'}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9}}},y:{ticks:{font:{size:9}}}}}
-  });
-  new Chart(document.getElementById('chartRepLine'),{
-    type:'line',
-    data:{labels:['Mar','Abr','May'],datasets:[{label:'Pasajeros',data:[245000,268000,281000],borderColor:'#2BB673',backgroundColor:'rgba(43,182,115,.1)',fill:true,tension:.4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9}}},y:{ticks:{font:{size:9}}}}}
-  });
-  document.getElementById('reportTable').innerHTML=`
-    <thead><tr><th>Corredor</th><th>Pasajeros/día</th><th>Cumplimiento</th><th>Incidentes</th></tr></thead>
-    <tbody>
-      <tr><td>Javier Prado</td><td style="font-family:var(--mono)">24,180</td><td><span class="badge yellow">87%</span></td><td>12</td></tr>
-      <tr><td>Av. Arequipa</td><td style="font-family:var(--mono)">31,540</td><td><span class="badge green">94%</span></td><td>7</td></tr>
-      <tr><td>Metropolitano</td><td style="font-family:var(--mono)">89,200</td><td><span class="badge green">97%</span></td><td>3</td></tr>
-      <tr><td>Metro Línea 1</td><td style="font-family:var(--mono)">112,400</td><td><span class="badge green">99%</span></td><td>1</td></tr>
-      <tr><td>La Marina</td><td style="font-family:var(--mono)">18,760</td><td><span class="badge red">72%</span></td><td>21</td></tr>
-    </tbody>
-  `;
+// ===== NOTIFICATIONS =====
+function renderNotifs(){
+  document.getElementById('npBody').innerHTML=NOTIFS.map(n=>`
+    <div class="np-item ${n.unread?'unread':''}">
+      <div class="np-text">${n.text}</div>
+      <div class="np-time">${n.time}</div>
+    </div>
+  `).join('');
+}
+function toggleNotif(){
+  const np=document.getElementById('npanel'),ov=document.getElementById('npOv');
+  const open=np.classList.toggle('open');
+  ov.classList.toggle('open',open);
+  if(open){renderNotifs();document.getElementById('notifDot').style.display='none';}
+}
+function clearNotifs(){
+  NOTIFS.forEach(n=>n.unread=false);
+  document.getElementById('npBody').innerHTML='<div style="color:var(--mu);font-size:12px;padding:20px;text-align:center">Sin notificaciones nuevas</div>';
+  showToast('Notificaciones limpiadas','green');
 }
 
 // ===== TOAST =====
-function showToast(msg, type='green'){
-  const t = document.createElement('div');
+function showToast(msg,type='green'){
+  const t=document.createElement('div');
   t.className=`toast ${type}`;
-  t.innerHTML=`<span style="font-size:14px">${type==='red'?'🚨':type==='yellow'?'⚠️':'✅'}</span><div><div style="font-size:12px;color:#fff;font-weight:600">${msg}</div></div>`;
-  document.getElementById('toastContainer').appendChild(t);
-  setTimeout(()=>t.remove(),4000);
+  const ico=type==='red'?'🚨':type==='yellow'?'⚠️':'✅';
+  t.innerHTML=`<span style="font-size:14px">${ico}</span><div class="t-msg">${msg}</div>`;
+  document.getElementById('tc').appendChild(t);
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),200);},3800);
 }
 
-// ===== KPI LIVE UPDATE =====
-let reportCount=84;
+// ===== KPI LIVE =====
+let rptCount=84;
 function liveUpdate(){
-  if(Math.random()>.6){
-    reportCount++;
-    const el=document.getElementById('kpi-reports');
-    if(el) el.textContent=reportCount.toLocaleString();
-  }
-  const v=document.getElementById('kpi-vehicles');
-  if(v) v.textContent=(1200+Math.floor(Math.random()*100)).toLocaleString();
-  const c=document.getElementById('kpi-cong');
-  if(c) c.textContent=Math.floor(38+Math.random()*12)+'%';
-
-  // Random alerts
-  if(Math.random()>.92){
-    const msgs=[
-      'Congestión detectada en Av. Brasil',
-      'Bus MT-1234 reporta incidencia',
-      'Semáforo SEM-003 con ciclo irregular',
-      'Ciudadano reporta paradero bloqueado'
-    ];
+  if(Math.random()>.65){rptCount++;const e=document.getElementById('kr');if(e)e.textContent=rptCount;}
+  const v=document.getElementById('kv');if(v)v.textContent=(1200+Math.floor(Math.random()*100)).toLocaleString();
+  const c=document.getElementById('kc');if(c)c.textContent=Math.floor(38+Math.random()*12)+'%';
+  const a=document.getElementById('ka');if(a){const n=Math.floor(3+Math.random()*4);a.textContent=n;a.style.color=n>5?'var(--r)':'var(--y)';}
+  if(Math.random()>.9){
+    const msgs=['Congestión detectada en Av. Brasil','Bus MT-1234 reporta incidencia','SEM-003 con ciclo irregular','Ciudadano reporta paradero bloqueado','Velocidad media caída en Javier Prado'];
     showToast(msgs[Math.floor(Math.random()*msgs.length)],'yellow');
+    const nd=document.getElementById('notifDot');
+    const np=document.getElementById('npanel');
+    if(nd&&!np.classList.contains('open'))nd.style.display='block';
   }
 }
-setInterval(liveUpdate,5000);
+setInterval(liveUpdate,6000);
+
+// ===== FS =====
+function toggleFS(){if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();}
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded',()=>{
   initMainMap();
   initOverviewCharts();
   renderAlerts();
-  renderIncidentsList();
+  renderIncList();
+  document.getElementById('notifDot').style.display='block';
 });
 </script>
 </body>
