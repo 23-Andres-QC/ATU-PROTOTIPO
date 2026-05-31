@@ -145,7 +145,7 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
 .leaflet-popup-content-wrapper{border-radius:10px!important;box-shadow:var(--sh2)!important;font-family:Inter,sans-serif!important;font-size:12px!important}
 
 /* Search bar */
-.sbar-srch{position:absolute;top:11px;left:11px;right:11px;z-index:400;background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;box-shadow:0 6px 20px rgba(0,82,163,.15);display:flex;align-items:center;padding:0 13px;height:44px;gap:8px;border:1.5px solid rgba(0,82,163,.1);cursor:pointer;transition:all .2s cubic-bezier(.4,0,.2,1)}
+.sbar-srch{position:absolute;top:55px;left:11px;right:11px;z-index:1000;background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;box-shadow:0 6px 20px rgba(0,82,163,.15);display:flex;align-items:center;padding:0 13px;height:44px;gap:8px;border:1.5px solid rgba(0,82,163,.1);cursor:pointer;transition:all .2s cubic-bezier(.4,0,.2,1)}
 .sbar-srch:hover{border-color:#0052A3;box-shadow:0 8px 24px rgba(0,82,163,.2)}
 .sbar-srch:active{transform:scale(.97)}
 .sbar-srch span{flex:1;font-size:13px;color:var(--t3);font-weight:500}
@@ -442,73 +442,13 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
     <div class="sp-sub">Tu ciudad, en tiempo real</div>
     <div class="sp-bar"><div class="sp-prog"></div></div>
   </div>
-
-  <!-- ── ONBOARDING ── -->
-  <div id="onboard">
-    <div class="ob-wrap">
-      <div class="ob-sl act" id="ob0">
-        <div class="ob-art" style="background:linear-gradient(145deg,#e8f4ff,#d0e8ff)">🚌</div>
-        <div class="ob-h">Sabe cuándo llega tu bus</div>
-        <div class="ob-p">Rastrea en tiempo real la posición exacta de los buses y conoce el tiempo de llegada con precisión al minuto.</div>
-      </div>
-      <div class="ob-sl" id="ob1">
-        <div class="ob-art" style="background:linear-gradient(145deg,#e8fff4,#d0f0e0)">📍</div>
-        <div class="ob-h">Reporta lo que ves</div>
-        <div class="ob-p">Accidentes, semáforos rotos, paraderos bloqueados. Tu reporte llega directo a la ATU en segundos y mejora la movilidad de todos.</div>
-      </div>
-      <div class="ob-sl" id="ob2">
-        <div class="ob-art" style="background:linear-gradient(145deg,#f3e8ff,#e8d5ff)">🗺️</div>
-        <div class="ob-h">Rutas inteligentes</div>
-        <div class="ob-p">La IA de SmartFlow analiza el tráfico en tiempo real y te recomienda la ruta más rápida, económica o cómoda para cada viaje.</div>
-      </div>
-    </div>
-    <div class="ob-dots"><div class="ob-d act" id="d0"></div><div class="ob-d" id="d1"></div><div class="ob-d" id="d2"></div></div>
-    <div class="ob-foot">
-      <button class="btn-p" id="obn">Siguiente</button>
-      <button class="btn-ghost" id="obs">Omitir introducción</button>
-    </div>
-  </div>
-
-  <!-- ── ROLE SELECT ── -->
-  <div id="rolesel">
-    <div class="role-head">
-      <div class="role-h">¿Cómo usarás SmartFlow?</div>
-      <div class="role-sub">Puedes cambiar de rol en cualquier momento</div>
-    </div>
-    <div class="role-list">
-      <div class="role-c" onclick="launch('passenger')">
-        <div class="role-ic blue">🧍</div>
-        <div style="flex:1">
-          <div class="role-nm">Pasajero</div>
-          <div class="role-ds">Consulta rutas, ve buses en tiempo real, recarga tu tarjeta y reporta incidentes</div>
-        </div>
-        <svg class="chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
-      <div class="role-c" onclick="launch('driver')">
-        <div class="role-ic green">🚌</div>
-        <div style="flex:1">
-          <div class="role-nm">Conductor</div>
-          <div class="role-ds">Recibe alertas de tráfico, cambios de ruta y comunícate con la base en tiempo real</div>
-        </div>
-        <svg class="chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
-      <div class="role-c" onclick="launch('guest')" style="border-style:dashed">
-        <div class="role-ic gray">👤</div>
-        <div style="flex:1">
-          <div class="role-nm">Explorar como invitado</div>
-          <div class="role-ds">Acceso básico al mapa, sin historial ni notificaciones personalizadas</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- ── MAIN APP ── -->
   <div id="app">
     <div class="tbar">
       <div class="av" id="avEl">LR</div>
       <div class="tg">
         <div class="tg-n" id="grn">Buenos días, Luis</div>
-        <div class="tg-s" id="grs">Lima · Clima 22°C ☀️</div>
+        <div class="tg-s" id="grs">Lima · 22°C ☀️</div>
       </div>
       <div class="mode-sw">
         <button class="msw on" id="mP" onclick="setMode('passenger')">Pasajero</button>
@@ -526,99 +466,69 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
       <div class="drv-pill" id="dvPill">● En Ruta</div>
     </div>
 
-    <div id="mc">
-      <!-- Search bar -->
-      <div class="sbar-srch" onclick="op('searchP')">
-        <svg width="14" height="14" fill="none" stroke="var(--t3)" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        <span id="srchLbl">¿A dónde vas?</span>
-      </div>
 
-      <div id="map"></div>
+    <div class="sbar-srch" onclick="op('searchP')">
+      <svg width="14" height="14" fill="none" stroke="var(--t3)" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <span id="srchLbl">¿A dónde vas?</span>
+    </div>
 
-      <!-- Map controls -->
-      <div class="map-ctrl">
-        <div class="mc-btn" onclick="locateMe()" title="Mi ubicación">📍</div>
-        <div class="mc-btn" onclick="toggleLayers()" title="Capas" id="layerBtn">🗺️</div>
-      </div>
+    <div id="map"></div>
 
-      <!-- Route legend -->
-      <div class="rleg" id="rlegend">
-        <div class="rleg-row"><div class="rleg-line" style="background:#1A4E8C"></div>B12 Arequipa</div>
-        <div class="rleg-row"><div class="rleg-line" style="background:#2BB673"></div>C45 La Marina</div>
-        <div class="rleg-row"><div class="rleg-line" style="background:#F5A623"></div>A07 Javier Prado</div>
-        <div class="rleg-row"><div class="rleg-line" style="background:#9333ea"></div>MET Metropolitano</div>
-      </div>
+    <!-- Map controls -->
+    <div class="map-ctrl">
+      <div class="mc-btn" onclick="locateMe()" title="Mi ubicación">📍</div>
+      <div class="mc-btn" onclick="toggleLayers()" title="Capas" id="layerBtn">🗺️</div>
+    </div>
 
-      <!-- Passenger bottom sheet -->
-      <div class="bs" id="bs">
-        <div class="bs-handle"></div>
-        <div class="bs-mini" id="bsPass">
-          <div class="nbc" onclick="op('busDetailM')">
-            <div class="nb-ico">🚌</div>
-            <div style="flex:1">
-              <div class="nb-rt">Bus B12 · Av. Arequipa → Centro</div>
-              <div class="nb-eta" id="etaMain">2<sub> min</sub></div>
-              <div class="nb-prog"><div class="nb-prog-fill" id="etaBar" style="width:85%"></div></div>
-              <div class="occ-row">
-                <div class="od" style="background:var(--g)"></div>
-                <div class="od" style="background:var(--g)"></div>
-                <div class="od" style="background:var(--bd)"></div>
-                <span style="font-size:10px;color:var(--t3);margin-left:2px">Baja ocupación · A/C ❄️</span>
-              </div>
-            </div>
-            <svg width="14" height="14" fill="none" stroke="var(--t3)" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-          </div>
-          <div class="ub-row">
-            <div class="ub"><div class="ub-l">B12</div><div class="ub-t" id="u1">8<span style="font-size:9px;color:var(--t3)"> min</span></div><div class="ub-o"><div class="od" style="width:5px;height:5px;background:var(--y)"></div><div class="od" style="width:5px;height:5px;background:var(--y)"></div><div class="od" style="width:5px;height:5px;background:var(--bd)"></div></div></div>
-            <div class="ub"><div class="ub-l">C45</div><div class="ub-t">14<span style="font-size:9px;color:var(--t3)"> min</span></div><div class="ub-o"><div class="od" style="width:5px;height:5px;background:var(--g)"></div><div class="od" style="width:5px;height:5px;background:var(--bd)"></div><div class="od" style="width:5px;height:5px;background:var(--bd)"></div></div></div>
-            <div class="ub"><div class="ub-l">A07</div><div class="ub-t">19<span style="font-size:9px;color:var(--t3)"> min</span></div><div class="ub-o"><div class="od" style="width:5px;height:5px;background:var(--g)"></div><div class="od" style="width:5px;height:5px;background:var(--g)"></div><div class="od" style="width:5px;height:5px;background:var(--bd)"></div></div></div>
-            <div class="ub"><div class="ub-l">MET</div><div class="ub-t">6<span style="font-size:9px;color:var(--t3)"> min</span></div><div class="ub-o"><div class="od" style="width:5px;height:5px;background:var(--r)"></div><div class="od" style="width:5px;height:5px;background:var(--r)"></div><div class="od" style="width:5px;height:5px;background:var(--r)"></div></div></div>
-          </div>
-          <button class="rep-btn" onclick="op('reportP')">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            REPORTAR INTERFERENCIA
-          </button>
-        </div>
+    <!-- Route legend -->
+    <div class="rleg" id="rlegend">
+      <div class="rleg-row"><div class="rleg-line" style="background:#1A4E8C"></div>B12 Arequipa</div>
+      <div class="rleg-row"><div class="rleg-line" style="background:#2BB673"></div>C45 La Marina</div>
+      <div class="rleg-row"><div class="rleg-line" style="background:#F5A623"></div>A07 Javier Prado</div>
+      <div class="rleg-row"><div class="rleg-line" style="background:#9333ea"></div>MET Metropolitano</div>
+    </div>
 
-        <!-- Driver sheet -->
-        <div class="drv-sheet" id="bsDrv">
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px">
-            <div class="dc">
-              <div class="dc-l">Velocidad</div>
-              <div class="dc-v" id="spdV">28 km/h</div>
-              <div class="spd-gauge"><div class="spd-fill" id="spdB" style="width:46%;background:var(--g)"></div></div>
-            </div>
-            <div class="dc">
-              <div class="dc-l">Próximo Paradero</div>
-              <div class="dc-v" style="font-size:11px">La Cultura <span style="color:var(--t3)">1.2km</span></div>
-            </div>
-            <div class="dc">
-              <div class="dc-l">Cumplimiento</div>
-              <div class="dc-v" style="color:var(--g)">✓ A tiempo</div>
-            </div>
+    <!-- Passenger bottom sheet -->
+    <div class="bs" id="bs">
+      <!-- Driver sheet -->
+      <div class="drv-sheet" id="bsDrv">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px">
+          <div class="dc">
+            <div class="dc-l">Velocidad</div>
+            <div class="dc-v" id="spdV">28 km/h</div>
+            <div class="spd-gauge"><div class="spd-fill" id="spdB" style="width:46%;background:var(--g)"></div></div>
           </div>
           <div class="dc">
-            <div class="dc-l">Pasajeros esperando en próximo paradero</div>
-            <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
-              <div style="font-size:24px;font-weight:800;color:var(--p)">~24</div>
-              <div style="flex:1;height:6px;background:var(--bd);border-radius:6px;overflow:hidden"><div style="width:48%;height:100%;background:var(--y);border-radius:6px"></div></div>
-              <span style="font-size:10px;color:var(--t3)">capacidad media</span>
-            </div>
+            <div class="dc-l">Próximo Paradero</div>
+            <div class="dc-v" style="font-size:11px">La Cultura <span style="color:var(--t3)">1.2km</span></div>
           </div>
-          <div class="drv-acts">
-            <button class="da" style="background:#fff7d6;color:#92400e" onclick="toast('Reporte enviado a la base ✓','y')">⚠️ Reportar</button>
-            <button class="da" style="background:#dbeafe;color:#1e40af" onclick="op('chatP')">💬 Base</button>
-            <button class="da" style="background:var(--r);color:#fff" onclick="toast('¡Solicitud de apoyo enviada urgente!','r')">🆘 Apoyo</button>
+          <div class="dc">
+            <div class="dc-l">Cumplimiento</div>
+            <div class="dc-v" style="color:var(--g)">✓ A tiempo</div>
           </div>
+        </div>
+        <div class="dc">
+          <div class="dc-l">Pasajeros esperando en próximo paradero</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+            <div style="font-size:24px;font-weight:800;color:var(--p)">~24</div>
+            <div style="flex:1;height:6px;background:var(--bd);border-radius:6px;overflow:hidden"><div style="width:48%;height:100%;background:var(--y);border-radius:6px"></div></div>
+            <span style="font-size:10px;color:var(--t3)">capacidad media</span>
+          </div>
+        </div>
+        <div class="drv-acts">
+          <button class="da" style="background:#fff7d6;color:#92400e" onclick="toast('Reporte enviado a la base ✓','y')">⚠️ Reportar</button>
+          <button class="da" style="background:#dbeafe;color:#1e40af" onclick="op('chatP')">💬 Base</button>
+          <button class="da" style="background:var(--r);color:#fff" onclick="toast('¡Solicitud de apoyo enviada urgente!','r')">🆘 Apoyo</button>
         </div>
       </div>
     </div>
+    
 
     <nav class="bnav">
       <div class="ni" id="ni"></div>
       <button class="nt on" onclick="ntab(0);ca()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg><span>Inicio</span></button>
       <button class="nt" onclick="ntab(1);op('searchP')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span>Rutas</span></button>
-      <button class="nt" onclick="ntab(2);op('reportP')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Reportar</span></button>
+
       <button class="nt" onclick="ntab(3);op('chatP')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span>Chat IA</span></button>
       <button class="nt" onclick="ntab(4);op('profileP')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Perfil</span></button>
     </nav>
@@ -691,39 +601,6 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
     </div>
   </div>
 
-  <!-- Report -->
-  <div class="panel" id="reportP">
-    <div class="ph">
-      <button class="bk" onclick="cl('reportP');ntab(0)"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
-      <div class="ph-t">Reportar Incidencia</div>
-    </div>
-    <div class="pb">
-      <div class="sec-l" style="margin-bottom:9px">Tipo de incidente</div>
-      <div class="rt-grid">
-        <div class="rtb sel" onclick="selRT(this)"><div class="rtb-i">🚗</div>Accidente</div>
-        <div class="rtb" onclick="selRT(this)"><div class="rtb-i">🚦</div>Congestión</div>
-        <div class="rtb" onclick="selRT(this)"><div class="rtb-i">🚌</div>Bus Averiado</div>
-        <div class="rtb" onclick="selRT(this)"><div class="rtb-i">🚧</div>Paradero Bloqueado</div>
-        <div class="rtb" onclick="selRT(this)"><div class="rtb-i">🔴</div>Semáforo Roto</div>
-        <div class="rtb" onclick="selRT(this)"><div class="rtb-i">📢</div>Otro</div>
-      </div>
-      <div class="sec-l" style="margin-bottom:7px">Ubicación</div>
-      <div class="loc-p">
-        <span style="font-size:16px">📍</span>
-        <span style="flex:1">Av. Arequipa cdra. 42, San Isidro</span>
-        <span style="font-size:11px;color:var(--p);font-weight:700;cursor:pointer">Cambiar</span>
-      </div>
-      <button class="photo-b" onclick="toast('Cámara activada','y')">
-        <span style="font-size:28px">📷</span>
-        <span>Agregar foto del incidente</span>
-        <span style="font-size:10px;color:var(--t3)">Opcional — ayuda a la ATU a verificar</span>
-      </button>
-      <div class="sec-l" style="margin-bottom:7px">Descripción</div>
-      <textarea id="repDesc" style="width:100%;background:var(--bg);border:1.5px solid var(--bd);border-radius:11px;padding:10px;font-size:12px;font-family:Inter,sans-serif;outline:none;resize:none;color:var(--tx);transition:.2s" rows="3" placeholder="Describe brevemente lo que está ocurriendo..." onfocus="this.style.borderColor='var(--p)'" onblur="this.style.borderColor='var(--bd)'"></textarea>
-      <div style="height:10px"></div>
-      <button class="rep-submit" onclick="submitReport()">Enviar Reporte</button>
-    </div>
-  </div>
 
   <!-- Chat IA -->
   <div class="panel" id="chatP" style="background:#f7faff">
@@ -897,18 +774,34 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
 // ── DATA ──
 const ROUTES_DATA=[
   {id:'B12',nm:'B12 — Miraflores ↔ Centro Lima',col:'#1A4E8C',out:'#0d3a72',
-   coords:[[-12.1192,-77.0290],[-12.1176,-77.0298],[-12.1067,-77.0332],[-12.0983,-77.0356],[-12.0923,-77.0361],[-12.0876,-77.0365],[-12.0812,-77.0367],[-12.0736,-77.0365],[-12.0680,-77.0358],[-12.0636,-77.0352],[-12.0589,-77.0345],[-12.0550,-77.0335],[-12.0521,-77.0327],[-12.0489,-77.0316],[-12.0464,-77.0297]],
-   stops:[{lat:-12.1192,lng:-77.0290,nm:'Paradero Larco'},{lat:-12.0983,lng:-77.0356,nm:'Paradero San Isidro'},{lat:-12.0876,lng:-77.0365,nm:'Paradero Javier Prado'},{lat:-12.0736,lng:-77.0365,nm:'Paradero 28 de Julio'},{lat:-12.0521,lng:-77.0327,nm:'Paradero Wilson'},{lat:-12.0464,lng:-77.0297,nm:'Paradero Plaza Mayor'}]},
+   coords:[[-12.1185,-77.0283],[-12.0983,-77.0356],[-12.0876,-77.0388],[-12.0521,-77.0352],[-12.0464,-77.0297]],
+   stops:[{lat:-12.1185,lng:-77.0283,nm:'Paradero Larco'},{lat:-12.0983,lng:-77.0356,nm:'Paradero San Isidro'},{lat:-12.0876,lng:-77.0388,nm:'Paradero Javier Prado'},{lat:-12.0521,lng:-77.0352,nm:'Paradero Wilson'},{lat:-12.0464,lng:-77.0297,nm:'Paradero Plaza Mayor'}]},
   {id:'C45',nm:'C45 — Callao ↔ San Isidro',col:'#2BB673',out:'#1a8050',
-   coords:[[-12.0564,-77.1197],[-12.0578,-77.1089],[-12.0601,-77.0998],[-12.0623,-77.0912],[-12.0634,-77.0856],[-12.0672,-77.0756],[-12.0712,-77.0634],[-12.0745,-77.0534],[-12.0789,-77.0456],[-12.0834,-77.0412],[-12.0898,-77.0389],[-12.0947,-77.0374],[-12.0983,-77.0366]],
-   stops:[{lat:-12.0564,lng:-77.1197,nm:'Terminal Callao'},{lat:-12.0634,lng:-77.0856,nm:'Paradero La Marina'},{lat:-12.0712,lng:-77.0634,nm:'Paradero Brasil'},{lat:-12.0983,lng:-77.0366,nm:'Paradero San Isidro'}]},
+   coords:[[-12.0564,-77.1197],[-12.0487,-77.0756],[-12.0464,-77.0428],[-12.0983,-77.0366]],
+   stops:[{lat:-12.0564,lng:-77.1197,nm:'Terminal Callao'},{lat:-12.0464,lng:-77.0428,nm:'Paradero Brasil'},{lat:-12.0983,lng:-77.0366,nm:'Paradero San Isidro'}]},
   {id:'A07',nm:'A07 — SJL ↔ Ate Vitarte',col:'#F5A623',out:'#b87a10',
-   coords:[[-12.0089,-77.0023],[-12.0156,-77.0145],[-12.0245,-77.0212],[-12.0356,-77.0256],[-12.0420,-77.0278],[-12.0464,-77.0297],[-12.0534,-77.0189],[-12.0634,-77.0089],[-12.0712,-76.9978],[-12.0756,-76.9891],[-12.0834,-76.9756]],
+   coords:[[-12.0089,-77.0023],[-12.0464,-77.0297],[-12.0834,-76.9756]],
    stops:[{lat:-12.0089,lng:-77.0023,nm:'Terminal SJL'},{lat:-12.0464,lng:-77.0297,nm:'Paradero Lima Centro'},{lat:-12.0834,lng:-76.9756,nm:'Terminal Ate'}]},
   {id:'MET',nm:'Metropolitano — Naranjal ↔ Benavides',col:'#9333ea',out:'#6b21a8',
-   coords:[[-11.9798,-77.0423],[-11.9967,-77.0420],[-12.0134,-77.0412],[-12.0289,-77.0378],[-12.0364,-77.0356],[-12.0434,-77.0334],[-12.0489,-77.0312],[-12.0612,-77.0298],[-12.0712,-77.0298],[-12.0823,-77.0298],[-12.0923,-77.0298],[-12.1034,-77.0298],[-12.1267,-77.0298]],
-   stops:[{lat:-11.9798,lng:-77.0423,nm:'Est. Naranjal'},{lat:-12.0364,lng:-77.0356,nm:'Est. Quilca'},{lat:-12.0489,lng:-77.0312,nm:'Est. España'},{lat:-12.0712,lng:-77.0298,nm:'Est. Canadá'},{lat:-12.0923,lng:-77.0298,nm:'Est. Javier Prado'},{lat:-12.1034,lng:-77.0298,nm:'Est. Aramburu'},{lat:-12.1267,lng:-77.0298,nm:'Est. Benavides'}]}
+   coords:[[-11.9798,-77.0423],[-12.0364,-77.0356],[-12.0712,-77.0298],[-12.1267,-77.0298]],
+   stops:[{lat:-11.9798,lng:-77.0423,nm:'Est. Naranjal'},{lat:-12.0364,lng:-77.0356,nm:'Est. Quilca'},{lat:-12.0712,lng:-77.0298,nm:'Est. Canadá'},{lat:-12.1267,lng:-77.0298,nm:'Est. Benavides'}]}
 ];
+
+async function osrmRoute(coords,alts=false){
+  if(coords.length<2)return null;
+  const str=coords.map(c=>`${c[1]},${c[0]}`).join(';');
+  const url=`https://router.project-osrm.org/route/v1/driving/${str}?overview=full&geometries=geojson${alts?'&alternatives=true':''}`;
+  try{
+    const res=await fetch(url);
+    const data=await res.json();
+    if(data.code!=='Ok')return null;
+    return data.routes.map(r=>({
+      coords:r.geometry.coordinates.map(c=>[c[1],c[0]]),
+      dist:(r.distance/1000).toFixed(1),
+      dur:Math.ceil(r.duration/60)
+    }));
+  }catch(e){return null;}
+}
 
 const NOTIFS_DATA=[
   {ic:'🚌',t:'Bus B12 llega en 2 min',b:'Paradero Arequipa cdra. 42',ago:'Hace 1 min',c:'var(--p)'},
@@ -959,9 +852,9 @@ function showRS(){document.getElementById('onboard').style.display='none';docume
 
 function launch(role){
   mode=role;
-  document.getElementById('rolesel').style.display='none';
-  document.getElementById('app').style.display='flex';
-  if(role==='driver'){setMode('driver');}
+  if(document.getElementById('rolesel')) document.getElementById('rolesel').style.display='none';
+  if(document.getElementById('app')) document.getElementById('app').style.display='flex';
+  if(role==='driver'){setMode('driver');} else {setMode('passenger');}
   initMap();
   startETA();
   startDriverSim();
@@ -975,68 +868,50 @@ function initMap(){
   map=L.map('map',{zoomControl:false,attributionControl:false}).setView([-12.0720,-77.0400],13);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
 
-  ROUTES_DATA.forEach(r=>{
+  Promise.all(ROUTES_DATA.map(async r=>{
     const shadow=L.polyline(r.coords,{color:r.out,weight:8,opacity:.35,lineJoin:'round',lineCap:'round'}).addTo(map);
     const line=L.polyline(r.coords,{color:r.col,weight:4.5,opacity:.92,lineJoin:'round',lineCap:'round'}).bindPopup(`<b style="color:${r.col}">${r.id}</b><br>${r.nm}`).addTo(map);
-    routeLayers.push({shadow,line,r});
 
+    // Fetch precise street routing from OSRM
+    const res = await osrmRoute(r.coords, false);
+    if(res && res[0]){
+      line.setLatLngs(res[0].coords);
+      shadow.setLatLngs(res[0].coords);
+      r.coords = res[0].coords; // Update base array to dense array for buses to follow
+    }
+
+    const stopsGroup = L.layerGroup().addTo(map);
     r.stops.forEach(s=>{
       const ic=L.divIcon({className:'smooth-marker',html:`<div style="width:10px;height:10px;border-radius:50%;background:#fff;border:2.5px solid ${r.col};box-shadow:0 1px 4px rgba(0,0,0,.2)"></div>`,iconSize:[10,10],iconAnchor:[5,5]});
-      L.marker([s.lat,s.lng],{icon:ic}).bindPopup(`<b>${s.nm}</b><br><span style="color:${r.col};font-size:11px;font-weight:700">${r.id}</span>`).addTo(map);
+      L.marker([s.lat,s.lng],{icon:ic}).bindPopup(`<b>${s.nm}</b><br><span style="color:${r.col};font-size:11px;font-weight:700">${r.id}</span>`).addTo(stopsGroup);
     });
+    routeLayers.push({shadow,line,r,stopsGroup});
+  })).then(() => {
+    // Animated buses initialized AFTER routes become dense
+    const bInits=[
+      {ri:0,pct:0.2},{ri:0,pct:0.7},{ri:1,pct:0.4},{ri:2,pct:0.3},{ri:3,pct:0.1},{ri:3,pct:0.8}
+    ];
+    bInits.forEach(b=>{
+      const r=ROUTES_DATA[b.ri];
+      const pi=Math.floor(r.coords.length * b.pct);
+      const pos=r.coords[pi];
+      const ic=L.divIcon({className:'smooth-marker',html:`<div style="background:${r.col};color:#fff;border-radius:6px;padding:3px 7px;font-size:9px;font-weight:800;border:2px solid rgba(255,255,255,.5);box-shadow:0 3px 10px rgba(0,0,0,.28);white-space:nowrap;line-height:1.2">${r.id}</div>`,iconSize:[36,18],iconAnchor:[18,9]});
+      busMs.push({m:L.marker(pos,{icon:ic,zIndexOffset:500}).addTo(map),ri:b.ri,pi:pi,dir:1});
+    });
+
+    setInterval(()=>{
+      busMs.forEach(b=>{
+        const coords=ROUTES_DATA[b.ri].coords;
+        b.pi+=b.dir;
+        if(b.pi>=coords.length-1){b.pi=coords.length-1; b.dir=-1;}
+        if(b.pi<=0){b.pi=0; b.dir=1;}
+        b.m.setLatLng(coords[b.pi]);
+      });
+    }, 120); // Faster interval for dense points
   });
 
   // User marker
-  const uIc=L.divIcon({className:'smooth-marker',html:`<div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#0052A3,#0066CC);border:4px solid #fff;box-shadow:0 0 0 6px rgba(0,82,163,.12),0 4px 14px rgba(0,82,163,.35);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#FFD700;animation:pulse-user 2s ease-in-out infinite">👤</div><style>@keyframes pulse-user{0%,100%{box-shadow:0 0 0 6px rgba(0,82,163,.12),0 4px 14px rgba(0,82,163,.35)}50%{box-shadow:0 0 0 10px rgba(0,82,163,.2),0 4px 18px rgba(0,82,163,.45)}}
-/* Dark Mode */
-.dark-mode {
-  --bg: #09090b; --sf: #18181b; --glass: rgba(24, 24, 27, 0.75);
-  --bd: rgba(255, 255, 255, 0.1); --tx: #f8fafc; --t2: #cbd5e1; --t3: #94a3b8;
-}
-.dark-mode .shell { box-shadow: 0 0 0 1px #252525, 0 40px 90px rgba(0,0,0,0.9); }
-.dark-mode #map { filter: invert(90%) hue-rotate(180deg) brightness(95%) contrast(85%); }
-
-
-.smooth-marker, .leaflet-marker-shadow {
-  transition: transform 1.6s linear;
-}
-
-
-/* Professional UI Polish */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--bd); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: var(--p); }
-
-.leaflet-popup-content-wrapper { 
-  background: var(--glass) !important; 
-  backdrop-filter: blur(16px); 
-  -webkit-backdrop-filter: blur(16px);
-  color: var(--tx) !important; 
-  border-radius: 12px !important;
-  box-shadow: var(--sh) !important;
-  border: 1px solid var(--bd) !important;
-}
-.leaflet-popup-tip { background: var(--glass) !important; backdrop-filter: blur(16px); }
-.leaflet-container a.leaflet-popup-close-button { color: var(--tx) !important; }
-
-/* Smooth Panel Transitions */
-.panel {
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-  transform: translateY(100%) scale(0.95);
-  opacity: 0;
-  pointer-events: none;
-  display: flex !important; /* Override inline none if any */
-  z-index: -1;
-}
-.panel.open {
-  transform: translateY(0) scale(1);
-  opacity: 1;
-  pointer-events: all;
-  z-index: 1000;
-}
-
-</style>`,iconSize:[48,48],iconAnchor:[24,24]});
+  const uIc=L.divIcon({className:'smooth-marker',html:`<div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#0052A3,#0066CC);border:4px solid #fff;box-shadow:0 0 0 6px rgba(0,82,163,.12),0 4px 14px rgba(0,82,163,.35);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#FFD700;animation:pulse-user 2s ease-in-out infinite">👤</div><style>@keyframes pulse-user{0%,100%{box-shadow:0 0 0 6px rgba(0,82,163,.12),0 4px 14px rgba(0,82,163,.35)}50%{box-shadow:0 0 0 10px rgba(0,82,163,.2),0 4px 18px rgba(0,82,163,.45)}}</style>`,iconSize:[48,48],iconAnchor:[24,24]});
   L.marker([-12.0983,-77.0366],{icon:uIc,zIndexOffset:1000}).bindPopup('<b style="color:#0052A3">Tu ubicación</b><br><span style="font-size:12px">San Isidro, Lima</span>').addTo(map);
 
   // Incident markers
@@ -1045,26 +920,7 @@ function initMap(){
     L.marker([i.lat,i.lng],{icon:ic}).bindPopup(i.t).addTo(map);
   });
 
-  // Animated buses
-  const bInits=[
-    {ri:0,pi:8},{ri:0,pi:3},{ri:1,pi:5},{ri:2,pi:4},{ri:3,pi:6},{ri:3,pi:10}
-  ];
-  bInits.forEach(b=>{
-    const r=ROUTES_DATA[b.ri];
-    const pos=r.coords[b.pi];
-    const ic=L.divIcon({className:'smooth-marker',html:`<div style="background:${r.col};color:#fff;border-radius:6px;padding:3px 7px;font-size:9px;font-weight:800;border:2px solid rgba(255,255,255,.5);box-shadow:0 3px 10px rgba(0,0,0,.28);white-space:nowrap;line-height:1.2">${r.id}</div>`,iconSize:[36,18],iconAnchor:[18,9]});
-    busMs.push({m:L.marker(pos,{icon:ic,zIndexOffset:500}).addTo(map),ri:b.ri,pi:b.pi,dir:1});
-  });
 
-  setInterval(()=>{
-    busMs.forEach(b=>{
-      const coords=ROUTES_DATA[b.ri].coords;
-      b.pi+=b.dir;
-      if(b.pi>=coords.length-1)b.dir=-1;
-      if(b.pi<=0)b.dir=1;
-      b.m.setLatLng(coords[b.pi]);
-    });
-  },1600);
 }
 
 function locateMe(){
@@ -1074,11 +930,13 @@ function locateMe(){
 
 function toggleLayers(){
   showLayers=!showLayers;
-  routeLayers.forEach(({shadow,line})=>{
-    if(showLayers){shadow.addTo(map);line.addTo(map);}
-    else{shadow.remove();line.remove();}
-  });
-  document.getElementById('rlegend').style.opacity=showLayers?'1':'0.3';
+  if(showLayers) selRoute('ALL');
+  else {
+    routeLayers.forEach(({shadow,line,stopsGroup})=>{
+      shadow.remove();line.remove();stopsGroup.remove();
+    });
+  }
+  if(document.getElementById('rlegend')) document.getElementById('rlegend').style.opacity=showLayers?'1':'0.3';
   toast(showLayers?'Rutas visibles':'Rutas ocultas','y');
 }
 
@@ -1120,24 +978,24 @@ function startDriverSim(){
 // ── MODE SWITCH ──
 function setMode(m){
   mode=m;
-  document.getElementById('mP').classList.toggle('on',m==='passenger');
-  document.getElementById('mD').classList.toggle('on',m==='driver');
-  document.getElementById('dvBar').style.display=m==='driver'?'flex':'none';
-  document.getElementById('bsPass').style.display=m==='passenger'?'block':'none';
-  document.getElementById('bsDrv').style.display=m==='driver'?'flex':'none';
+  if(document.getElementById('mP')) document.getElementById('mP').classList.toggle('on',m==='passenger');
+  if(document.getElementById('mD')) document.getElementById('mD').classList.toggle('on',m==='driver');
+  if(document.getElementById('dvBar')) document.getElementById('dvBar').style.display=m==='driver'?'flex':'none';
+  if(document.getElementById('bsPass')) document.getElementById('bsPass').style.display=m==='passenger'?'block':'none';
+  if(document.getElementById('bsDrv')) document.getElementById('bsDrv').style.display=m==='driver'?'flex':'none';
   if(m==='driver'){
-    document.getElementById('grn').textContent='Conductor · MT-2347';
-    document.getElementById('grs').textContent='Ruta C45 · En servicio';
-    document.getElementById('avEl').textContent='DR';
-    document.getElementById('pfAv').textContent='DR';
-    document.getElementById('pfNm').textContent='Carlos Mendoza';
+    if(document.getElementById('grn')) document.getElementById('grn').textContent='Conductor · MT-2347';
+    if(document.getElementById('grs')) document.getElementById('grs').textContent='Ruta C45 · En servicio';
+    if(document.getElementById('avEl')) document.getElementById('avEl').textContent='DR';
+    if(document.getElementById('pfAv')) document.getElementById('pfAv').textContent='DR';
+    if(document.getElementById('pfNm')) document.getElementById('pfNm').textContent='Carlos Mendoza';
     startDriverSim();
   } else {
-    document.getElementById('grn').textContent='Buenos días, Luis';
-    document.getElementById('grs').textContent='Lima · Clima 22°C ☀️';
-    document.getElementById('avEl').textContent='LR';
-    document.getElementById('pfAv').textContent='LR';
-    document.getElementById('pfNm').textContent='Luis Rodríguez';
+    if(document.getElementById('grn')) document.getElementById('grn').textContent='Buenos días, Luis';
+    if(document.getElementById('grs')) document.getElementById('grs').textContent='Lima · Clima 22°C ☀️';
+    if(document.getElementById('avEl')) document.getElementById('avEl').textContent='LR';
+    if(document.getElementById('pfAv')) document.getElementById('pfAv').textContent='LR';
+    if(document.getElementById('pfNm')) document.getElementById('pfNm').textContent='Luis Rodríguez';
   }
 }
 
@@ -1154,31 +1012,35 @@ function closeMod(id){document.getElementById(id).classList.remove('open');}
 // ── ROUTE SELECT ──
 function selRoute(id){
   cl('searchP');ntab(0);
-  document.getElementById('srchLbl').textContent='Ruta seleccionada: '+id;
-  document.getElementById('srchLbl').style.color='var(--p)';
-  if(map){
-    const r=ROUTES_DATA.find(x=>x.id===id);
-    if(r) map.fitBounds(L.polyline(r.coords).getBounds(),{padding:[20,20],animate:true,duration:.8});
+  if(document.getElementById('srchLbl')) {
+    document.getElementById('srchLbl').textContent = id === 'ALL' ? '¿A dónde vas?' : 'Ruta aislada: '+id;
+    document.getElementById('srchLbl').style.color = id === 'ALL' ? 'var(--t3)' : 'var(--p)';
   }
-  toast('Ruta '+id+' seleccionada y resaltada en el mapa','g');
+  if(map){
+    routeLayers.forEach(({shadow,line,r,stopsGroup})=>{
+      if(id==='ALL' || r.id===id){
+        if(!map.hasLayer(shadow)) shadow.addTo(map);
+        if(!map.hasLayer(line)) line.addTo(map);
+        if(!map.hasLayer(stopsGroup)) stopsGroup.addTo(map);
+        line.setStyle({opacity: 0.92, weight: id==='ALL'?4.5:6});
+      } else {
+        if(map.hasLayer(shadow)) shadow.remove();
+        if(map.hasLayer(line)) line.remove();
+        if(map.hasLayer(stopsGroup)) stopsGroup.remove();
+      }
+    });
+    if(id!=='ALL'){
+      const r=ROUTES_DATA.find(x=>x.id===id);
+      if(r) map.fitBounds(L.polyline(r.coords).getBounds(),{padding:[20,20],animate:true,duration:.8});
+    } else {
+      map.setView([-12.0720,-77.0400],13,{animate:true,duration:.8});
+    }
+  }
+  toast(id==='ALL'?'Todas las rutas visibles':'Ruta '+id+' aislada en el mapa','g');
 }
 function setDst(d){document.getElementById('destI').value=d;toast('Buscando rutas hacia '+d+'...','y');}
 
-// ── REPORT ──
-function selRT(el){document.querySelectorAll('.rtb').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');}
-function submitReport(){
-  const type=document.querySelector('.rtb.sel')?.textContent?.trim()||'Otro';
-  const desc=document.getElementById('repDesc').value;
-  const reps=JSON.parse(localStorage.getItem('sf_reports')||'[]');
-  reps.unshift({type,desc,when:new Date().toLocaleString('es-PE'),id:'REC-'+Math.floor(Math.random()*900+100)});
-  localStorage.setItem('sf_reports',JSON.stringify(reps));
-  cl('reportP');ntab(0);
-  document.getElementById('repDesc').value='';
-  setTimeout(()=>{
-    document.getElementById('successOv').classList.add('show');
-    setTimeout(()=>document.getElementById('successOv').classList.remove('show'),3000);
-  },200);
-}
+
 
 // ── CHAT ──
 const BOTS={
