@@ -56,9 +56,9 @@ body{background:radial-gradient(ellipse at 55% 35%,#162d55 0%,#0c1829 65%);displ
 .bat-fill{height:100%;width:72%;background:var(--g);border-radius:1px}
 
 /* ────── SCREENS: absolute stack ────── */
-#splash,#onboard,#rolesel,.modal-bg{position:absolute!important;inset:0!important}
+#splash,#onboard,#rolesel,.modal-bg{position:absolute!important;inset:0!important;display:none!important}
 /* App starts below the status bar (50px) so the Dynamic Island + time bar are never covered */
-#app{position:absolute!important;top:50px!important;left:0!important;right:0!important;bottom:0!important}
+#app{position:absolute!important;top:50px!important;left:0!important;right:0!important;bottom:0!important;display:flex!important}
 /* Panels stop above the bottom nav so the nav is always visible */
 .panel{position:absolute!important;top:50px!important;left:0!important;right:0!important;bottom:54px!important;z-index:500}
 .modal-bg{z-index:700}
@@ -867,10 +867,7 @@ document.getElementById('chatDate').textContent=new Date().toLocaleDateString('e
 
 // ── SPLASH ──
 window.addEventListener('load',()=>{
-  setTimeout(()=>{
-    document.getElementById('splash').classList.add('out');
-    document.getElementById('onboard').style.display='flex';
-  },2500);
+  launch('passenger');
 });
 
 // ── ONBOARDING ──
