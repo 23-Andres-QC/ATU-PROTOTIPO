@@ -279,6 +279,33 @@ tbody tr:hover td{background:#f9fbfd}
 .fsel, .fi, .btn { transition: all 0.2s ease; }
 .fsel:hover, .fi:hover { border-color: var(--p); }
 
+
+/* Professional UI Polish */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bd); border-radius: 10px; }
+
+.leaflet-popup-content-wrapper { 
+  background: var(--s1) !important; 
+  color: var(--tx) !important; 
+  border-radius: 10px !important;
+  box-shadow: var(--shadow) !important;
+  border: 1px solid var(--bd) !important;
+}
+.leaflet-popup-tip { background: var(--s1) !important; }
+.leaflet-container a.leaflet-popup-close-button { color: var(--tx) !important; }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sb { width: 60px !important; min-width: 60px !important; overflow: hidden; }
+  .sb-logo-txt, .ni span { display: none !important; }
+  .main { flex: 1; min-width: 0; }
+  .topbar { padding: 0 10px; }
+  .tb-search { display: none; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .rep-sidebar { display: none; }
+}
+
 </style>
 </head>
 <body>
