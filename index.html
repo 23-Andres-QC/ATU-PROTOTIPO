@@ -775,16 +775,16 @@ body{background:linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);display:flex;f
 const ROUTES_DATA=[
   {id:'B12',nm:'B12 — Miraflores ↔ Centro Lima',col:'#1A4E8C',out:'#0d3a72',
    coords:[[-12.1185,-77.0283],[-12.0983,-77.0356],[-12.0876,-77.0388],[-12.0521,-77.0352],[-12.0464,-77.0297]],
-   stops:[{lat:-12.1185,lng:-77.0283,nm:'Paradero Larco'},{lat:-12.0983,lng:-77.0356,nm:'Paradero San Isidro'},{lat:-12.0876,lng:-77.0388,nm:'Paradero Javier Prado'},{lat:-12.0521,lng:-77.0352,nm:'Paradero Wilson'},{lat:-12.0464,lng:-77.0297,nm:'Paradero Plaza Mayor'}]},
+   stops:[{lat:-12.1185,lng:-77.0283,nm:'Paradero Pardo'},{lat:-12.0983,lng:-77.0356,nm:'Paradero Aramburú'},{lat:-12.0876,lng:-77.0388,nm:'Paradero Javier Prado (Arequipa)'},{lat:-12.0521,lng:-77.0352,nm:'Paradero España'},{lat:-12.0464,lng:-77.0297,nm:'Paradero Tacna'}]},
   {id:'C45',nm:'C45 — Callao ↔ San Isidro',col:'#2BB673',out:'#1a8050',
    coords:[[-12.0564,-77.1197],[-12.0487,-77.0756],[-12.0464,-77.0428],[-12.0983,-77.0366]],
-   stops:[{lat:-12.0564,lng:-77.1197,nm:'Terminal Callao'},{lat:-12.0464,lng:-77.0428,nm:'Paradero Brasil'},{lat:-12.0983,lng:-77.0366,nm:'Paradero San Isidro'}]},
+   stops:[{lat:-12.0564,lng:-77.1197,nm:'Paradero Faucett'},{lat:-12.0487,lng:-77.0756,nm:'Paradero Universitaria'},{lat:-12.0464,lng:-77.0428,nm:'Paradero Pershing'},{lat:-12.0983,lng:-77.0366,nm:'Paradero Rivera Navarrete'}]},
   {id:'A07',nm:'A07 — SJL ↔ Ate Vitarte',col:'#F5A623',out:'#b87a10',
    coords:[[-12.0089,-77.0023],[-12.0464,-77.0297],[-12.0834,-76.9756]],
-   stops:[{lat:-12.0089,lng:-77.0023,nm:'Terminal SJL'},{lat:-12.0464,lng:-77.0297,nm:'Paradero Lima Centro'},{lat:-12.0834,lng:-76.9756,nm:'Terminal Ate'}]},
+   stops:[{lat:-12.0089,lng:-77.0023,nm:'Estación Bayóvar (SJL)'},{lat:-12.0464,lng:-77.0297,nm:'Paradero Abancay'},{lat:-12.0834,lng:-76.9756,nm:'Paradero Ceres (Ate)'}]},
   {id:'MET',nm:'Metropolitano — Naranjal ↔ Benavides',col:'#9333ea',out:'#6b21a8',
    coords:[[-11.9798,-77.0423],[-12.0364,-77.0356],[-12.0712,-77.0298],[-12.1267,-77.0298]],
-   stops:[{lat:-11.9798,lng:-77.0423,nm:'Est. Naranjal'},{lat:-12.0364,lng:-77.0356,nm:'Est. Quilca'},{lat:-12.0712,lng:-77.0298,nm:'Est. Canadá'},{lat:-12.1267,lng:-77.0298,nm:'Est. Benavides'}]}
+   stops:[{lat:-11.9798,lng:-77.0423,nm:'Estación Naranjal'},{lat:-12.0364,lng:-77.0356,nm:'Estación UNI'},{lat:-12.0712,lng:-77.0298,nm:'Estación Central'},{lat:-12.1267,lng:-77.0298,nm:'Estación Benavides'}]}
 ];
 
 async function osrmRoute(coords,alts=false){
@@ -1029,6 +1029,16 @@ function selRoute(id){
         if(map.hasLayer(stopsGroup)) stopsGroup.remove();
       }
     });
+    if(typeof busMs !== 'undefined'){
+      busMs.forEach(b=>{
+        const r=ROUTES_DATA[b.ri];
+        if(id==='ALL' || r.id===id){
+          if(!map.hasLayer(b.m)) b.m.addTo(map);
+        } else {
+          if(map.hasLayer(b.m)) b.m.remove();
+        }
+      });
+    }
     if(id!=='ALL'){
       const r=ROUTES_DATA.find(x=>x.id===id);
       if(r) map.fitBounds(L.polyline(r.coords).getBounds(),{padding:[20,20],animate:true,duration:.8});
