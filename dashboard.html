@@ -273,6 +273,12 @@ tbody tr:hover td{background:#f9fbfd}
 .alt-card{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;border:1px solid var(--bd);cursor:pointer;transition:all .12s;background:#ffffff}
 .alt-card:hover,.alt-card.active{border-color:var(--p);background:#f8fafc}
 .free-draw-hint{font-size:10px;color:var(--p);line-height:1.5;padding:6px 8px;background:#f8fafc;border-radius:6px;border-left:2px solid #0052A3}
+
+/* UX Animations */
+.leaflet-marker-icon, .leaflet-marker-shadow { transition: transform 1.6s linear; }
+.fsel, .fi, .btn { transition: all 0.2s ease; }
+.fsel:hover, .fi:hover { border-color: var(--p); }
+
 </style>
 </head>
 <body>
@@ -1908,8 +1914,8 @@ function assignRec(id,btn){
 let repInit=false;
 function initRepCharts(){
   if(repInit)return;repInit=true;
-  new Chart(document.getElementById('chartRBar'),{type:'bar',data:{labels:['Naranjal','Javier Prado','Angamos','Miraflores','La Cultura','Canadá'],datasets:[{data:[8420,7130,6890,5940,5210,4780],backgroundColor:['#1A4E8C','#2563eb','#1A4E8C','#2563eb','#1A4E8C','#2563eb'],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9},color:'#5a6b8a'}},y:{ticks:{font:{size:9},color:'#5a6b8a'}}}}});
-  new Chart(document.getElementById('chartRLine'),{type:'line',data:{labels:['Mar','Abr','May'],datasets:[{label:'Pasajeros',data:[245000,268000,281000],borderColor:'#2BB673',backgroundColor:'rgba(43,182,115,.12)',fill:true,tension:.4,pointBackgroundColor:'#2BB673',pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9},color:'#5a6b8a'}},y:{ticks:{font:{size:9},color:'#5a6b8a'}}}}});
+  window.chartBar = new Chart(document.getElementById('chartRBar'),{type:'bar',data:{labels:['Naranjal','Javier Prado','Angamos','Miraflores','La Cultura','Canadá'],datasets:[{data:[8420,7130,6890,5940,5210,4780],backgroundColor:['#1A4E8C','#2563eb','#1A4E8C','#2563eb','#1A4E8C','#2563eb'],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9},color:'#5a6b8a'}},y:{ticks:{font:{size:9},color:'#5a6b8a'}}}}});
+  window.chartLine = new Chart(document.getElementById('chartRLine'),{type:'line',data:{labels:['Mar','Abr','May'],datasets:[{label:'Pasajeros',data:[245000,268000,281000],borderColor:'#2BB673',backgroundColor:'rgba(43,182,115,.12)',fill:true,tension:.4,pointBackgroundColor:'#2BB673',pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9},color:'#5a6b8a'}},y:{ticks:{font:{size:9},color:'#5a6b8a'}}}}});
   document.getElementById('repTable').innerHTML=`<thead><tr><th>Corredor</th><th>Pasajeros/día</th><th>Cumplimiento</th><th>Incidentes</th><th>Tendencia</th></tr></thead><tbody>
     <tr><td>Metropolitano</td><td class="fmono">89,200</td><td><span class="badge green">97%</span></td><td>3</td><td style="color:var(--g)">▲ +3%</td></tr>
     <tr><td>Metro Línea 1</td><td class="fmono">112,400</td><td><span class="badge green">99%</span></td><td>1</td><td style="color:var(--g)">▲ +5%</td></tr>
@@ -1923,11 +1929,30 @@ function genReport(){
   const type=document.getElementById('repType').value;
   showToast('Generando reporte…','yellow');
   document.getElementById('repPreviewTitle').textContent='Generando…';
+  
+  // Animate charts opacity to simulate loading
+  document.getElementById('chartRBar').style.opacity = '0.4';
+  document.getElementById('chartRLine').style.opacity = '0.4';
+  document.getElementById('repTable').style.opacity = '0.4';
+
   setTimeout(()=>{
     showToast(`Reporte listo: ${type}`,'green');
     document.getElementById('repPreviewTitle').textContent=`Vista Previa — ${type} (Últimos 3 meses)`;
     document.getElementById('lastRepTime').textContent=new Date().toLocaleString('es-PE');
-  },2000);
+    
+    // Dynamically update charts with random data to make it functional
+    if (window.chartBar && window.chartLine) {
+        window.chartBar.data.datasets[0].data = Array.from({length: 6}, () => Math.floor(Math.random() * 8000 + 2000));
+        window.chartBar.update();
+        window.chartLine.data.datasets[0].data = Array.from({length: 3}, () => Math.floor(Math.random() * 50000 + 200000));
+        window.chartLine.update();
+    }
+    
+    document.getElementById('chartRBar').style.opacity = '1';
+    document.getElementById('chartRLine').style.opacity = '1';
+    document.getElementById('repTable').style.opacity = '1';
+  },1500);
+
 }
 
 // ===== OVERVIEW CHARTS =====
